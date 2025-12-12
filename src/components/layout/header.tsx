@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { ShoppingCart, User, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { CartDrawer } from "@/components/cart/cart-drawer"
 
 const menuItems = [
   { label: "MATTRESS", href: "/mattress" },
@@ -18,6 +19,7 @@ const menuItems = [
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false)
 
   return (
     <>
@@ -48,22 +50,25 @@ export function Header() {
 
             {/* Right side - User and Cart icons */}
             <div className="flex items-center gap-2 sm:gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
-              >
-                <User className="h-5 w-5" />
-                <span className="sr-only">User account</span>
-              </Button>
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
+                >
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">User account</span>
+                </Button>
+              </Link>
               <Button
                 variant="ghost"
                 size="icon"
                 className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors relative"
+                onClick={() => setIsCartOpen(true)}
               >
                 <ShoppingCart className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 bg-[#8B5A3C] text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                  0
+                  2
                 </span>
                 <span className="sr-only">Shopping cart</span>
               </Button>
@@ -98,6 +103,9 @@ export function Header() {
           </div>
         </>
       )}
+
+      {/* Cart Drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   )
 }
