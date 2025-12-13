@@ -34,7 +34,7 @@ export function Header() {
                 className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
-                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                 <span className="sr-only">Menu</span>
               </Button>
             </div>
@@ -75,23 +75,16 @@ export function Header() {
             </div>
           </div>
         </div>
-      </header>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <>
-          {/* Overlay */}
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setIsMenuOpen(false)} />
-
-          {/* Menu Panel */}
-          <div className="fixed top-16 left-0 w-80 max-w-[85vw] h-[calc(100vh-4rem)] bg-[#F5F1ED] z-50 shadow-xl overflow-y-auto animate-in slide-in-from-left duration-300">
-            <nav className="py-6 px-6">
+        {isMenuOpen && (
+          <div className="absolute top-full left-0 right-0 bg-[#F5F1ED] border-b border-[#8B5A3C]/20 shadow-lg animate-in slide-in-from-top duration-300 max-h-[calc(100vh-4rem)] overflow-y-auto">
+            <nav className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
               <ul className="space-y-1">
                 {menuItems.map((item, index) => (
                   <li key={index}>
                     <Link
                       href={item.href}
-                      className="block py-3 px-4 text-[#6D4530] text-base font-normal tracking-wide hover:text-[#8B5A3C] hover:bg-[#8B5A3C]/5 transition-all duration-300 rounded-md"
+                      className="block py-3 px-4 text-[#6D4530] text-base font-normal tracking-wide hover:text-[#8B5A3C] hover:bg-[#8B5A3C]/10 transition-all duration-300 rounded-md"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {item.label}
@@ -101,8 +94,10 @@ export function Header() {
               </ul>
             </nav>
           </div>
-        </>
-      )}
+        )}
+      </header>
+
+      {isMenuOpen && <div className="fixed inset-0 bg-black/20 z-30" onClick={() => setIsMenuOpen(false)} />}
 
       {/* Cart Drawer */}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
