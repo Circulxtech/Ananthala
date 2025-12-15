@@ -43,8 +43,7 @@ export function Footer() {
               <span className="text-[#8B5A3C] text-xl font-normal tracking-wider">ANANTHALA</span>
             </Link>
             <p className="text-[#8B5A3C] text-sm mb-6 leading-relaxed">
-              Premium mattresses crafted for your best sleep. Experience luxury comfort with our 100-night trial and
-              15-year warranty.
+              Premium mattresses crafted for your best sleep. Experience luxury & comfort
             </p>
 
             {/* Contact Information */}
