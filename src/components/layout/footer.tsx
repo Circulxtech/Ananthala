@@ -1,174 +1,179 @@
-import Link from "next/link"
-import { Instagram, Facebook, Twitter, Phone, Mail, MapPin } from "lucide-react"
+"use client"
 
-const navigation = {
-  shop: [
-    { name: "All Mattresses", href: "/mattresses" },
-    { name: "Pillows", href: "/pillows" },
-    { name: "Bedding", href: "/bedding" },
-    { name: "Accessories", href: "/accessories" },
-    { name: "Gift Cards", href: "/gift-cards" },
-  ],
-  customerService: [
-    { name: "Contact Us", href: "/contact" },
-    { name: "Track Order", href: "/track-order" },
-    { name: "Returns & Refunds", href: "/returns" },
-    { name: "Shipping Info", href: "/shipping" },
-    { name: "Warranty", href: "/warranty" },
-  ],
-  company: [
-    { name: "About Us", href: "/about" },
-    { name: "Blog", href: "/blog" },
-    { name: "Sustainability", href: "/sustainability" },
-    { name: "Reviews", href: "/reviews" },
-    { name: "Careers", href: "/careers" },
-  ],
-}
-
-const socialLinks = [
-  { name: "Instagram", href: "https://instagram.com", icon: Instagram },
-  { name: "Facebook", href: "https://facebook.com", icon: Facebook },
-  { name: "Twitter", href: "https://twitter.com", icon: Twitter },
-]
+import { Instagram, Facebook, Twitter, Mail, Phone, MapPin } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function Footer() {
-  return (
-    <footer className="bg-[#F5F1ED] border-t-4 border-[#6D4530]">
-      {/* Main Footer Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-          {/* Brand & Contact Section */}
-          <div className="lg:col-span-1">
-            <Link href="/" className="inline-block mb-4">
-              <span className="text-[#8B5A3C] text-xl font-normal tracking-wider">ANANTHALA</span>
-            </Link>
-            <p className="text-[#8B5A3C] text-sm mb-6 leading-relaxed">
-              Premium mattresses crafted for your best sleep. Experience luxury & comfort
-            </p>
+  const router = useRouter()
 
-            {/* Contact Information */}
-            <div className="space-y-3 mb-6">
-              <a
-                href="tel:1-800-SLEEP-WELL"
-                className="flex items-center gap-2 text-[#8B5A3C] text-sm hover:text-[#4A2818] transition-all duration-300 group"
-              >
-                <Phone className="w-4 h-4 group-hover:scale-110 transition-all duration-300" />
+  const onNavigate = (page: string) => {
+    router.push(`/${page}`)
+  }
+
+  return (
+    <footer className="bg-stone-50 border-t border-amber-100 py-16 px-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+          {/* Brand */}
+          <div className="lg:col-span-2">
+            <p className="tracking-widest mb-4 text-black">ANANTHALA</p>
+            <p className="text-black mb-6">
+              Premium mattresses crafted for your best sleep. Experience luxury comfort with our 100-night trial
+              and 15-year warranty.
+            </p>
+            {/* Contact Details */}
+            <div className="space-y-2 mb-6 text-black">
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-black" />
                 <span>1-800-SLEEP-WELL</span>
-              </a>
-              <a
-                href="mailto:support@ananthala.com"
-                className="flex items-center gap-2 text-[#8B5A3C] text-sm hover:text-[#4A2818] transition-all duration-300 group"
-              >
-                <Mail className="w-4 h-4 group-hover:scale-110 transition-all duration-300" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-black" />
                 <span>support@ananthala.com</span>
-              </a>
-              <div className="flex items-start gap-2 text-[#8B5A3C] text-sm">
-                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-black" />
                 <span>123 Sleep Street, San Francisco, CA</span>
               </div>
             </div>
-
-            {/* Social Media Icons */}
+            {/* Social Media */}
             <div className="flex gap-3">
-              {socialLinks.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="w-10 h-10 rounded-full bg-[#F9F5E8] flex items-center justify-center text-[#6D4530] hover:bg-[#8B5A3C] hover:text-[#F9F5E8] hover:scale-110 transition-all duration-300 shadow-sm hover:shadow-md"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <item.icon className="w-4 h-4 transition-colors duration-300" />
-                  <span className="sr-only">{item.name}</span>
-                </Link>
-              ))}
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center hover:bg-amber-200 transition-colors text-amber-900"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center hover:bg-amber-200 transition-colors text-amber-900"
+              >
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center hover:bg-amber-200 transition-colors text-amber-900"
+              >
+                <Twitter className="w-5 h-5" />
+              </a>
             </div>
           </div>
 
-          {/* Shop Links */}
+          {/* contact */}
           <div>
-            <h3 className="text-[#6D4530] font-medium text-base mb-4">Shop</h3>
-            <ul className="space-y-3">
-              {navigation.shop.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="text-[#8B5A3C] text-sm hover:text-[#4A2818] hover:translate-x-1 inline-block transition-all duration-300"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
+            <h4 className="mb-4 text-black">CONTACT</h4>
+            <ul className="space-y-2 text-black">
+              <li>
+                <button
+                  onClick={() => onNavigate("products")}
+                  className="hover:text-amber-950 transition-colors"
+                >
+                  Dealer Enquiry
+                </button>
+              </li>
+              <li>
+                <button className="hover:text-amber-950 transition-colors">Contact Us</button>
+              </li>
+              <li>
+                <button className="hover:text-amber-950 transition-colors">T&C</button>
+              </li>
+              <li>
+                <button className="hover:text-amber-950 transition-colors">Shipping & Return</button>
+              </li>
+              <li>
+                <button className="hover:text-amber-950 transition-colors">Terms of Service</button>
+              </li>
+              <li>
+                <button className="hover:text-amber-950 transition-colors">Refund Policy</button>
+              </li>
             </ul>
           </div>
 
-          {/* Customer Service Links */}
+          {/* Ananthala */}
           <div>
-            <h3 className="text-[#6D4530] font-medium text-base mb-4">Customer Service</h3>
-            <ul className="space-y-3">
-              {navigation.customerService.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="text-[#8B5A3C] text-sm hover:text-[#4A2818] hover:translate-x-1 inline-block transition-all duration-300"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company Links */}
-          <div>
-            <h3 className="text-[#6D4530] font-medium text-base mb-4">Company</h3>
-            <ul className="space-y-3">
-              {navigation.company.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="text-[#8B5A3C] text-sm hover:text-[#4A2818] hover:translate-x-1 inline-block transition-all duration-300"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
+            <h4 className="mb-4 text-black">ANANTHALA</h4>
+            <ul className="space-y-2 text-black">
+              <li>
+                <button
+                  onClick={() => onNavigate("contact")}
+                  className="hover:text-amber-950 transition-colors"
+                >
+                  Home
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate("contact")}
+                  className="hover:text-amber-950 transition-colors"
+                >
+                  Mattress
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate("track-order")}
+                  className="hover:text-amber-950 transition-colors"
+                >
+                  Bedding
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate("policy-refund")}
+                  className="hover:text-amber-950 transition-colors"
+                >
+                  Press
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate("policy-shipping")}
+                  className="hover:text-amber-950 transition-colors"
+                >
+                  Blog
+                </button>
+              </li>
+              <li>
+                <button className="hover:text-amber-950 transition-colors">Story</button>
+              </li>
             </ul>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-[#8B5A3C]/20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-[#8B5A3C] text-sm">© 2025 Ananthala. All rights reserved.</p>
-            <div className="flex flex-wrap justify-center gap-6">
-              <Link
-                href="/privacy"
-                className="text-[#8B5A3C] text-sm hover:text-[#4A2818] hover:underline transition-all duration-300"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="/terms"
-                className="text-[#8B5A3C] text-sm hover:text-[#4A2818] hover:underline transition-all duration-300"
-              >
-                Terms & Conditions
-              </Link>
-              <Link
-                href="/refund"
-                className="text-[#8B5A3C] text-sm hover:text-[#4A2818] hover:underline transition-all duration-300"
-              >
-                Refund Policy
-              </Link>
-              <Link
-                href="/shipping-policy"
-                className="text-[#8B5A3C] text-sm hover:text-[#4A2818] hover:underline transition-all duration-300"
-              >
-                Shipping Policy
-              </Link>
-            </div>
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-amber-100 flex flex-col md:flex-row justify-between items-center gap-4 text-black">
+          <p>© 2025 Ananthala. All rights reserved.</p>
+          <div className="flex gap-6">
+            <button
+              onClick={() => onNavigate("policy-privacy")}
+              className="hover:text-amber-950 transition-colors"
+            >
+              Privacy Policy
+            </button>
+            <button
+              onClick={() => onNavigate("policy-terms")}
+              className="hover:text-amber-950 transition-colors"
+            >
+              Terms & Conditions
+            </button>
+            <button
+              onClick={() => onNavigate("policy-refund")}
+              className="hover:text-amber-950 transition-colors"
+            >
+              Refund Policy
+            </button>
+            <button
+              onClick={() => onNavigate("policy-shipping")}
+              className="hover:text-amber-950 transition-colors"
+            >
+              Shipping Policy
+            </button>
           </div>
         </div>
       </div>
