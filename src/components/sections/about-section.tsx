@@ -122,7 +122,7 @@ export function AboutSection() {
               At Ananthala, every step we take is guided by our purpose and the future we strive to build.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
             {/* Mission */}
             <div className="bg-white/10 backdrop-blur-lg p-12 border border-white/20 rounded-lg">
               <div className="w-12 h-12 bg-[#8B5A3C] text-white rounded-full flex items-center justify-center mb-6">

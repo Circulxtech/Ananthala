@@ -4,8 +4,9 @@ import { X, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
-interface CartItem {
+export interface CartItem {
   id: string
   name: string
   image: string
@@ -17,30 +18,17 @@ interface CartItem {
 interface CartDrawerProps {
   isOpen: boolean
   onClose: () => void
+  cartItems?: CartItem[]
 }
 
-export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  // Sample cart items - replace with actual cart data
-  const cartItems: CartItem[] = [
-    {
-      id: "1",
-      name: "Cloud Comfort Mattress",
-      image: "/comfortable-mattress.png",
-      size: "Queen",
-      quantity: 1,
-      price: 1299,
-    },
-    {
-      id: "2",
-      name: "Serene Sleep Luxury",
-      image: "/luxury-mattress.png",
-      size: "King",
-      quantity: 1,
-      price: 1899,
-    },
-  ]
-
+export function CartDrawer({ isOpen, onClose, cartItems = [] }: CartDrawerProps) {
+  const router = useRouter()
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+  const handleCheckout = () => {
+    onClose()
+    router.push("/checkout")
+  }
 
   return (
     <>
@@ -57,13 +45,9 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center gap-3">
-              <ShoppingBag className="h-6 w-6 text-[#8B5A3C]" />
-              <h2 className="text-2xl font-serif text-[#6D4530]">Your Cart</h2>
-              <span className="bg-[#8B5A3C] text-white text-sm rounded-full w-6 h-6 flex items-center justify-center font-medium">
-                {cartItems.length}
-              </span>
+              <h2 className="text-2xl font-serif text-black">CART</h2>
             </div>
-            <Button variant="ghost" size="icon" onClick={onClose} className="text-[#6D4530] hover:bg-gray-100">
+            <Button variant="ghost" size="icon" onClick={onClose} className="text-black hover:bg-gray-100">
               <X className="h-6 w-6" />
               <span className="sr-only">Close cart</span>
             </Button>
@@ -81,16 +65,21 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               <div className="space-y-6">
                 {cartItems.map((item) => (
                   <div key={item.id} className="flex gap-4 pb-6 border-b border-gray-100">
-                    <div className="relative w-24 h-24 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                    <div className="relative w-24 h-24 flex-shrink-0 bg-gray-100 overflow-hidden">
                       <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-serif text-[#6D4530] text-lg mb-2 leading-tight">{item.name}</h3>
-                      <p className="text-[#8B5A3C] text-sm mb-2">Size: {item.size}</p>
-                      <p className="text-[#8B5A3C] text-sm">Qty: {item.quantity}</p>
+                      <h3 className="font-serif text-black text-lg mb-2 leading-tight">{item.name}</h3>
+                      <p className="text-black text-sm mb-2">Size: {item.size}</p>
+                      <p className="text-black text-sm">Qty: {item.quantity}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[#6D4530] font-medium text-lg">₹{item.price}</p>
+                      <p className="text-black font-medium text-lg">
+                        ₹{(item.price * item.quantity).toLocaleString("en-IN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -103,22 +92,29 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             <div className="border-t border-gray-200 p-6 bg-gray-50">
               <div className="space-y-4 mb-6">
                 <div className="flex items-center justify-between text-lg">
-                  <span className="text-[#8B5A3C] font-medium">Subtotal</span>
-                  <span className="text-[#6D4530] font-semibold">₹{subtotal}</span>
+                  <span className="text-black font-medium">Subtotal</span>
+                  <span className="text-black font-semibold">
+                    ₹{subtotal.toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
                 </div>
-                <p className="text-[#8B5A3C] text-sm">Shipping calculated at checkout</p>
+                <p className="text-black text-sm">Shipping calculated at checkout</p>
               </div>
 
               <div className="space-y-3">
                 <Button
-                  className="w-full bg-[#8B5A3C] hover:bg-[#6D4530] text-white py-6 text-lg font-medium transition-colors"
-                  onClick={onClose}
+                  className="w-full text-white py-6 text-lg font-medium transition-colors hover:opacity-90"
+                  style={{ backgroundColor: "#6B563F" }}
+                  onClick={handleCheckout}
                 >
                   Checkout
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full border-2 border-[#8B5A3C] text-[#8B5A3C] hover:bg-[#8B5A3C]/5 py-6 text-lg font-medium transition-colors bg-transparent"
+                  className="w-full border-2 py-6 text-lg font-medium transition-colors bg-transparent text-black hover:opacity-70"
+                  style={{ borderColor: "#D9CFC7" }}
                   onClick={onClose}
                   asChild
                 >
