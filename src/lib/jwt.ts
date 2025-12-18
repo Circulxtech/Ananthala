@@ -8,9 +8,10 @@ export interface JWTPayload {
   fullname: string
 }
 
-export function generateToken(payload: JWTPayload, rememberMe?: any): string {
-  // Token expires in 2 hours
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" })
+export function generateToken(payload: JWTPayload, rememberMe?: boolean): string {
+  // Token expires in 30 days if remember me is checked, otherwise 2 hours
+  const expiresIn = rememberMe ? "30d" : "2h"
+  return jwt.sign(payload, JWT_SECRET, { expiresIn })
 }
 
 export function verifyToken(token: string): JWTPayload | null {

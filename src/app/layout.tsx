@@ -3,9 +3,10 @@ import type { Metadata } from "next"
 import { Playfair_Display, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/contexts/cart-context"
+import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
-const playfairDisplay = Playfair_Display({ 
+const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
 })
@@ -43,9 +44,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfairDisplay.className} antialiased`}>
-        <CartProvider>
-          {children}
-        </CartProvider>
+        <CartProvider>{children}</CartProvider>
+        <Toaster />
         <Analytics />
       </body>
     </html>
