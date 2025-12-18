@@ -1,8 +1,9 @@
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { HeroSection } from "@/components/sections/hero-section"
-import { FeaturesSection } from "@/components/sections/features-section"
+import { CategorySliderSection } from "@/components/sections/category-slider-section"
 import { ProductsSection } from "@/components/sections/products-section"
+import { ComfortSection } from "@/components/sections/comfort-section"
 import { ReviewsSection } from "@/components/sections/reviews-section"
 
 export default function Home() {
@@ -11,8 +12,9 @@ export default function Home() {
       <Header />
       <main>
         <HeroSection />
-        <FeaturesSection />
+        <CategorySliderSection />
         <ProductsSection />
+        <ComfortSection />
         <ReviewsSection />
       </main>
       <Footer />

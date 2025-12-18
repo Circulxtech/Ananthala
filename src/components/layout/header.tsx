@@ -1,10 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ShoppingCart, User, Menu, X } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { ShoppingCart, User, Menu, X, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CartDrawer } from "@/components/cart/cart-drawer"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useToast } from "@/hooks/use-toast"
 
 const menuItems = [
   { label: "MATTRESS", href: "/mattress" },
@@ -20,6 +23,57 @@ const menuItems = [
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [user, setUser] = useState<{ fullname: string; email: string } | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+  const { toast } = useToast()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/verify")
+        const data = await response.json()
+
+        if (data.success && data.user) {
+          setUser(data.user)
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    checkAuth()
+  }, [])
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" })
+      setUser(null)
+      toast({
+        title: "Success",
+        description: "Logged out successfully",
+      })
+      router.push("/")
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to logout",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const getFirstName = (fullname: string) => {
+    return fullname.split(" ")[0]
+  }
+
+  const getGradientColor = (name: string) => {
+    const firstChar = name.charAt(0).toUpperCase()
+    const hue = ((firstChar.charCodeAt(0) - 65) * 137.5) % 360
+    return `linear-gradient(135deg, hsl(${hue}, 70%, 60%), hsl(${(hue + 60) % 360}, 70%, 50%))`
+  }
 
   return (
     <>
@@ -50,16 +104,47 @@ export function Header() {
 
             {/* Right side - User and Cart icons */}
             <div className="flex items-center gap-2 sm:gap-4">
-              <Link href="/login">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
-                >
-                  <User className="h-5 w-5" />
-                  <span className="sr-only">User account</span>
-                </Button>
-              </Link>
+              {!isLoading && (
+                <>
+                  {user ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#8B5A3C]/30 bg-white hover:bg-[#8B5A3C]/5 transition-colors">
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                            style={{ background: getGradientColor(user.fullname) }}
+                          >
+                            {getFirstName(user.fullname).charAt(0).toUpperCase()}
+                          </div>
+                          <span className="text-[#6D4530] text-sm font-medium hidden sm:block">
+                            {getFirstName(user.fullname)}
+                          </span>
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48 bg-white border-[#8B5A3C]/20">
+                        <DropdownMenuItem
+                          onClick={handleLogout}
+                          className="text-[#6D4530] cursor-pointer hover:bg-[#8B5A3C]/10 focus:bg-[#8B5A3C]/10"
+                        >
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Logout
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <Link href="/login">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
+                      >
+                        <User className="h-5 w-5" />
+                        <span className="sr-only">User account</span>
+                      </Button>
+                    </Link>
+                  )}
+                </>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
