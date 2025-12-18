@@ -34,8 +34,17 @@ const products = [
 export function ProductsSection() {
   const router = useRouter()
 
-  const onNavigate = (path: string) => {
-    router.push(`/${path}`)
+  const getCategoryPath = (productName: string) => {
+    const name = productName.toLowerCase()
+    if (name.includes("pillow")) return "/pillows"
+    if (name.includes("bed sheet") || name.includes("blanket")) return "/bedding"
+    if (name.includes("towel")) return "/bedding"
+    return "/mattress"
+  }
+
+  const onNavigate = (productName: string) => {
+    const path = getCategoryPath(productName)
+    router.push(path)
   }
 
   return (
@@ -68,7 +77,7 @@ export function ProductsSection() {
             return (
               <button
                 key={product.id}
-                onClick={() => onNavigate("products")}
+                onClick={() => onNavigate(product.name)}
                 className="relative group overflow-hidden aspect-3/4 cursor-pointer bg-gray-100"
               >
                 {/* Image placeholder - replace with actual Image component when images are ready */}

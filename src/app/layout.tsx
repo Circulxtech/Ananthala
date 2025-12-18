@@ -2,10 +2,10 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Playfair_Display, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { Toaster } from "@/components/ui/toaster"
+import { CartProvider } from "@/contexts/cart-context"
 import "./globals.css"
 
-const playfairDisplay = Playfair_Display({
+const playfairDisplay = Playfair_Display({ 
   subsets: ["latin"],
   variable: "--font-playfair",
 })
@@ -43,8 +43,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfairDisplay.className} antialiased`}>
-        {children}
-        <Toaster />
+        <CartProvider>
+          {children}
+        </CartProvider>
         <Analytics />
       </body>
     </html>

@@ -3,85 +3,49 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ShoppingCart, User, Menu, X, LogOut } from "lucide-react"
+import { ShoppingCart, User, Menu, X, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CartDrawer } from "@/components/cart/cart-drawer"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useToast } from "@/hooks/use-toast"
+import { useCart } from "@/contexts/cart-context"
 
 const menuItems = [
   { label: "MATTRESS", href: "/mattress" },
   { label: "PILLOWS", href: "/pillows" },
   { label: "BEDDING", href: "/bedding" },
-  { label: "SUPPORT & MOBILITY", href: "/support-mobility" },
   { label: "BESTSELLERS", href: "/bestsellers" },
   { label: "NEW LAUNCHES", href: "/new-launches" },
-  { label: "HELP ME CHOOSE", href: "/help-me-choose" },
-  { label: "MORE", href: "/more" },
 ]
 
 export function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isCartOpen, setIsCartOpen] = useState(false)
-  const [user, setUser] = useState<{ fullname: string; email: string } | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
-  const { toast } = useToast()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const { cartItems, isCartOpen, setIsCartOpen } = useCart()
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch("/api/auth/verify")
-        const data = await response.json()
-
-        if (data.success && data.user) {
-          setUser(data.user)
-        }
-      } catch (error) {
-        console.error("Auth check failed:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    checkAuth()
-  }, [])
-
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" })
-      setUser(null)
-      toast({
-        title: "Success",
-        description: "Logged out successfully",
-      })
-      router.push("/")
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to logout",
-        variant: "destructive",
-      })
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+      setSearchQuery("")
+      setIsSearchOpen(false)
     }
   }
 
-  const getFirstName = (fullname: string) => {
-    return fullname.split(" ")[0]
-  }
-
-  const getGradientColor = (name: string) => {
-    const firstChar = name.charAt(0).toUpperCase()
-    const hue = ((firstChar.charCodeAt(0) - 65) * 137.5) % 360
-    return `linear-gradient(135deg, hsl(${hue}, 70%, 60%), hsl(${(hue + 60) % 360}, 70%, 50%))`
+  const handleSearchIconClick = () => {
+    setIsSearchOpen(!isSearchOpen)
+    if (isSearchOpen) {
+      setSearchQuery("")
+    }
   }
 
   return (
     <>
-      <header className="bg-[#F5F1ED] border-b border-[#8B5A3C]/20 relative z-50">
+      <header className="bg-[#F5F1ED] border-b relative z-50" style={{ borderColor: '#D9CFC7' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Left side - Hamburger Menu */}
-            <div className="flex items-center">
+            {/* Left side - Hamburger Menu and Search Icon */}
+            <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
@@ -90,6 +54,15 @@ export function Header() {
               >
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                 <span className="sr-only">Menu</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
+                onClick={handleSearchIconClick}
+              >
+                <Search className="h-5 w-5" />
+                <span className="sr-only">Search</span>
               </Button>
             </div>
 
@@ -152,17 +125,50 @@ export function Header() {
                 onClick={() => setIsCartOpen(true)}
               >
                 <ShoppingCart className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 bg-[#8B5A3C] text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                  2
-                </span>
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#8B5A3C] text-white text-xs rounded-full min-w-[1rem] h-4 flex items-center justify-center px-1">
+                    {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+                  </span>
+                )}
                 <span className="sr-only">Shopping cart</span>
               </Button>
             </div>
           </div>
         </div>
 
+        {/* Search Bar Dropdown */}
+        {isSearchOpen && (
+          <div className="absolute top-full left-0 right-0 bg-[#F5F1ED] border-b shadow-lg animate-in slide-in-from-top duration-300 z-40" style={{ borderColor: '#D9CFC7' }}>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search products..."
+                    autoFocus
+                    className="w-full px-4 py-3 pl-12 pr-12 bg-white border rounded-md text-[#6D4530] placeholder:text-[#8B5A3C]/50 focus:outline-none focus:ring-2 focus:ring-[#8B5A3C]/30 transition-all"
+                    style={{ borderColor: '#D9CFC7' }}
+                  />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8B5A3C]/50" />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B5A3C]/50 hover:text-[#6D4530] transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         {isMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-[#F5F1ED] border-b border-[#8B5A3C]/20 shadow-lg animate-in slide-in-from-top duration-300 max-h-[calc(100vh-4rem)] overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 bg-[#F5F1ED] border-b shadow-lg animate-in slide-in-from-top duration-300 max-h-[calc(100vh-4rem)] overflow-y-auto z-40" style={{ borderColor: '#D9CFC7' }}>
             <nav className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
               <ul className="space-y-1">
                 {menuItems.map((item, index) => (
@@ -182,10 +188,18 @@ export function Header() {
         )}
       </header>
 
-      {isMenuOpen && <div className="fixed inset-0 bg-black/20 z-30" onClick={() => setIsMenuOpen(false)} />}
+      {(isMenuOpen || isSearchOpen) && (
+        <div
+          className="fixed inset-0 bg-black/20 z-30"
+          onClick={() => {
+            setIsMenuOpen(false)
+            setIsSearchOpen(false)
+          }}
+        />
+      )}
 
       {/* Cart Drawer */}
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cartItems={cartItems} />
     </>
   )
 }
