@@ -1,7 +1,5 @@
 import Image from "next/image"
 import { Heart, Eye, Award, Leaf } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
 
 const values = [
   {

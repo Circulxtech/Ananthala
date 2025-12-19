@@ -4,6 +4,7 @@ import { Cormorant_Garamond, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/contexts/cart-context"
 import { FixedSidebar } from "@/components/layout/fixed-sidebar"
+import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
 const cormorantGaramond = Cormorant_Garamond({ 
@@ -49,6 +50,7 @@ export default function RootLayout({
           {children}
           <FixedSidebar />
         </CartProvider>
+        <Toaster />
         <Analytics />
       </body>
     </html>
