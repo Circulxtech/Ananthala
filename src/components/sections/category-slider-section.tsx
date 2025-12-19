@@ -70,7 +70,7 @@ export function CategorySliderSection() {
             Experience The Difference
           </h2>
           <p
-            className="max-w-2xl mx-auto"
+            className="max-w-2xl mx-auto text-lg"
             style={{ color: "#000000" }}
           >
             See how our mattresses are crafted with precision

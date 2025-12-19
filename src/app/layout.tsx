@@ -1,13 +1,15 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Playfair_Display, Geist_Mono } from "next/font/google"
+import { Cormorant_Garamond, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/contexts/cart-context"
+import { FixedSidebar } from "@/components/layout/fixed-sidebar"
 import "./globals.css"
 
-const playfairDisplay = Playfair_Display({ 
+const cormorantGaramond = Cormorant_Garamond({ 
   subsets: ["latin"],
-  variable: "--font-playfair",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-cormorant-garamond",
 })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
@@ -42,9 +44,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${playfairDisplay.className} antialiased`}>
+      <body className={`${cormorantGaramond.className} antialiased`} style={{ fontWeight: 300 }}>
         <CartProvider>
           {children}
+          <FixedSidebar />
         </CartProvider>
         <Analytics />
       </body>

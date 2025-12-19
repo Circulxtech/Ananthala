@@ -75,7 +75,7 @@
 }
 
 @theme inline {
-  --font-sans: "Playfair Display", serif;
+  --font-sans: 'Cormorant Garamond', serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback";
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -119,7 +119,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
+    font-weight: 300;
   }
 }

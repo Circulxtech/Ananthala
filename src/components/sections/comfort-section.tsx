@@ -7,7 +7,7 @@ export function ComfortSection() {
   const router = useRouter()
 
   return (
-    <section className="py-24 px-4 bg-stone-50">
+    <section id="comfort" className="py-24 px-4 bg-stone-50">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="order-2 lg:order-1">
@@ -64,7 +64,7 @@ export function ComfortSection() {
               onClick={() => router.push("/about")}
               className="bg-[#6B563F] text-white px-8 py-3 hover:bg-amber-950 transition-colors"
             >
-              About us
+              More
             </button>
           </div>
           <div className="order-1 lg:order-2">
