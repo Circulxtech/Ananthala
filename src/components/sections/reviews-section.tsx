@@ -27,25 +27,25 @@ export function ReviewsSection() {
           <h2 className="text-4xl sm:text-4xl lg:text-4xl font-bold text-black mb-4 text-balance">
             What Our Customers Say
           </h2>
-          <p className="text-lg sm:text-xl text-black">Join thousands of happy sleepers</p>
+          <p className="text-xl sm:text-2xl text-black font-semibold">Join thousands of happy sleepers</p>
         </div>
 
         {/* Reviews Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-8">
           {reviews.map((review, index) => (
-            <div key={index} className="bg-[#F5F1ED] rounded-lg p-8 flex flex-col">
+            <div key={index} className="bg-[#EED9C4] rounded-lg p-8 flex flex-col">
               {/* Review Text */}
-              <p className="text-black text-base sm:text-lg mb-6 grow leading-relaxed">{review.text}</p>
+              <p className="text-black text-base sm:text-lg mb-6 grow leading-relaxed font-semibold">{review.text}</p>
 
               {/* Author */}
-              <p className="text-black font-medium">— {review.author}</p>
+              <p className="text-black font-semibold">— {review.author}</p>
             </div>
           ))}
         </div>
 
         {/* Rating Summary */}
         <div className="text-center">
-          <p className="text-black text-lg">Rated 4.9/5 from over 10,000 reviews</p>
+          <p className="text-black text-lg font-semibold">Rated 4.9/5 from over 10,000 reviews</p>
         </div>
       </div>
     </section>

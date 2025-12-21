@@ -58,7 +58,7 @@ export function ProductsSection() {
             Find Your Perfect Mattress
           </h2>
           <p
-            className="max-w-2xl mx-auto text-lg"
+            className="max-w-2xl mx-auto text-xl font-semibold"
             style={{ color: "#000000" }}
           >
             Each mattress is expertly crafted with premium
@@ -95,7 +95,7 @@ export function ProductsSection() {
                 <div className={`absolute ${positionClasses[product.position as keyof typeof positionClasses]}`}>
                   <div className="bg-white px-6 py-3 text-center">
                     <span
-                      className="tracking-wider text-sm md:text-base font-normal uppercase"
+                      className="tracking-wider text-sm md:text-base font-semibold uppercase"
                       style={{ color: "#000000", fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
                     >
                       {product.name}

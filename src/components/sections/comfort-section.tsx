@@ -17,44 +17,44 @@ export function ComfortSection() {
             >
               Crafted for Comfort
             </p>
-            <h2 className="mb-6 text-lg" style={{ color: "#000000" }}>
+            <h2 className="mb-6 text-xl font-semibold" style={{ color: "#000000" }}>
               The Science of Better Sleep
             </h2>
-            <p className="mb-6" style={{ color: "#000000" }}>
+            <p className="mb-6 text-lg text-black/90 font-medium" style={{ color: "#000000" }}>
               Our mattresses are engineered with cutting-edge sleep technology and premium materials to
               provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
               help you wake up refreshed.
             </p>
             <div className="space-y-4 mb-8">
               <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-amber-900 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
                 <div>
-                  <p className="mb-1" style={{ color: "#000000" }}>
+                  <p className="mb-1 font-medium text-lg" style={{ color: "#000000" }}>
                     Pressure Relief Technology
                   </p>
-                  <p style={{ color: "#000000" }}>
+                  <p className="font-medium text-lg" style={{ color: "#000000" }}>
                     Conforms to your body for optimal spinal alignment
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-amber-900 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
                 <div>
-                  <p className="mb-1" style={{ color: "#000000" }}>
+                  <p className="mb-1 font-medium text-lg" style={{ color: "#000000" }}>
                     Temperature Regulation
                   </p>
-                  <p style={{ color: "#000000" }}>
+                  <p className="font-medium text-lg" style={{ color: "#000000" }}>
                     Advanced cooling system keeps you comfortable all night
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-amber-900 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
                 <div>
-                  <p className="mb-1" style={{ color: "#000000" }}>
+                  <p className="mb-1 font-medium text-lg" style={{ color: "#000000" }}>
                     Motion Isolation
                   </p>
-                  <p style={{ color: "#000000" }}>
+                  <p className="font-medium text-lg" style={{ color: "#000000" }}>
                     Undisturbed sleep even with a restless partner
                   </p>
                 </div>
@@ -62,7 +62,7 @@ export function ComfortSection() {
             </div>
             <button
               onClick={() => router.push("/about")}
-              className="bg-[#6B563F] text-white px-8 py-3 hover:bg-amber-950 transition-colors"
+              className="bg-[#EED9C4] text-black font-medium text-lg px-8 py-3 hover:bg-amber-950 transition-colors"
             >
               More
             </button>

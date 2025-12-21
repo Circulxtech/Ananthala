@@ -2,12 +2,6 @@ import mongoose from "mongoose"
 
 const MONGODB_URI = process.env.MONGODB_URI
 
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local\n" 
-  )
-}
-
 let cached = global.mongoose
 
 if (!cached) {
@@ -15,6 +9,12 @@ if (!cached) {
 }
 
 async function connectDB() {
+  if (!MONGODB_URI) {
+    throw new Error(
+      "Please define the MONGODB_URI environment variable inside .env.local\n" 
+    )
+  }
+
   if (cached.conn) {
     console.log("[v0] Using cached database connection")
     return cached.conn
@@ -29,7 +29,7 @@ async function connectDB() {
 
     console.log("[v0] Creating new database connection...")
     cached.promise = mongoose
-      .connect(MONGODB_URI!, opts)
+      .connect(MONGODB_URI, opts)
       .then((mongoose) => {
         console.log("[v0] Database connection established successfully")
         return mongoose

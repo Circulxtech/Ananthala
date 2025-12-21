@@ -5,12 +5,12 @@ import { Menu, Phone, Mail } from "lucide-react"
 export function FixedSidebar() {
   return (
     <aside className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
-      <div className="bg-[#D4C4A8] px-4 py-6 rounded-l-2xl shadow-lg flex flex-col items-center gap-5">
+      <div className="bg-[#EED9C4] px-4 py-6 rounded-l-2xl shadow-lg flex flex-col items-center gap-5">
         
 
         {/* RESERVE Text - Vertical */}
         <div className="flex flex-col items-center gap-1 my-4">
-          {["A", "N", "A", "N", "T", "H", "A", "L", "A"].map((letter, index) => (
+          {["C", "O", "N", "T", "A", "C", "T"].map((letter, index) => (
             <span
               key={index}
               className="text-blacktext-sm font-normal tracking-wider"
