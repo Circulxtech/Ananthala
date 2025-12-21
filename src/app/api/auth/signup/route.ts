@@ -33,14 +33,21 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    // Create new user
-    const user = await User.create({
+    const userData = {
       fullname,
       email: email.toLowerCase(),
       password: hashedPassword,
-    })
+      role: "customer",
+    }
 
-    console.log("[v0] User created successfully:", user.email)
+    console.log("[v0] Creating user with data:", { ...userData, password: "[REDACTED]" })
+    const user = await User.create(userData)
+
+    console.log("[v0] User created successfully:", {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    })
 
     return NextResponse.json(
       {
@@ -50,6 +57,7 @@ export async function POST(request: Request) {
           id: user._id,
           fullname: user.fullname,
           email: user.email,
+          role: user.role, // Include role in response to verify
         },
       },
       { status: 201 },

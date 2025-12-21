@@ -6,12 +6,23 @@ export interface JWTPayload {
   userId: string
   email: string
   fullname: string
+  role?: string
 }
 
 export function generateToken(payload: JWTPayload, rememberMe?: boolean): string {
   // Token expires in 30 days if remember me is checked, otherwise 2 hours
   const expiresIn = rememberMe ? "30d" : "2h"
   return jwt.sign(payload, JWT_SECRET, { expiresIn })
+}
+
+export function generateAdminToken(payload: JWTPayload): string {
+  // Admin token expires in 30 minutes for security
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "30m" })
+}
+
+export function generateAgentToken(payload: JWTPayload): string {
+  // Agent token expires in 30 minutes for security
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "30m" })
 }
 
 export function verifyToken(token: string): JWTPayload | null {

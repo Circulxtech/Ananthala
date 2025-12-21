@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ShoppingCart, User, Menu, X, Search, LogOut } from "lucide-react"
+import { ShoppingCart, User, Menu, X, Search, LogOut, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CartDrawer } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
@@ -153,6 +153,12 @@ export function Header() {
                           <div className="font-medium">{getFirstName(user.fullname)}</div>
                           <div className="text-xs text-[#8B5A3C]/70 truncate">{user.email}</div>
                         </div>
+                        <DropdownMenuItem asChild className="text-[#6D4530] cursor-pointer">
+                          <Link href="/customer/dashboard">
+                            <LayoutDashboard className="mr-2 h-4 w-4" />
+                            <span>Dashboard</span>
+                          </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleLogout} className="text-[#6D4530] cursor-pointer">
                           <LogOut className="mr-2 h-4 w-4" />
                           <span>Logout</span>

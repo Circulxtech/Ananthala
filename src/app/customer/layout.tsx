@@ -1,0 +1,232 @@
+"use client"
+
+import type React from "react"
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { LayoutDashboard, ShoppingCart, Heart, Package, Lock, UserIcon, Menu, X, LogOut } from "lucide-react"
+import { Button } from "@/components/ui/button"
+
+interface AuthenticatedUser {
+  id: string
+  fullname: string
+  email: string
+}
+
+const menuItems = [
+  {
+    label: "Dashboard",
+    href: "/customer/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    label: "My Orders",
+    href: "/customer/orders",
+    icon: Package,
+  },
+  {
+    label: "Wishlist",
+    href: "/customer/wishlist",
+    icon: Heart,
+  },
+  {
+    label: "Cart",
+    href: "/customer/cart",
+    icon: ShoppingCart,
+  },
+  {
+    label: "Profile",
+    href: "/customer/profile",
+    icon: UserIcon,
+  },
+  {
+    label: "Change Password",
+    href: "/customer/change-password",
+    icon: Lock,
+  },
+]
+
+export default function CustomerLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const router = useRouter()
+  const [user, setUser] = useState<AuthenticatedUser | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/verify")
+        const data = await response.json()
+        if (data.success && data.user) {
+          setUser(data.user)
+        } else {
+          router.push("/login")
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error)
+        router.push("/login")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    checkAuth()
+  }, [router])
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" })
+      setUser(null)
+      router.push("/")
+      router.refresh()
+    } catch (error) {
+      console.error("Logout failed:", error)
+    }
+  }
+
+  const getFirstName = (fullname: string) => {
+    return fullname.split(" ")[0]
+  }
+
+  const getGradientColor = (name: string) => {
+    const firstLetter = name.charAt(0).toUpperCase()
+    const colors = [
+      "from-purple-500 to-pink-500",
+      "from-blue-500 to-cyan-500",
+      "from-green-500 to-emerald-500",
+      "from-orange-500 to-red-500",
+      "from-indigo-500 to-purple-500",
+      "from-teal-500 to-green-500",
+    ]
+    const index = firstLetter.charCodeAt(0) % colors.length
+    return colors[index]
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F5F1ED] flex items-center justify-center">
+        <div className="text-[#8B5A3C] text-lg">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F5F1ED]">
+      {/* Header */}
+      <header className="bg-white border-b sticky top-0 z-40" style={{ borderColor: "#D9CFC7" }}>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden text-[#8B5A3C] hover:bg-[#8B5A3C]/10"
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              >
+                {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+              <Link
+                href="/"
+                className="text-[#8B5A3C] text-xl font-normal tracking-wider hover:text-[#6D4530] transition-colors"
+              >
+                ANANTHALA
+              </Link>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:block text-right">
+                <div className="text-sm font-medium text-[#6D4530]">{getFirstName(user.fullname)}</div>
+                <div className="text-xs text-[#8B5A3C]/70">{user.email}</div>
+              </div>
+              <div
+                className={`w-10 h-10 rounded-full bg-gradient-to-br ${getGradientColor(user.fullname)} flex items-center justify-center text-white font-semibold`}
+              >
+                {getFirstName(user.fullname).charAt(0).toUpperCase()}
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex">
+        {/* Sidebar - Desktop */}
+        <aside
+          className="hidden lg:block w-64 bg-white border-r min-h-[calc(100vh-4rem)] sticky top-16"
+          style={{ borderColor: "#D9CFC7" }}
+        >
+          <nav className="p-4 space-y-1">
+            {menuItems.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                    isActive ? "bg-[#8B5A3C] text-white" : "text-[#6D4530] hover:bg-[#8B5A3C]/10 hover:text-[#8B5A3C]"
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="font-medium">{item.label}</span>
+                </Link>
+              )
+            })}
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#6D4530] hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="font-medium">Logout</span>
+            </button>
+          </nav>
+        </aside>
+
+        {/* Sidebar - Mobile */}
+        {isSidebarOpen && (
+          <>
+            <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
+            <aside
+              className="fixed left-0 top-16 bottom-0 w-64 bg-white border-r z-50 lg:hidden animate-in slide-in-from-left duration-300"
+              style={{ borderColor: "#D9CFC7" }}
+            >
+              <nav className="p-4 space-y-1">
+                {menuItems.map((item) => {
+                  const Icon = item.icon
+                  const isActive = pathname === item.href
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                        isActive
+                          ? "bg-[#8B5A3C] text-white"
+                          : "text-[#6D4530] hover:bg-[#8B5A3C]/10 hover:text-[#8B5A3C]"
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span className="font-medium">{item.label}</span>
+                    </Link>
+                  )
+                })}
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#6D4530] hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span className="font-medium">Logout</span>
+                </button>
+              </nav>
+            </aside>
+          </>
+        )}
+
+        {/* Main Content */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+      </div>
+    </div>
+  )
+}

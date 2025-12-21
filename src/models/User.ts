@@ -4,6 +4,9 @@ export interface IUser {
   fullname: string
   email: string
   password: string
+  role: "customer" | "admin" | "agent"
+  phone?: string
+  address?: string
   createdAt: Date
 }
 
@@ -27,12 +30,35 @@ const UserSchema = new Schema<IUser>(
       required: [true, "Please provide a password"],
       minlength: [6, "Password must be at least 6 characters"],
     },
+    role: {
+      type: String,
+      enum: {
+        values: ["customer", "admin", "agent"],
+        message: "{VALUE} is not a valid role",
+      },
+      default: "customer",
+      required: true,
+    },
+    phone: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    address: {
+      type: String,
+      trim: true,
+      default: "",
+    },
   },
   {
     timestamps: true,
   },
 )
 
-const User = models.User || mongoose.model<IUser>("User", UserSchema)
+if (models.User) {
+  delete models.User
+}
+
+const User = mongoose.model<IUser>("User", UserSchema)
 
 export default User
