@@ -26,7 +26,7 @@ const values = [
     icon: Eye,
     title: "Transparency",
     description:
-      "We believe in being honest about our materials, processes, and pricing. No hidden costs, no compromises.",
+      "We believe in being honest about our materials, processes, and pricing. No hidden costs & no compromises.",
   },
 ]
 
