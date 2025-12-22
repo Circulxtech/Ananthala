@@ -173,7 +173,7 @@ export default function Home() {
 
           {/* Content Box - Left Bottom Corner */}
           <div className="w-full relative z-10 pb-4 lg:pb-6 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-lg bg-white rounded-xl p-4 lg:p-8 shadow-xl" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}>
+            <div className="max-w-sm bg-white rounded-xl p-4 lg:p-8 shadow-xl" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}>
               <h1 className="text-black text-2xl sm:text-3xl lg:text-4xl font-semibold mb-2 text-balance">Premium Comfort</h1>
               <h2 className="text-black text-xl sm:text-2xl lg:text-3xl font-medium mb-6">Sleep Better, Live Better</h2>
 
