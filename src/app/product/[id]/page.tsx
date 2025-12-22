@@ -116,7 +116,7 @@ export default function ProductDetailPage() {
           <div className="max-w-7xl mx-auto">
             <button
               onClick={() => router.back()}
-              className="flex items-center gap-2 hover:opacity-70 transition-opacity"
+              className="flex text-lg font-medium items-center gap-2 hover:opacity-70 transition-opacity"
               style={{ color: "#000000" }}
             >
               <ChevronLeft className="w-4 h-4" />
@@ -178,7 +178,7 @@ export default function ProductDetailPage() {
                 {product.name}
               </p>
 
-              <p className="mb-6 text-black">
+              <p className="mb-6 text-lg  text-black">
                 {product.description}
               </p>
 
@@ -201,7 +201,7 @@ export default function ProductDetailPage() {
                 {/* Size Selection */}
                 <div className="mb-6">
                   <label
-                    className="block mb-3 text-black"
+                    className="block mb-3 text-black text-lg"
                   >
                     Select Size
                   </label>
@@ -213,14 +213,17 @@ export default function ProductDetailPage() {
                         className="py-3 px-4 border-2 transition-colors"
                         style={{
                           borderColor:
-                            selectedSize === size.name
-                              ? colors.accent
-                              : colors.border,
-                          backgroundColor:
-                            selectedSize === size.name
-                              ? colors.bg100
-                              : "transparent",
-                          color: "#000000",
+                          selectedSize === size.name
+                            ? "#EED9C4"
+                            : colors.border,
+                        
+                        backgroundColor:
+                          selectedSize === size.name
+                            ? "rgba(238, 217, 196, 0.35)" // soft tint
+                            : "transparent",
+                        
+                        color: "black",
+                        
                         }}
                       >
                         {size.name}
@@ -232,11 +235,11 @@ export default function ProductDetailPage() {
                 {/* Quantity */}
                 <div className="mb-6">
                   <label
-                    className="block mb-3 text-black"
+                    className="block mb-3 text-lg text-black"
                   >
                     Quantity
                   </label>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center text-lg gap-4">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       className="w-10 h-10 border hover:opacity-70 transition-opacity text-black"
@@ -263,8 +266,8 @@ export default function ProductDetailPage() {
                 <button
                   onClick={handleAddToCart}
                   disabled={isAddingToCart}
-                  className="w-full py-4 text-white hover:opacity-90 transition-opacity mb-3 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                  style={{ backgroundColor: colors.accent }}
+                  className="w-full py-4 text-black text-lg font-medium hover:opacity-90 transition-opacity mb-3 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: "#EED9C4" }}
                 >
                   {isAddingToCart ? (
                     <>
@@ -287,7 +290,7 @@ export default function ProductDetailPage() {
                     </>
                   )}
                 </button>
-                <p className="text-center text-black">
+                <p className="text-center text-base text-black">
                   Free shipping on all orders
                 </p>
               </div>
@@ -299,10 +302,10 @@ export default function ProductDetailPage() {
                     className="w-5 h-5 mt-1 shrink-0 text-black"
                   />
                   <div>
-                    <p className="mb-1 text-black">
+                    <p className="mb-1 font-medium text-black">
                       {isBabyProduct ? "100 Night Trial" : "100 Night Trial"}
                     </p>
-                    <p className="text-black">
+                    <p className="font-medium text-black">
                       Risk-free sleep trial period
                     </p>
                   </div>
@@ -312,12 +315,12 @@ export default function ProductDetailPage() {
                     className="w-5 h-5 mt-1 shrink-0 text-black"
                   />
                   <div>
-                    <p className="mb-1 text-black">
+                    <p className="mb-1 font-medium text-black">
                       {isBabyProduct
                         ? "Safety Certified"
                         : "15 Year Warranty"}
                     </p>
-                    <p className="text-black">
+                    <p className="font-medium text-black">
                       {isBabyProduct
                         ? "GREENGUARD Gold & CertiPUR-US"
                         : "Comprehensive coverage included"}
@@ -329,10 +332,10 @@ export default function ProductDetailPage() {
                     className="w-5 h-5 mt-1 shrink-0 text-black"
                   />
                   <div>
-                    <p className="mb-1 text-black">
+                    <p className="mb-1 text-black font-medium">
                       Free Delivery
                     </p>
-                    <p className="text-black">
+                    <p className="font-medium text-black">
                       {isBabyProduct
                         ? "Safe & secure packaging"
                         : "White glove delivery available"}
@@ -354,7 +357,7 @@ export default function ProductDetailPage() {
             >
               <button
                 onClick={() => setActiveTab("features")}
-                className="pb-4 transition-colors relative text-black"
+                className="pb-4 transition-colors relative text-black text-lg font-medium"
               >
                 Features & Materials
                 {activeTab === "features" && (
@@ -366,7 +369,7 @@ export default function ProductDetailPage() {
               </button>
               <button
                 onClick={() => setActiveTab("specs")}
-                className="pb-4 transition-colors relative text-black"
+                className="pb-4 transition-colors relative text-black text-lg font-medium"
               >
                 Specifications
                 {activeTab === "specs" && (
@@ -388,7 +391,7 @@ export default function ProductDetailPage() {
                     {product.features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-start gap-3">
                         <Check
-                          className="w-5 h-5 mt-0.5 shrink-0 text-black"
+                          className="w-5 h-5 mt-0.5 shrink-0 text-black text-lg"
                         />
                         <span className="text-black">{feature}</span>
                       </li>
@@ -404,7 +407,7 @@ export default function ProductDetailPage() {
                       (material: string, index: number) => (
                         <li key={index} className="flex items-start gap-3">
                           <div
-                            className="w-2 h-2 rounded-full mt-2 shrink-0 bg-black"
+                            className="w-2 h-2 rounded-full mt-2 shrink-0 bg-black text-lg"
                           ></div>
                           <span className="text-black">{material}</span>
                         </li>

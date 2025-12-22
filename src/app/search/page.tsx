@@ -3,7 +3,6 @@
 import { useSearchParams } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { ProductListing } from "@/components/sections/product-listing"
 import { useState, useEffect, Suspense } from "react"
 import { products, type Product } from "@/data/products"
 import Image from "next/image"

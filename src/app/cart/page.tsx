@@ -362,8 +362,8 @@ export default function CartPage() {
 
                 <button
                   onClick={handleCheckout}
-                  className="w-full py-4 text-white hover:opacity-90 transition-opacity mb-3 flex items-center justify-center gap-2"
-                  style={{ backgroundColor: "#6B563F" }}
+                  className="w-full py-4 text-black hover:opacity-90 transition-opacity mb-3 flex items-center justify-center gap-2"
+                  style={{ backgroundColor: "#EED9C4" }}
                 >
                   <ShoppingCart className="w-5 h-5" />
                   Proceed to Checkout

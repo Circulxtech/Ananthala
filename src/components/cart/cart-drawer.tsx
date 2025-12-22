@@ -100,13 +100,13 @@ export function CartDrawer({ isOpen, onClose, cartItems = [] }: CartDrawerProps)
                     })}
                   </span>
                 </div>
-                <p className="text-black text-sm">Shipping calculated at checkout</p>
+                <p className="text-black text-lg">Shipping calculated at checkout</p>
               </div>
 
               <div className="space-y-3">
                 <Button
-                  className="w-full text-white py-6 text-lg font-medium transition-colors hover:opacity-90"
-                  style={{ backgroundColor: "#6B563F" }}
+                  className="w-full text-black py-6 text-lg font-medium transition-colors hover:opacity-90"
+                  style={{ backgroundColor: "#EED9C4" }}
                   onClick={handleCheckout}
                 >
                   Checkout

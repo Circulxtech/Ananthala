@@ -31,9 +31,9 @@ export function PopularProductsCarousel({ excludeProductId }: PopularProductsCar
   }
 
   return (
-    <section className="py-12 px-4 bg-white border-t" style={{ borderColor: "#D9CFC7" }}>
+    <section className="py-12 px-4 bg-white border-t" style={{ borderColor: "#EED9C4" }}>
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl font-serif text-black mb-8">Popular Products</h2>
+        <h2 className="text-3xl md:text-4xl font-serif font-medium text-black mb-8">Popular Products</h2>
         <div className="relative">
           <Carousel
             opts={{
@@ -61,13 +61,13 @@ export function PopularProductsCarousel({ excludeProductId }: PopularProductsCar
                         unoptimized
                       />
                     </div>
-                    <h3 className="mb-1 text-sm text-black group-hover:opacity-70 transition-colors line-clamp-2 min-h-[2.5rem]">
+                    <h3 className="mb-1 text-base md:text-lg text-black group-hover:opacity-70 transition-colors line-clamp-2 min-h-10">
                       {product.name}
                     </h3>
-                    <p className="mb-2 text-xs text-gray-600">{product.firmness} Firmness</p>
+                    <p className="mb-2 text-sm md:text-base text-gray-600">{product.firmness} Firmness</p>
                     <div className="flex items-center gap-1 text-black">
-                      <IndianRupee className="w-3 h-3" />
-                      <span className="text-sm font-medium">
+                      <IndianRupee className="w-4 h-4" />
+                      <span className="text-base md:text-lg font-medium">
                         {product.price.toLocaleString("en-IN", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
@@ -78,8 +78,8 @@ export function PopularProductsCarousel({ excludeProductId }: PopularProductsCar
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#D9CFC7" }} />
-            <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#D9CFC7" }} />
+            <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
+            <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
           </Carousel>
         </div>
       </div>

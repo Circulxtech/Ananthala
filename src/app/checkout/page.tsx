@@ -125,13 +125,13 @@ export default function CheckoutPage() {
           {/* Back Button */}
           <button
             onClick={() => router.push("/cart")}
-            className="flex items-center gap-2 mb-6 text-black hover:opacity-70 transition-opacity"
+            className="flex items-center gap-2 mb-6 text-black hover:opacity-70 transition-opacity text-lg"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-5 h-5" />
             Back to Cart
           </button>
 
-          <h1 className="text-3xl font-serif text-black mb-8">Checkout</h1>
+          <h1 className="text-xl md:text-2xl font-serif text-black mb-8">Checkout</h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Checkout Form */}
@@ -139,85 +139,85 @@ export default function CheckoutPage() {
               <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Shipping Information */}
                 <div>
-                  <h2 className="text-2xl font-serif text-black mb-6">
+                  <h2 className="text-xl md:text-2xl font-serif text-black mb-6">
                     Shipping Information
                   </h2>
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-black mb-2">First Name</label>
+                        <label className="block text-black mb-2 text-lg font-medium">First Name</label>
                         <input
                           type="text"
                           name="firstName"
                           value={formData.firstName}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-4 py-3 border text-black"
+                          className="w-full px-4 py-3 border text-black text-lg"
                           style={{ borderColor: "#D9CFC7" }}
                         />
                       </div>
                       <div>
-                        <label className="block text-black mb-2">Last Name</label>
+                        <label className="block text-black mb-2 text-lg font-medium">Last Name</label>
                         <input
                           type="text"
                           name="lastName"
                           value={formData.lastName}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-4 py-3 border text-black"
+                          className="w-full px-4 py-3 border text-black text-lg"
                           style={{ borderColor: "#D9CFC7" }}
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-black mb-2">Email</label>
+                      <label className="block text-black mb-2 text-lg font-medium">Email</label>
                       <input
                         type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 border text-black"
+                        className="w-full px-4 py-3 border text-black text-lg"
                         style={{ borderColor: "#D9CFC7" }}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-black mb-2">Phone Number</label>
+                      <label className="block text-black mb-2 text-lg font-medium">Phone Number</label>
                       <input
                         type="tel"
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 border text-black"
+                        className="w-full px-4 py-3 border text-black text-lg"
                         style={{ borderColor: "#D9CFC7" }}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-black mb-2">Address</label>
+                      <label className="block text-black mb-2 text-lg font-medium">Address</label>
                       <textarea
                         name="address"
                         value={formData.address}
                         onChange={handleInputChange}
                         required
                         rows={3}
-                        className="w-full px-4 py-3 border text-black"
+                        className="w-full px-4 py-3 border text-black text-lg"
                         style={{ borderColor: "#D9CFC7" }}
                       />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-black mb-2">State</label>
+                        <label className="block text-black mb-2 text-lg font-medium">State</label>
                         <select
                           name="state"
                           value={formData.state}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-4 py-3 border text-black bg-white"
+                          className="w-full px-4 py-3 border text-black bg-white text-lg"
                           style={{ borderColor: "#D9CFC7" }}
                         >
                           <option value="">Select State</option>
@@ -229,14 +229,14 @@ export default function CheckoutPage() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-black mb-2">City</label>
+                        <label className="block text-black mb-2 text-lg font-medium">City</label>
                         <select
                           name="city"
                           value={formData.city}
                           onChange={handleInputChange}
                           required
                           disabled={!formData.state}
-                          className="w-full px-4 py-3 border text-black bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                          className="w-full px-4 py-3 border text-black bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg"
                           style={{ borderColor: "#D9CFC7" }}
                         >
                           <option value="">Select City</option>
@@ -248,28 +248,28 @@ export default function CheckoutPage() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-black mb-2">ZIP Code</label>
+                        <label className="block text-black mb-2 text-lg font-medium">ZIP Code</label>
                         <input
                           type="text"
                           name="zipCode"
                           value={formData.zipCode}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-4 py-3 border text-black"
+                          className="w-full px-4 py-3 border text-black text-lg"
                           style={{ borderColor: "#D9CFC7" }}
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-black mb-2">Country</label>
+                      <label className="block text-black mb-2 text-lg font-medium">Country</label>
                       <select
                         name="country"
                         value={formData.country}
                         onChange={handleInputChange}
                         required
                         disabled
-                        className="w-full px-4 py-3 border text-black bg-gray-100 cursor-not-allowed"
+                        className="w-full px-4 py-3 border text-black bg-gray-100 cursor-not-allowed text-lg"
                         style={{ borderColor: "#D9CFC7" }}
                       >
                         <option value="India">India</option>
@@ -280,7 +280,7 @@ export default function CheckoutPage() {
 
                 {/* Payment Method */}
                 <div>
-                  <h2 className="text-2xl font-serif text-black mb-6">
+                  <h2 className="text-xl md:text-2xl font-serif text-black mb-6">
                     Payment Method
                   </h2>
                   <div className="space-y-3">
@@ -293,7 +293,7 @@ export default function CheckoutPage() {
                         onChange={handleInputChange}
                         className="w-4 h-4"
                       />
-                      <span className="text-black">Credit/Debit Card</span>
+                      <span className="text-black text-lg">Credit/Debit Card</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
@@ -302,9 +302,9 @@ export default function CheckoutPage() {
                         value="upi"
                         checked={formData.paymentMethod === "upi"}
                         onChange={handleInputChange}
-                        className="w-4 h-4"
+                        className="w-5 h-5"
                       />
-                      <span className="text-black">UPI</span>
+                      <span className="text-black text-lg">UPI</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
@@ -313,9 +313,9 @@ export default function CheckoutPage() {
                         value="cod"
                         checked={formData.paymentMethod === "cod"}
                         onChange={handleInputChange}
-                        className="w-4 h-4"
+                        className="w-5 h-5"
                       />
-                      <span className="text-black">Cash on Delivery</span>
+                      <span className="text-black text-lg">Cash on Delivery</span>
                     </label>
                   </div>
                 </div>
@@ -323,14 +323,14 @@ export default function CheckoutPage() {
                 <button
                   type="submit"
                   disabled={isProcessing}
-                  className="w-full py-4 text-white hover:opacity-90 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  style={{ backgroundColor: "#6B563F" }}
+                  className="w-full py-4 text-black hover:opacity-90 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg font-medium"
+                  style={{ backgroundColor: "#EED9C4" }}
                 >
                   {isProcessing ? (
                     "Processing..."
                   ) : (
                     <>
-                      <ShoppingCart className="w-5 h-5" />
+                      <ShoppingCart className="w-6 h-6" />
                       Place Order
                     </>
                   )}
@@ -344,7 +344,7 @@ export default function CheckoutPage() {
                 className="border p-6 sticky top-24"
                 style={{ borderColor: "#D9CFC7" }}
               >
-                <h2 className="text-2xl font-serif text-black mb-6">
+                <h2 className="text-xl md:text-2xl font-serif text-black mb-6">
                   Order Summary
                 </h2>
 
@@ -362,15 +362,15 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-black text-sm font-medium line-clamp-1">
+                        <h3 className="text-black text-base md:text-lg font-medium line-clamp-1">
                           {item.name}
                         </h3>
-                        <p className="text-gray-600 text-xs">Size: {item.size}</p>
-                        <p className="text-gray-600 text-xs">Qty: {item.quantity}</p>
+                        <p className="text-gray-600 text-sm md:text-base">Size: {item.size}</p>
+                        <p className="text-gray-600 text-sm md:text-base">Qty: {item.quantity}</p>
                       </div>
                       <div className="text-right">
-                        <div className="flex items-center gap-1 text-black text-sm">
-                          <IndianRupee className="w-3 h-3" />
+                        <div className="flex items-center gap-1 text-black text-base md:text-lg">
+                          <IndianRupee className="w-4 h-4" />
                           <span>
                             {(item.price * item.quantity).toLocaleString("en-IN", {
                               minimumFractionDigits: 2,
@@ -388,11 +388,11 @@ export default function CheckoutPage() {
                   style={{ borderColor: "#D9CFC7" }}
                 >
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-black">Subtotal</span>
+                    <div className="flex items-center justify-between text-base md:text-lg">
+                      <span className="text-black font-medium">Subtotal</span>
                       <span className="text-black">
                         <div className="flex items-center gap-1">
-                          <IndianRupee className="w-3 h-3" />
+                          <IndianRupee className="w-4 h-4" />
                           <span>
                             {subtotal.toLocaleString("en-IN", {
                               minimumFractionDigits: 2,
@@ -402,14 +402,14 @@ export default function CheckoutPage() {
                         </div>
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-black">Shipping</span>
+                    <div className="flex items-center justify-between text-base md:text-lg">
+                      <span className="text-black font-medium">Shipping</span>
                       <span className="text-black">
                         {shipping === 0 ? (
                           "Free"
                         ) : (
                           <div className="flex items-center gap-1">
-                            <IndianRupee className="w-3 h-3" />
+                            <IndianRupee className="w-4 h-4" />
                             <span>
                               {shipping.toLocaleString("en-IN", {
                                 minimumFractionDigits: 2,
@@ -427,11 +427,11 @@ export default function CheckoutPage() {
                   className="border-t pt-4"
                   style={{ borderColor: "#D9CFC7" }}
                 >
-                  <div className="flex items-center justify-between text-xl">
-                    <span className="text-black font-semibold">Total</span>
-                    <span className="text-black font-bold">
+                  <div className="flex items-center justify-between text-2xl md:text-3xl">
+                    <span className="text-black text-xl font-semibold">Total</span>
+                    <span className="text-black font-bold text-xl">
                       <div className="flex items-center gap-1">
-                        <IndianRupee className="w-5 h-5" />
+                        <IndianRupee className="w-6 h-6" />
                         <span>
                           {total.toLocaleString("en-IN", {
                             minimumFractionDigits: 2,

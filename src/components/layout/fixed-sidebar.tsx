@@ -5,7 +5,7 @@ import { Menu, Phone, Mail } from "lucide-react"
 export function FixedSidebar() {
   return (
     <aside className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
-      <div className="bg-[#EED9C4] px-4 py-6 rounded-l-2xl shadow-lg flex flex-col items-center gap-5">
+      <div className="bg-[#D9BB9B] px-4 py-6 rounded-l-2xl shadow-lg flex flex-col items-center gap-5">
         
 
         {/* RESERVE Text - Vertical */}
