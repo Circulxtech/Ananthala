@@ -8,7 +8,7 @@ const values = [
     icon: Heart,
     title: "Customer First",
     description:
-      "Your comfort and satisfaction are at the heart of everything we do. We listen, adapt, and continuously improve to serve you better.",
+      "Your comfort and satisfaction are at the heart of everything we do. We listen, adapt and continuously improve to serve you better.",
   },
   {
     icon: Leaf,
