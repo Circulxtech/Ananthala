@@ -100,10 +100,10 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen bg-[#F5F1ED] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-white shadow-lg border-2 border-[#E5D5C5] flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Shield className="w-8 h-8 text-[#8B5A3C]" />
+          <div className="w-16 h-16 rounded-full bg-white shadow-lg border-2 border-[#EED9C4] flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Shield className="w-8 h-8 text-[#EED9C4]" />
           </div>
-          <p className="text-[#8B5A3C] font-medium">Verifying admin access...</p>
+          <p className="text-[#EED9C4] font-medium">Verifying admin access...</p>
         </div>
       </div>
     )
@@ -111,16 +111,16 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F5F1ED]">
-      <header className="bg-white border-b border-[#E5D5C5] shadow-sm">
+      <header className="bg-white border-b border-[#EED9C4] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#8B5A3C] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-[#EED9C4] flex items-center justify-center">
                 <Shield className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-normal text-[#6D4530] tracking-wide">Ananthala Admin</h1>
-                <p className="text-xs text-[#B8A396]">Dashboard</p>
+                <h1 className="text-xl font-normal text-[#EED9C4] tracking-wide">Ananthala Admin</h1>
+                <p className="text-xs text-[#EED9C4]">Dashboard</p>
               </div>
             </div>
 
@@ -134,20 +134,20 @@ export default function AdminDashboard() {
                       >
                         {adminData.fullname.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-sm text-[#6D4530] hidden sm:inline font-medium">
+                      <span className="text-sm text-[#EED9C4] hidden sm:inline font-medium">
                         {getFirstName(adminData.fullname)}
                       </span>
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-white border-[#E5D5C5]">
-                    <div className="px-3 py-2 border-b border-[#E5D5C5]">
-                      <p className="text-sm font-medium text-[#6D4530]">{adminData.fullname}</p>
-                      <p className="text-xs text-[#B8A396] mt-1">{adminData.email}</p>
-                      <p className="text-xs text-[#8B5A3C] mt-1 font-medium">Admin Access</p>
+                  <DropdownMenuContent align="end" className="w-56 bg-white border-[#EED9C4]">
+                    <div className="px-3 py-2 border-b border-[#EED9C4]">
+                      <p className="text-sm font-medium text-[#EED9C4]">{adminData.fullname}</p>
+                      <p className="text-xs text-[#EED9C4] mt-1">{adminData.email}</p>
+                      <p className="text-xs text-[#EED9C4] mt-1 font-medium">Admin Access</p>
                     </div>
                     <DropdownMenuItem
                       onClick={handleLogout}
-                      className="text-[#8B5A3C] cursor-pointer hover:bg-[#F5F1ED] focus:bg-[#F5F1ED]"
+                      className="text-[#EED9C4] cursor-pointer hover:bg-[#F5F1ED] focus:bg-[#F5F1ED]"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
                       Logout
@@ -162,85 +162,85 @@ export default function AdminDashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h2 className="text-2xl font-normal text-[#6D4530] mb-2">Dashboard Overview</h2>
-          <p className="text-[#8B5A3C]">Manage your Ananthala store</p>
+          <h2 className="text-2xl font-normal text-[#EED9C4] mb-2">Dashboard Overview</h2>
+          <p className="text-[#EED9C4]">Manage your Ananthala store</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Orders Card */}
-          <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
+          <div className="bg-white rounded-xl border border-[#EED9C4] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <ShoppingCart className="w-6 h-6 text-[#8B5A3C] group-hover:text-white transition-colors" />
+              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#EED9C4] transition-colors">
+                <ShoppingCart className="w-6 h-6 text-[#EED9C4] group-hover:text-white transition-colors" />
               </div>
-              <span className="text-xs px-2 py-1 rounded-full bg-[#F5F1ED] text-[#8B5A3C] font-medium">New</span>
+              <span className="text-xs px-2 py-1 rounded-full bg-[#F5F1ED] text-[#EED9C4] font-medium">New</span>
             </div>
-            <h3 className="text-[#6D4530] font-medium mb-2 text-lg">Orders</h3>
-            <p className="text-[#B8A396] text-sm">Manage customer orders and fulfillment</p>
+            <h3 className="text-[#EED9C4] font-medium mb-2 text-lg">Orders</h3>
+            <p className="text-[#EED9C4] text-sm">Manage customer orders and fulfillment</p>
           </div>
 
           {/* Products Card */}
-          <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
+          <div className="bg-white rounded-xl border border-[#EED9C4] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <Package className="w-6 h-6 text-[#8B5A3C] group-hover:text-white transition-colors" />
+              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#EED9C4] transition-colors">
+                <Package className="w-6 h-6 text-[#EED9C4] group-hover:text-white transition-colors" />
               </div>
             </div>
-            <h3 className="text-[#6D4530] font-medium mb-2 text-lg">Products</h3>
-            <p className="text-[#B8A396] text-sm">Manage product catalog and inventory</p>
+            <h3 className="text-[#EED9C4] font-medium mb-2 text-lg">Products</h3>
+            <p className="text-[#EED9C4] text-sm">Manage product catalog and inventory</p>
           </div>
 
           {/* Customers Card */}
-          <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
+          <div className="bg-white rounded-xl border border-[#EED9C4] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <Users className="w-6 h-6 text-[#8B5A3C] group-hover:text-white transition-colors" />
+              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#EED9C4] transition-colors">
+                <Users className="w-6 h-6 text-[#EED9C4] group-hover:text-white transition-colors" />
               </div>
             </div>
-            <h3 className="text-[#6D4530] font-medium mb-2 text-lg">Customers</h3>
-            <p className="text-[#B8A396] text-sm">View and manage customer information</p>
+            <h3 className="text-[#EED9C4] font-medium mb-2 text-lg">Customers</h3>
+            <p className="text-[#EED9C4] text-sm">View and manage customer information</p>
           </div>
 
           {/* Analytics Card */}
-          <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
+          <div className="bg-white rounded-xl border border-[#EED9C4] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <BarChart3 className="w-6 h-6 text-[#8B5A3C] group-hover:text-white transition-colors" />
+              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#EED9C4] transition-colors">
+                <BarChart3 className="w-6 h-6 text-[#EED9C4] group-hover:text-white transition-colors" />
               </div>
             </div>
-            <h3 className="text-[#6D4530] font-medium mb-2 text-lg">Analytics</h3>
-            <p className="text-[#B8A396] text-sm">View sales reports and insights</p>
+            <h3 className="text-[#EED9C4] font-medium mb-2 text-lg">Analytics</h3>
+            <p className="text-[#EED9C4] text-sm">View sales reports and insights</p>
           </div>
 
           {/* Settings Card */}
-          <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
+          <div className="bg-white rounded-xl border border-[#EED9C4] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <Settings className="w-6 h-6 text-[#8B5A3C] group-hover:text-white transition-colors" />
+              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#EED9C4] transition-colors">
+                <Settings className="w-6 h-6 text-[#EED9C4] group-hover:text-white transition-colors" />
               </div>
             </div>
-            <h3 className="text-[#6D4530] font-medium mb-2 text-lg">Settings</h3>
-            <p className="text-[#B8A396] text-sm">Configure store settings and preferences</p>
+            <h3 className="text-[#EED9C4] font-medium mb-2 text-lg">Settings</h3>
+            <p className="text-[#EED9C4] text-sm">Configure store settings and preferences</p>
           </div>
         </div>
 
         {/* Quick Stats Section */}
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-4">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-1">Total Orders</p>
-            <p className="text-2xl font-medium text-[#6D4530]">0</p>
+          <div className="bg-white rounded-lg border border-[#EED9C4] p-4">
+            <p className="text-xs text-[#EED9C4] uppercase tracking-wide mb-1">Total Orders</p>
+            <p className="text-2xl font-medium text-[#EED9C4]">0</p>
           </div>
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-4">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-1">Total Products</p>
-            <p className="text-2xl font-medium text-[#6D4530]">0</p>
+          <div className="bg-white rounded-lg border border-[#EED9C4] p-4">
+            <p className="text-xs text-[#EED9C4] uppercase tracking-wide mb-1">Total Products</p>
+            <p className="text-2xl font-medium text-[#EED9C4]">0</p>
           </div>
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-4">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-1">Total Customers</p>
-            <p className="text-2xl font-medium text-[#6D4530]">0</p>
+          <div className="bg-white rounded-lg border border-[#EED9C4] p-4">
+            <p className="text-xs text-[#EED9C4] uppercase tracking-wide mb-1">Total Customers</p>
+            <p className="text-2xl font-medium text-[#EED9C4]">0</p>
           </div>
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-4">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-1">Revenue</p>
-            <p className="text-2xl font-medium text-[#6D4530]">$0</p>
+          <div className="bg-white rounded-lg border border-[#EED9C4] p-4">
+            <p className="text-xs text-[#EED9C4] uppercase tracking-wide mb-1">Revenue</p>
+            <p className="text-2xl font-medium text-[#EED9C4]">$0</p>
           </div>
         </div>
       </main>

@@ -13,31 +13,24 @@ import { useRouter } from "next/navigation"
 const categories = [
   {
     id: 1,
-    title: "FOLDABLE MATTRESS",
-    subtitle: "COMFORT WHEN OPEN. COMPACT WHEN CLOSED.",
-    image:
-      "https://images.unsplash.com/photo-1691703028663-c5ff8cbb07c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmb2xkYWJsZSUyMG1hdHRyZXNzJTIwY29tcGFjdHxlbnwxfHx8fDE3NjU0NDM3NTF8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  },
-  {
-    id: 2,
-    title: "100% ORGANIC MATTRESSES",
-    subtitle: "FREE FROM TOXIC FOAM",
-    image:
-      "https://images.unsplash.com/photo-1718262722567-9f414d4cf98d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwbWF0dHJlc3MlMjBuYXR1cmFsfGVufDF8fHx8MTc2NTQ0Mzc1MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  },
-  {
-    id: 3,
-    title: "BABY'S MATTRESSES",
-    subtitle: "GENTLE SUPPORT FOR YOUR LITTLE ONE",
+    title: "JOY",
+    subtitle: "SAFE AND HEALTHY PRODUCTS FOR THE NEWBORNS AND THE LEARNING",
     image:
       "https://images.unsplash.com/photo-1619490742661-8949b7d3a612?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYWJ5JTIwY3JpYiUyMG1hdHRyZXNzfGVufDF8fHx8MTc2NTQ0Mzc1MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
   },
   {
-    id: 4,
-    title: "MEMORY FOAM LUXURY",
-    subtitle: "ADAPTIVE COMFORT FOR PERFECT REST",
+    id: 2,
+    title: "BLISS",
+    subtitle: "PRODUCTS FOR ONES IN THEIR PRIME",
     image:
       "https://images.unsplash.com/photo-1691703028663-c5ff8cbb07c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBtZW1vcnklMjBmb2FtJTIwbWF0dHJlc3N8ZW58MXx8fHwxNzY1NDQzNzUyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+  },
+  {
+    id: 3,
+    title: "GRACE",
+    subtitle: "SPECIALIST PRODUCTS TO CATER TO AGEING",
+    image:
+      "https://images.unsplash.com/photo-1718262722567-9f414d4cf98d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwbWF0dHJlc3MlMjBuYXR1cmFsfGVufDF8fHx8MTc2NTQ0Mzc1MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
   },
 ]
 
@@ -137,6 +130,7 @@ export default function Home() {
     router.push(path)
   }
 
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -171,29 +165,29 @@ export default function Home() {
             )}
           </button>
 
-          {/* Content Box - Left Bottom Corner */}
-          <div className="w-full relative z-10 pb-4 lg:pb-6 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-sm bg-white rounded-xl p-4 lg:p-8 shadow-xl" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}>
-              <h1 className="text-black text-2xl sm:text-3xl lg:text-4xl font-semibold mb-2 text-balance">Premium Comfort</h1>
-              <h2 className="text-black text-xl sm:text-2xl lg:text-3xl font-medium mb-6">Sleep Better, Live Better</h2>
-
-              <div className="flex flex-wrap gap-3">
-                <Button asChild className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-black px-6 py-5 text-lg rounded-md" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}>
-                  <Link href="/shop" className="flex items-center">
-                    Shop
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="border border-[#EED9C4] text-black hover:bg-[#EED9C4] hover:text-black px-6 py-5 text-lg bg-white rounded-md"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
-                >
-                  <Link href="/#comfort">More</Link>
-                </Button>
-              </div>
-            </div>
+          {/* Action Buttons - Lower Left Corner */}
+          <div className="relative z-10 flex flex-col sm:flex-row gap-4 pb-8 lg:pb-12 pl-4 sm:pl-6 lg:pl-8">
+            <Button 
+              asChild 
+              className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md shadow-lg transition-all duration-200 hover:scale-105" 
+              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
+            >
+              <Link href="/category/bliss" className="flex items-center">
+                Shop
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="border-2 border-white/90 text-white hover:bg-white/10 hover:border-white px-8 py-6 text-lg bg-transparent backdrop-blur-sm rounded-md shadow-lg transition-all duration-200 hover:scale-105"
+              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
+            >
+              <Link href="/#comfort" className="flex items-center">
+                Learn More
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </section>
 
@@ -201,14 +195,12 @@ export default function Home() {
         <div className="py-16 bg-white">
           <div className="max-w-7xl mx-auto text-center px-4">
             <h2
-              className="mb-4 font-semibold text-4xl "
-              style={{ color: "#000000" }}
+              className="mb-4 font-semibold text-4xl text-foreground"
             >
               Experience The Difference
             </h2>
             <p
-              className="max-w-2xl mx-auto text-xl font-semibold"
-              style={{ color: "#000000" }}
+              className="max-w-2xl mx-auto text-xl font-semibold text-foreground"
             >
               See how our mattresses are crafted with precision
               and care to deliver unmatched comfort.
@@ -253,6 +245,14 @@ export default function Home() {
                     {category.title}
                   </h2>
                   <button
+                    onClick={() => {
+                      const categoryMap: { [key: string]: string } = {
+                        "JOY": "/category/joy",
+                        "BLISS": "/category/bliss",
+                        "GRACE": "/category/grace",
+                      }
+                      router.push(categoryMap[category.title] || "/category/bliss")
+                    }}
                     className="px-8 py-3 bg-white hover:bg-gray-100 transition-colors"
                     style={{ color: "#6B563F" }}
                   >
@@ -302,14 +302,12 @@ export default function Home() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2
-                className="mb-4 text-4xl font-semibold"
-                style={{ color: "#000000" }}
+                className="mb-4 text-4xl font-semibold text-foreground"
               >
                 Find Your Perfect Mattress
               </h2>
               <p
-                className="max-w-2xl mx-auto text-xl font-semibold"
-                style={{ color: "#000000" }}
+                className="max-w-2xl mx-auto text-xl font-semibold text-foreground"
               >
                 Each mattress is expertly crafted with premium
                 materials to ensure the perfect night's sleep,
@@ -345,8 +343,8 @@ export default function Home() {
                     <div className={`absolute ${positionClasses[product.position as keyof typeof positionClasses]}`}>
                       <div className="bg-white px-6 py-3 text-center">
                         <span
-                          className="tracking-wider text-sm md:text-base font-semibold uppercase"
-                          style={{ color: "#000000", fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
+                          className="tracking-wider text-sm md:text-base font-semibold uppercase text-foreground"
+                          style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
                         >
                           {product.name}
                         </span>
@@ -365,15 +363,12 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="order-2 lg:order-1">
                 <p
-                  className="text-3xl font-bold mb-2"
-                  style={{ color: "#000000" }}
+                  className="text-3xl font-bold mb-2 text-foreground"
                 >
-                  Crafted for Comfort
+                  Our Crafted Heritage
                 </p>
-                <h2 className="mb-6 text-xl font-semibold" style={{ color: "#000000" }}>
-                  The Science of Better Sleep
-                </h2>
-                <p className="mb-6 text-lg text-black/90 font-medium" style={{ color: "#000000" }}>
+                
+                <p className="mb-6 text-lg text-foreground/90 font-medium">
                   Our mattresses are engineered with cutting-edge sleep technology and premium materials to
                   provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
                   help you wake up refreshed.
@@ -382,10 +377,10 @@ export default function Home() {
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
                     <div>
-                      <p className="mb-1 font-medium text-lg" style={{ color: "#000000" }}>
+                      <p className="mb-1 font-medium text-lg text-foreground">
                         Pressure Relief Technology
                       </p>
-                      <p className="font-medium text-lg" style={{ color: "#000000" }}>
+                      <p className="font-medium text-lg text-foreground">
                         Conforms to your body for optimal spinal alignment
                       </p>
                     </div>
@@ -393,10 +388,10 @@ export default function Home() {
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
                     <div>
-                      <p className="mb-1 font-medium text-lg" style={{ color: "#000000" }}>
+                      <p className="mb-1 font-medium text-lg text-foreground">
                         Temperature Regulation
                       </p>
-                      <p className="font-medium text-lg" style={{ color: "#000000" }}>
+                      <p className="font-medium text-lg text-foreground">
                         Advanced cooling system keeps you comfortable all night
                       </p>
                     </div>
@@ -404,10 +399,10 @@ export default function Home() {
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
                     <div>
-                      <p className="mb-1 font-medium text-lg" style={{ color: "#000000" }}>
+                      <p className="mb-1 font-medium text-lg text-foreground">
                         Motion Isolation
                       </p>
-                      <p className="font-medium text-lg" style={{ color: "#000000" }}>
+                      <p className="font-medium text-lg text-foreground">
                         Undisturbed sleep even with a restless partner
                       </p>
                     </div>
@@ -415,7 +410,7 @@ export default function Home() {
                 </div>
                 <button
                   onClick={() => router.push("/about")}
-                  className="bg-[#EED9C4] text-black font-medium text-lg px-8 py-3 hover:bg-[#D9BB9B]  transition-colors"
+                  className="bg-[#EED9C4] text-foreground font-medium text-lg px-8 py-3 hover:bg-[#D9BB9B]  transition-colors"
                 >
                   More
                 </button>
@@ -423,7 +418,7 @@ export default function Home() {
               <div className="order-1 lg:order-2">
                 <div className="relative aspect-square overflow-hidden">
                   <Image
-                    src="https://images.unsplash.com/photo-1590924439021-85cdab4bca41?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb21mb3J0YWJsZSUyMGJlZCUyMHNsZWVwfGVufDF8fHx8MTc2NDE3NTUwNXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                    src="/mattress.jpg"
                     alt="Comfort"
                     fill
                     className="w-full h-full object-cover"
@@ -439,10 +434,10 @@ export default function Home() {
           <div className="max-w-7xl mx-auto">
             {/* Section Header */}
             <div className="text-center mb-12">
-              <h2 className="text-4xl sm:text-4xl lg:text-4xl font-bold text-black mb-4 text-balance">
+              <h2 className="text-4xl sm:text-4xl lg:text-4xl font-bold text-foreground mb-4 text-balance">
                 What Our Customers Say
               </h2>
-              <p className="text-xl sm:text-2xl text-black font-semibold">Join thousands of happy sleepers</p>
+              <p className="text-xl sm:text-2xl text-foreground font-semibold">Join thousands of happy sleepers</p>
             </div>
 
             {/* Reviews Grid */}
@@ -450,17 +445,17 @@ export default function Home() {
               {reviews.map((review, index) => (
                 <div key={index} className="bg-[#EED9C4] rounded-lg p-8 flex flex-col">
                   {/* Review Text */}
-                  <p className="text-black text-base sm:text-lg mb-6 grow leading-relaxed font-semibold">{review.text}</p>
+                  <p className="text-foreground text-base sm:text-lg mb-6 grow leading-relaxed font-semibold">{review.text}</p>
 
                   {/* Author */}
-                  <p className="text-black font-semibold">— {review.author}</p>
+                  <p className="text-foreground font-semibold">— {review.author}</p>
                 </div>
               ))}
             </div>
 
             {/* Rating Summary */}
             <div className="text-center">
-              <p className="text-black text-lg font-semibold">Rated 4.9/5 from over 10,000 reviews</p>
+              <p className="text-foreground text-lg font-semibold">Rated 4.9/5 from over 10,000 reviews</p>
             </div>
           </div>
         </section>
