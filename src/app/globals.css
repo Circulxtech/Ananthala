@@ -129,3 +129,10 @@
     font-weight: 300;
   }
 }
+
+@layer utilities {
+  .font-cormorant {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+  }
+}

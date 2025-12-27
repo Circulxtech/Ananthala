@@ -56,14 +56,84 @@ export default function BlissPage() {
         {/* 2. Prime Product - Mattress (Hero Product) */}
         <section className="py-24 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}>
-                   Ananthala Difference
-                 </h1>
-                 <p className="text-xl md:text-2xl text-foreground/90 font-medium">
-                   Crafted for Your Needs
-                 </p>
-              </div>
+            {/* Ananthala Difference Section - Carousel */}
+            <div className="relative">
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-2 md:-ml-4">
+                  {[
+                    {
+                      id: 1,
+                      image: "/mattress.jpg",
+                      title: "Premium Comfort",
+                      description: "Our BLISS collection is designed for those in their prime years, offering the perfect balance of luxury and support. Each mattress is crafted with premium memory foam and natural latex layers that contour to your body, providing exceptional pressure relief and spinal alignment for the best sleep of your life.",
+                    },
+                    {
+                      id: 2,
+                      image: "/hybrid-mattress-with-blue-accent-pillows-bedroom.jpg",
+                      title: "Temperature Regulation",
+                      description: "Experience cool, comfortable sleep all night long with our advanced cooling technology. Our mattresses feature gel-infused memory foam and breathable cover materials that wick away moisture and regulate temperature, ensuring you stay comfortable regardless of the season.",
+                    },
+                    {
+                      id: 3,
+                      image: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
+                      title: "Complete Sleep System",
+                      description: "Enhance your sleep experience with our complimentary pillows and bedspreads. Every mattress purchase includes premium accessories that complement your mattress perfectly, creating a complete sleep environment designed for optimal rest and recovery.",
+                    },
+                  ].map((slide) => (
+                    <CarouselItem
+                      key={slide.id}
+                      className="pl-2 md:pl-4 basis-full"
+                    >
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        {/* Left Side - Image */}
+                        <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                          <Image
+                            src={slide.image}
+                            alt={slide.title}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        
+                        {/* Right Side - Text Content with Card */}
+                        <div className="space-y-6">
+                          <div className="text-sm uppercase tracking-wider font-medium text-foreground">
+                            ANANTHALA
+                          </div>
+                          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-cormorant text-foreground">
+                            Ananthala Difference
+                          </h1>
+                          <div className="text-sm uppercase tracking-wider font-medium text-foreground">
+                            BLISS COLLECTION
+                          </div>
+                          <p className="text-lg leading-relaxed text-foreground">
+                            Our BLISS collection is designed for those in their prime years, offering the perfect balance of luxury and support. Each mattress is crafted with premium memory foam and natural latex layers that contour to your body, providing exceptional pressure relief and spinal alignment for the best sleep of your life.
+                          </p>
+                          
+                          {/* Feature Card */}
+                          <div className="bg-stone-50 p-6 rounded-lg border border-[#EED9C4]/30 mt-8">
+                            <h3 className="text-2xl font-semibold mb-4 font-cormorant text-foreground">
+                              {slide.title}
+                            </h3>
+                            <p className="leading-relaxed text-foreground">
+                              {slide.description}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
+                <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
+              </Carousel>
+            </div>
             
             <div className="relative">
               <Carousel
@@ -120,7 +190,7 @@ export default function BlissPage() {
         <section className="py-24 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}>
+              <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 font-cormorant">
                 Complimentary Add-ons
               </h2>
               <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
@@ -131,7 +201,7 @@ export default function BlissPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Pillows - Complimentary */}
               <div className="bg-[#F5F1ED] p-6 rounded-lg border border-[#EED9C4]/30">
-                <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-4" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}>
+                <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-4 font-cormorant">
                   Pillows <span className="text-base font-normal text-foreground/70">(Complimentary)</span>
                 </h3>
                 <div className="flex flex-col md:flex-row gap-6">
@@ -169,7 +239,7 @@ export default function BlissPage() {
 
               {/* Bed Spread - Complimentary */}
               <div className="bg-[#F5F1ED] p-6 rounded-lg border border-[#EED9C4]/30">
-                <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-4" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}>
+                <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-4 font-cormorant">
                   Bed Spread <span className="text-base font-normal text-foreground/70">(Complimentary)</span>
                 </h3>
                 <div className="flex flex-col md:flex-row gap-6">
@@ -209,27 +279,64 @@ export default function BlissPage() {
           </div>
         </section>
 
-        {/* 4. Customer Testimonials - Video */}
+        {/* 4. Customer Testimonials - Video Carousel */}
         <section className="py-24 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}>
+            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center font-cormorant">
               Customer Testimonials
             </h2>
             <p className="text-center text-foreground/80 mb-8 max-w-2xl mx-auto">
               Hear from our satisfied customers about their experience with Ananthala mattresses
             </p>
-            <div className="relative aspect-video rounded-lg overflow-hidden shadow-xl">
-              <video
-                className="w-full h-full object-cover"
-                controls
-                controlsList="nodownload nofullscreen noremoteplayback"
-                disablePictureInPicture
-                onContextMenu={(e) => e.preventDefault()}
-                poster="/luxury-plush-mattress-with-pillows-on-bed.jpg"
+            <div className="relative">
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                className="w-full"
               >
-                <source src="/ananthala hero section video.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+                <CarouselContent className="-ml-2 md:-ml-4">
+                  {[
+                    {
+                      id: 1,
+                      video: "/ananthala hero section video.mp4",
+                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
+                    },
+                    {
+                      id: 2,
+                      video: "/ananthala hero section video.mp4",
+                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
+                    },
+                    {
+                      id: 3,
+                      video: "/ananthala hero section video.mp4",
+                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
+                    },
+                  ].map((testimonial) => (
+                    <CarouselItem
+                      key={testimonial.id}
+                      className="pl-2 md:pl-4 basis-full"
+                    >
+                      <div className="relative aspect-video rounded-lg overflow-hidden shadow-xl">
+                        <video
+                          className="w-full h-full object-cover"
+                          controls
+                          controlsList="nodownload nofullscreen noremoteplayback"
+                          disablePictureInPicture
+                          onContextMenu={(e) => e.preventDefault()}
+                          poster={testimonial.poster}
+                        >
+                          <source src={testimonial.video} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
+                <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
+              </Carousel>
             </div>
           </div>
         </section>
@@ -237,7 +344,7 @@ export default function BlissPage() {
         {/* 5. About Us - Reused from Landing Page */}
         <section className="py-24 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-8 text-center" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}>
+            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-8 text-center font-cormorant">
               About Us
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
