@@ -2,15 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { UserCheck, MessageSquare, ClipboardList, Users, FileText, HelpCircle, LogOut, TrendingUp } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { UserCheck, HelpCircle, LogOut } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export default function AgentDashboard() {
   const [isVerifying, setIsVerifying] = useState(true)
   const [agentData, setAgentData] = useState<{ fullname: string; email: string } | null>(null)
   const router = useRouter()
-  const { toast } = useToast()
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -50,10 +48,14 @@ export default function AgentDashboard() {
         verifyAuth()
       },
       30 * 60 * 1000,
-    ) // 30 minutes
+    )
 
     return () => clearInterval(intervalId)
   }, [router])
+
+  const handleCouponManagementClick = () => {
+    router.push("/agent/coupons")
+  }
 
   const handleLogout = async () => {
     try {
@@ -64,18 +66,9 @@ export default function AgentDashboard() {
         credentials: "include",
       })
 
-      toast({
-        title: "Logged Out",
-        description: "You have been successfully logged out.",
-      })
-
       router.replace("/agent")
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to logout. Please try again.",
-        variant: "destructive",
-      })
+      router.replace("/agent")
     }
   }
 
@@ -101,7 +94,7 @@ export default function AgentDashboard() {
       <div className="min-h-screen bg-[#F5F1ED] flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 rounded-full bg-white shadow-lg border-2 border-[#E5D5C5] flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <UserCheck className="w-8 h-8 text-[#8B5A3C]" />
+            <HelpCircle className="w-8 h-8 text-[#8B5A3C]" />
           </div>
           <p className="text-[#8B5A3C] font-medium">Verifying agent access...</p>
         </div>
@@ -164,96 +157,54 @@ export default function AgentDashboard() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h2 className="text-2xl font-normal text-[#6D4530] mb-2">Agent Dashboard</h2>
-          <p className="text-[#8B5A3C]">Manage customer support and inquiries</p>
+          <h2 className="text-3xl font-normal text-[#6D4530] mb-2">Dashboard Overview</h2>
+          <p className="text-[#8B5A3C]">Manage your Ananthala agent portal</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Customer Inquiries Card */}
-          <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <MessageSquare className="w-6 h-6 text-[#8B5A3C] group-hover:text-white transition-colors" />
-              </div>
-              <span className="text-xs px-2 py-1 rounded-full bg-[#F5F1ED] text-[#8B5A3C] font-medium">Active</span>
-            </div>
-            <h3 className="text-[#6D4530] font-medium mb-2 text-lg">Customer Inquiries</h3>
-            <p className="text-[#B8A396] text-sm">Respond to customer questions and concerns</p>
-          </div>
-
-          {/* Orders Management Card */}
-          <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <ClipboardList className="w-6 h-6 text-[#8B5A3C] group-hover:text-white transition-colors" />
-              </div>
-            </div>
-            <h3 className="text-[#6D4530] font-medium mb-2 text-lg">Orders Management</h3>
-            <p className="text-[#B8A396] text-sm">View and assist with customer orders</p>
-          </div>
-
-          {/* Customer Database Card */}
-          <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <Users className="w-6 h-6 text-[#8B5A3C] group-hover:text-white transition-colors" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div
+            onClick={handleCouponManagementClick}
+            className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-8 hover:shadow-xl transition-all duration-200 cursor-pointer group hover:border-[#8B5A3C]"
+          >
+            <div className="flex items-start justify-between mb-6">
+              <div className="w-16 h-16 rounded-xl bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
+                <svg
+                  className="w-8 h-8 text-[#8B5A3C] group-hover:text-white transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                  />
+                </svg>
               </div>
             </div>
-            <h3 className="text-[#6D4530] font-medium mb-2 text-lg">Customer Database</h3>
-            <p className="text-[#B8A396] text-sm">Access customer information and history</p>
-          </div>
-
-          {/* Knowledge Base Card */}
-          <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <FileText className="w-6 h-6 text-[#8B5A3C] group-hover:text-white transition-colors" />
-              </div>
-            </div>
-            <h3 className="text-[#6D4530] font-medium mb-2 text-lg">Knowledge Base</h3>
-            <p className="text-[#B8A396] text-sm">Access product information and FAQs</p>
-          </div>
-
-          {/* Support Tickets Card */}
-          <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <HelpCircle className="w-6 h-6 text-[#8B5A3C] group-hover:text-white transition-colors" />
-              </div>
-            </div>
-            <h3 className="text-[#6D4530] font-medium mb-2 text-lg">Support Tickets</h3>
-            <p className="text-[#B8A396] text-sm">Track and manage support cases</p>
-          </div>
-
-          {/* Performance Card */}
-          <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <TrendingUp className="w-6 h-6 text-[#8B5A3C] group-hover:text-white transition-colors" />
-              </div>
-            </div>
-            <h3 className="text-[#6D4530] font-medium mb-2 text-lg">Performance</h3>
-            <p className="text-[#B8A396] text-sm">View your support metrics and stats</p>
+            <h3 className="text-[#6D4530] font-medium mb-3 text-2xl">Coupon Management</h3>
+            <p className="text-[#B8A396] text-base leading-relaxed">Create and manage discount coupons</p>
           </div>
         </div>
 
         {/* Quick Stats Section */}
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-4">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-1">Active Inquiries</p>
-            <p className="text-2xl font-medium text-[#6D4530]">0</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white rounded-lg border border-[#E5D5C5] p-5 shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-2 font-medium">Active Coupons</p>
+            <p className="text-3xl font-medium text-[#6D4530]">0</p>
           </div>
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-4">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-1">Resolved Today</p>
-            <p className="text-2xl font-medium text-[#6D4530]">0</p>
+          <div className="bg-white rounded-lg border border-[#E5D5C5] p-5 shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-2 font-medium">Used Today</p>
+            <p className="text-3xl font-medium text-[#6D4530]">0</p>
           </div>
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-4">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-1">Avg Response Time</p>
-            <p className="text-2xl font-medium text-[#6D4530]">-</p>
+          <div className="bg-white rounded-lg border border-[#E5D5C5] p-5 shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-2 font-medium">Total Savings</p>
+            <p className="text-3xl font-medium text-[#6D4530]">₹0</p>
           </div>
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-4">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-1">Customer Rating</p>
-            <p className="text-2xl font-medium text-[#6D4530]">-</p>
+          <div className="bg-white rounded-lg border border-[#E5D5C5] p-5 shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-2 font-medium">Expiring Soon</p>
+            <p className="text-3xl font-medium text-[#6D4530]">0</p>
           </div>
         </div>
       </main>
