@@ -16,23 +16,23 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <p className="tracking-widest mb-4 text-black font-bold text-2xl">ANANTHALA</p>
-            <p className="text-black mb-6 font-semibold text-lg">
+            <p className="tracking-widest mb-4 text-foreground font-bold text-2xl">ANANTHALA</p>
+            <p className="text-foreground mb-6 font-semibold text-lg">
               Premium mattresses crafted for your best sleep. Experience luxury comfort with our 100-night trial
               and 15-year warranty.
             </p>
             {/* Contact Details */}
-            <div className="space-y-2 mb-6 text-black">
+            <div className="space-y-2 mb-6 text-foreground">
               <div className="flex items-center gap-2">
-                <Phone className="w-5 h-5 text-black" />
+                <Phone className="w-5 h-5 text-foreground" />
                 <span className="font-semibold text-lg">1-800-SLEEP-WELL</span>
               </div>
               <div className="flex items-center gap-2">
-                <Mail className="w-5 h-5 text-black" />
+                <Mail className="w-5 h-5 text-foreground" />
                 <span className="font-semibold text-lg">support@ananthala.com</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-black" />
+                <MapPin className="w-5 h-5 text-foreground" />
                 <span className="font-semibold text-lg">123 Sleep Street, San Francisco, CA</span>
               </div>
             </div>
@@ -67,8 +67,8 @@ export function Footer() {
 
           {/* contact */}
           <div>
-            <h4 className="mb-4 text-black font-bold text-xl">CONTACT</h4>
-            <ul className="space-y-2 text-black">
+            <h4 className="mb-4 text-foreground font-bold text-xl">CONTACT</h4>
+            <ul className="space-y-2 text-foreground">
               <li>
                 <button
                   onClick={() => onNavigate("products")}
@@ -97,8 +97,8 @@ export function Footer() {
 
           {/* Ananthala */}
           <div>
-            <h4 className="mb-4 text-black font-bold text-xl">ANANTHALA</h4>
-            <ul className="space-y-2 text-black">
+            <h4 className="mb-4 text-foreground font-bold text-xl">ANANTHALA</h4>
+            <ul className="space-y-2 text-foreground">
               <li>
                 <button
                   onClick={() => onNavigate("contact")}
@@ -147,7 +147,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-amber-100 flex flex-col md:flex-row justify-between items-center gap-4 text-black">
+        <div className="pt-8 border-t border-amber-100 flex flex-col md:flex-row justify-between items-center gap-4 text-foreground">
           <p className="font-semibold text-lg">© 2025 Ananthala. All rights reserved.</p>
           <div className="flex gap-6">
             <button

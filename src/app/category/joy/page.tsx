@@ -21,8 +21,8 @@ import { type CartItem } from "@/components/cart/cart-drawer"
 export default function JoyPage() {
   const [hamperSelected, setHamperSelected] = useState(true)
   const [selectedItems, setSelectedItems] = useState<string[]>([])
-  const [bedsheetColor, setBedsheetColor] = useState("")
-  const [bedsheetDimension, setBedsheetDimension] = useState("")
+  const [bedSpreadColor, setBedSpreadColor] = useState("")
+  const [pillowSize, setPillowSize] = useState("")
   const [swaddleSelected, setSwaddleSelected] = useState(false)
   const [selectedHamperImage, setSelectedHamperImage] = useState(0)
   const [mattressVariant, setMattressVariant] = useState("")
@@ -30,6 +30,7 @@ export default function JoyPage() {
   const [mattressFabric, setMattressFabric] = useState("")
   const [mattressApplicator, setMattressApplicator] = useState("")
   const [isAddingHamper, setIsAddingHamper] = useState(false)
+  const [isAddingMattress, setIsAddingMattress] = useState(false)
   const [addingProductId, setAddingProductId] = useState<string | null>(null)
   const [addingSwaddleType, setAddingSwaddleType] = useState<string | null>(null)
   
@@ -83,21 +84,31 @@ export default function JoyPage() {
       addToCart(cartItem)
     })
     
-    // Add complimentary bedsheet if color and dimension are selected
-    if (bedsheetColor && bedsheetDimension) {
-      const dimensionLabel = bedsheetDimension.split('-').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' ')
-      const colorLabel = bedsheetColor.charAt(0).toUpperCase() + bedsheetColor.slice(1)
-      const bedsheetItem: CartItem = {
-        id: `joy-bedsheet-${bedsheetDimension}-${bedsheetColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
-        name: "JOY Bedsheet (Complimentary)",
+    // Add complimentary bed spread if color is selected
+    if (bedSpreadColor) {
+      const colorLabel = bedSpreadColor.charAt(0).toUpperCase() + bedSpreadColor.slice(1)
+      const bedSpreadItem: CartItem = {
+        id: `joy-bedspread-${bedSpreadColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        name: "JOY Bed Spread (Complimentary)",
         image: "/bedsheet.jpg",
-        size: `${dimensionLabel} - ${colorLabel}`,
+        size: colorLabel,
         quantity: 1,
         price: 0,
       }
-      addToCart(bedsheetItem)
+      addToCart(bedSpreadItem)
+    }
+    
+    // Add complimentary pillow if size is selected
+    if (pillowSize) {
+      const pillowItem: CartItem = {
+        id: `joy-pillow-${pillowSize}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        name: "JOY Pillow (Complimentary)",
+        image: "/pillow.jpg",
+        size: pillowSize,
+        quantity: 1,
+        price: 0,
+      }
+      addToCart(pillowItem)
     }
     
     setHamperSelected(true)
@@ -150,6 +161,53 @@ export default function JoyPage() {
     
     setSwaddleSelected(true)
     setAddingSwaddleType(null)
+    setIsCartOpen(true)
+  }
+
+  const handleAddMattressToCart = async () => {
+    setIsAddingMattress(true)
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    const sizeInfo = `${mattressVariant || "Standard"} - ${mattressDimension || "Standard"}${mattressFabric ? ` - ${mattressFabric}` : ""}${mattressApplicator ? ` - ${mattressApplicator}` : ""}`
+    
+    const mattressItem: CartItem = {
+      id: `joy-mattress-${mattressVariant}-${mattressDimension}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      name: "JOY Mattress",
+      image: "/productmattress.jpg",
+      size: sizeInfo,
+      quantity: 1,
+      price: 299,
+    }
+    addToCart(mattressItem)
+    
+    // Add complimentary pillow if size is selected
+    if (pillowSize) {
+      const pillowItem: CartItem = {
+        id: `joy-pillow-${pillowSize}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        name: "JOY Pillow (Complimentary)",
+        image: "/pillow.jpg",
+        size: pillowSize,
+        quantity: 1,
+        price: 0,
+      }
+      addToCart(pillowItem)
+    }
+    
+    // Add complimentary bed spread if color is selected
+    if (bedSpreadColor) {
+      const bedSpreadItem: CartItem = {
+        id: `joy-bedspread-${bedSpreadColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        name: "JOY Bed Spread (Complimentary)",
+        image: "/bedsheet.jpg",
+        size: bedSpreadColor,
+        quantity: 1,
+        price: 0,
+      }
+      addToCart(bedSpreadItem)
+    }
+    
+    setIsAddingMattress(false)
     setIsCartOpen(true)
   }
 
@@ -243,6 +301,7 @@ export default function JoyPage() {
           </div>
         </section>
 
+       
         {/* Baby Hamper Section */}
         <section className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
@@ -428,40 +487,27 @@ export default function JoyPage() {
           </div>
         </section>
 
-        {/* Bedsheet Section - Complimentary */}
-        <section className="py-16 px-4 bg-stone-50">
+        
+
+        {/* Bed Spread Section - Complimentary */}
+        <section className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-2xl md:text-3xl text-center font-medium text-foreground mb-4 font-cormorant">
-              Bedsheet <span className="text-lg font-normal text-foreground">(Complimentary with purchase)</span>
+              Bed Spread <span className="text-lg font-normal text-foreground">(Complimentary with purchase)</span>
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center mt-8">
-              <div className="relative aspect-[4/3] overflow-hidden  w-full">
+              <div className="relative aspect-[4/3] overflow-hidden w-full">
                 <Image
                   src="/bedsheet.jpg"
-                  alt="Bedsheet"
+                  alt="Bed Spread"
                   fill
                   className="object-cover"
                 />
               </div>
               <div className="space-y-6 w-full p-6 bg-white border-2 border-[#EED9C4]">
                 <div>
-                  <label className="text-lg font-medium text-foreground mb-2 block">Dimension</label>
-                  <Select value={bedsheetDimension} onValueChange={setBedsheetDimension}>
-                    <SelectTrigger className="w-full text-foreground">
-                      <SelectValue placeholder="Select dimension" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="twin" className="text-foreground">Twin</SelectItem>
-                      <SelectItem value="full" className="text-foreground">Full</SelectItem>
-                      <SelectItem value="queen" className="text-foreground">Queen</SelectItem>
-                      <SelectItem value="king" className="text-foreground">King</SelectItem>
-                      <SelectItem value="california-king" className="text-foreground">California King</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
                   <label className="text-lg font-medium text-foreground mb-2 block">Color</label>
-                  <Select value={bedsheetColor} onValueChange={setBedsheetColor}>
+                  <Select value={bedSpreadColor} onValueChange={setBedSpreadColor}>
                     <SelectTrigger className="w-full text-foreground">
                       <SelectValue placeholder="Select color" />
                     </SelectTrigger>
@@ -474,7 +520,13 @@ export default function JoyPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <p className="text-foreground">Complimentary bedsheet included with your purchase.</p>
+                <div className="bg-[#EED9C4]/30 p-3 rounded border border-[#EED9C4]/50">
+                  <p className="text-foreground/70 text-sm flex items-center gap-2">
+                    <span className="text-foreground font-semibold">✓</span>
+                    Included at no additional cost
+                  </p>
+                </div>
+                <p className="text-foreground">Complimentary bed spread included with your mattress purchase.</p>
               </div>
             </div>
           </div>
@@ -541,49 +593,60 @@ export default function JoyPage() {
                       id: 1,
                       video: "/ananthala hero section video.mp4",
                       poster: "/productmattress.jpg",
+                      name: "Sarah Johnson",
                     },
                     {
                       id: 2,
                       video: "/ananthala hero section video.mp4",
                       poster: "/productmattress.jpg",
+                      name: "Michael Chen",
                     },
                     {
                       id: 3,
                       video: "/ananthala hero section video.mp4",
                       poster: "/productmattress.jpg",
+                      name: "Emily Rodriguez",
                     },
                     {
                       id: 4,
                       video: "/ananthala hero section video.mp4",
                       poster: "/productmattress.jpg",
+                      name: "David Thompson",
                     },
                     {
                       id: 5,
                       video: "/ananthala hero section video.mp4",
                       poster: "/productmattress.jpg",
+                      name: "Priya Sharma",
                     },
                     {
                       id: 6,
                       video: "/ananthala hero section video.mp4",
                       poster: "/productmattress.jpg",
+                      name: "James Wilson",
                     },
                   ].map((testimonial) => (
                     <CarouselItem
                       key={testimonial.id}
                       className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
                     >
-                      <div className="relative aspect-video overflow-hidden border border-[#EED9C4]">
-                        <video
-                          className="w-full h-full object-cover"
-                          controls
-                          controlsList="nodownload nofullscreen noremoteplayback"
-                          disablePictureInPicture
-                          onContextMenu={(e) => e.preventDefault()}
-                          poster={testimonial.poster}
-                        >
-                          <source src={testimonial.video} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
+                      <div className="space-y-2">
+                        <div className="relative aspect-video overflow-hidden border border-[#EED9C4]">
+                          <video
+                            className="w-full h-full object-cover"
+                            controls
+                            controlsList="nodownload nofullscreen noremoteplayback"
+                            disablePictureInPicture
+                            onContextMenu={(e) => e.preventDefault()}
+                            poster={testimonial.poster}
+                          >
+                            <source src={testimonial.video} type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                        </div>
+                        <p className="text-left text-foreground font-medium">
+                          {testimonial.name}
+                        </p>
                       </div>
                     </CarouselItem>
                   ))}

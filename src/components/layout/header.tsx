@@ -97,7 +97,7 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-[#F5F1ED] border-b relative z-50" style={{ borderColor: "#D9CFC7" }}>
+      <header className="bg-[#F5F1ED] border-b sticky top-0 z-50" style={{ borderColor: "#D9CFC7" }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
@@ -232,16 +232,16 @@ export function Header() {
 
         {isMenuOpen && (
           <div
-            className="absolute top-full left-0 right-0 bg-[#F5F1ED] border-b shadow-lg animate-in slide-in-from-top duration-300 max-h-[calc(100vh-4rem)] overflow-y-auto z-40"
+            className="fixed left-0 top-16 bottom-0 w-40 bg-[#F5F1ED] border-r shadow-lg animate-in slide-in-from-left duration-300 overflow-y-auto z-40"
             style={{ borderColor: "#D9CFC7" }}
           >
-            <nav className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <ul className="space-y-1">
+            <nav className="p-3">
+              <ul className="space-y-0.5">
                 {menuItems.map((item, index) => (
                   <li key={index}>
                     <Link
                       href={item.href}
-                      className="block py-3 px-4 text-[#6D4530] text-base font-normal tracking-wide hover:text-[#8B5A3C] hover:bg-[#8B5A3C]/10 transition-all duration-300 rounded-md"
+                      className="block py-2 px-3 text-[#6D4530] text-sm font-normal tracking-wide hover:text-[#8B5A3C] hover:bg-[#8B5A3C]/10 transition-all duration-300 rounded-md"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {item.label}
@@ -254,12 +254,19 @@ export function Header() {
         )}
       </header>
 
-      {(isMenuOpen || isSearchOpen) && (
+      {isSearchOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-30"
+          onClick={() => {
+            setIsSearchOpen(false)
+          }}
+        />
+      )}
+      {isMenuOpen && (
         <div
           className="fixed inset-0 bg-black/20 z-30"
           onClick={() => {
             setIsMenuOpen(false)
-            setIsSearchOpen(false)
           }}
         />
       )}
