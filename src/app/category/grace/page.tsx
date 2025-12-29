@@ -25,9 +25,35 @@ export default function GracePage() {
   const [mattressApplicator, setMattressApplicator] = useState("")
   const [pillowSize, setPillowSize] = useState("")
   const [bedSpreadColor, setBedSpreadColor] = useState("")
+  const [selectedColor, setSelectedColor] = useState("royal-blue")
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [isAddingMattress, setIsAddingMattress] = useState(false)
   
   const { addToCart, setIsCartOpen } = useCart()
+
+  // Color to images mapping
+  const colorImages: Record<string, string[]> = {
+    "royal-blue": ["/mattress.jpg", "/luxury-plush-mattress-with-pillows-on-bed.jpg", "/hybrid-mattress-with-blue-accent-pillows-bedroom.jpg", "/firm-mattress-with-beige-bedding-modern-bedroom.jpg", "/productmattress.jpg"],
+    gray: ["/luxury-plush-mattress-with-pillows-on-bed.jpg", "/mattress.jpg", "/hybrid-mattress-with-blue-accent-pillows-bedroom.jpg", "/firm-mattress-with-beige-bedding-modern-bedroom.jpg", "/productmattress.jpg"],
+    black: ["/hybrid-mattress-with-blue-accent-pillows-bedroom.jpg", "/mattress.jpg", "/luxury-plush-mattress-with-pillows-on-bed.jpg", "/firm-mattress-with-beige-bedding-modern-bedroom.jpg", "/productmattress.jpg"],
+    "dark-brown": ["/firm-mattress-with-beige-bedding-modern-bedroom.jpg", "/mattress.jpg", "/luxury-plush-mattress-with-pillows-on-bed.jpg", "/hybrid-mattress-with-blue-accent-pillows-bedroom.jpg", "/productmattress.jpg"],
+  }
+
+  const colors = [
+    { name: "royal-blue", label: "Royal Blue", hex: "#4169E1", overlay: "rgba(65, 105, 225, 0.5)", blendMode: "overlay" },
+    { name: "gray", label: "Gray", hex: "#4A4A4A", overlay: "rgba(74, 74, 74, 0.4)", blendMode: "multiply" },
+    { name: "black", label: "Black", hex: "#000000", overlay: "rgba(0, 0, 0, 0.3)", blendMode: "multiply" },
+    { name: "dark-brown", label: "Dark Brown", hex: "#5C4033", overlay: "rgba(92, 64, 51, 0.5)", blendMode: "overlay" },
+  ]
+
+  const selectedColorData = colors.find(c => c.name === selectedColor) || colors[0]
+
+  const currentImages = colorImages[selectedColor] || colorImages["royal-blue"]
+
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color)
+    setSelectedImageIndex(0) // Reset to first image when color changes
+  }
 
   const handleAddMattressToCart = async () => {
     setIsAddingMattress(true)
@@ -37,10 +63,10 @@ export default function GracePage() {
     const sizeInfo = `${mattressVariant || "Standard"} - ${mattressDimension || "Standard"}${mattressFabric ? ` - ${mattressFabric}` : ""}${mattressApplicator ? ` - ${mattressApplicator}` : ""}`
     
     const mattressItem: CartItem = {
-      id: `grace-mattress-${mattressVariant}-${mattressDimension}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      id: `grace-mattress-${mattressVariant}-${mattressDimension}-${selectedColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       name: "GRACE Mattress",
-      image: "/mattress.jpg",
-      size: sizeInfo,
+      image: currentImages[0],
+      size: `${sizeInfo}${selectedColor ? ` - ${colors.find(c => c.name === selectedColor)?.label || selectedColor}` : ""}`,
       quantity: 1,
       price: 29999, // Base price, can be adjusted based on selections
     }
@@ -184,12 +210,53 @@ export default function GracePage() {
                 {/* Main Image */}
                 <div className="relative aspect-square overflow-hidden">
                   <Image
-                    src="/mattress.jpg"
+                    src={currentImages[selectedImageIndex]}
                     alt="GRACE Mattress"
                     fill
                     className="object-cover"
                   />
+                  {/* Color Overlay */}
+                  <div 
+                    className="absolute inset-0 transition-all duration-300"
+                    style={{
+                      backgroundColor: selectedColorData.overlay,
+                      mixBlendMode: selectedColorData.blendMode as any,
+                    }}
+                  />
                 </div>
+                
+                {/* Thumbnail Gallery */}
+                {currentImages.length > 1 && (
+                  <div className="grid grid-cols-5 gap-2">
+                    {currentImages.map((image, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedImageIndex(index)}
+                        type="button"
+                        className={`relative aspect-square overflow-hidden border-2 transition-all cursor-pointer hover:opacity-80 ${
+                          selectedImageIndex === index
+                            ? "border-[#EED9C4] opacity-100"
+                            : "border-transparent opacity-60"
+                        }`}
+                      >
+                        <Image
+                          src={image}
+                          alt={`GRACE Mattress view ${index + 1}`}
+                          fill
+                          className="object-cover pointer-events-none"
+                        />
+                        {/* Color Overlay for Thumbnails */}
+                        <div 
+                          className="absolute inset-0"
+                          style={{
+                            backgroundColor: selectedColorData.overlay,
+                            mixBlendMode: selectedColorData.blendMode as any,
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="space-y-6">
                 {/* Mattress Customization */}
@@ -257,6 +324,41 @@ export default function GracePage() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+                </div>
+                
+                {/* Color Selection */}
+                <div className="p-6 bg-white border-2 border-[#EED9C4]">
+                  <h3 className="text-lg font-medium text-foreground mb-4">More Colors</h3>
+                  <div className="flex gap-3">
+                    {colors.map((color) => (
+                      <button
+                        key={color.name}
+                        onClick={() => handleColorChange(color.name)}
+                        type="button"
+                        className="relative transition-all hover:scale-110"
+                        aria-label={`Select ${color.label} color`}
+                      >
+                        <div
+                          className={`w-10 h-10 rounded-full border-2 transition-all shadow-sm ${
+                            selectedColor === color.name
+                              ? "border-[#EED9C4] ring-2 ring-[#EED9C4] ring-offset-2"
+                              : "border-gray-300 hover:border-[#EED9C4]"
+                          }`}
+                          style={{
+                            backgroundColor: color.hex,
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Price Section */}
+                <div className="p-6 bg-white border-2 border-[#EED9C4]">
+                  <h3 className="text-lg font-medium text-foreground mb-2">Price</h3>
+                  <div className="text-3xl font-semibold text-foreground">
+                    ₹29,999 <span className="text-base font-normal text-foreground/70">(inclusive of all taxes)</span>
                   </div>
                 </div>
                 

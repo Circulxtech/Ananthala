@@ -29,10 +29,36 @@ export default function JoyPage() {
   const [mattressDimension, setMattressDimension] = useState("")
   const [mattressFabric, setMattressFabric] = useState("")
   const [mattressApplicator, setMattressApplicator] = useState("")
+  const [selectedColor, setSelectedColor] = useState("royal-blue")
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [isAddingHamper, setIsAddingHamper] = useState(false)
   const [isAddingMattress, setIsAddingMattress] = useState(false)
   const [addingProductId, setAddingProductId] = useState<string | null>(null)
   const [addingSwaddleType, setAddingSwaddleType] = useState<string | null>(null)
+
+  // Color to images mapping
+  const colorImages: Record<string, string[]> = {
+    "royal-blue": ["/productmattress.jpg", "/topper.jpg", "/lounger.jpg", "/pillow.jpg", "/bumpers.jpg"],
+    gray: ["/topper.jpg", "/productmattress.jpg", "/lounger.jpg", "/pillow.jpg", "/bumpers.jpg"],
+    black: ["/lounger.jpg", "/productmattress.jpg", "/topper.jpg", "/pillow.jpg", "/bumpers.jpg"],
+    "dark-brown": ["/bumpers.jpg", "/productmattress.jpg", "/topper.jpg", "/lounger.jpg", "/pillow.jpg"],
+  }
+
+  const colors = [
+    { name: "royal-blue", label: "Royal Blue", hex: "#4169E1", overlay: "rgba(65, 105, 225, 0.5)", blendMode: "overlay" },
+    { name: "gray", label: "Gray", hex: "#4A4A4A", overlay: "rgba(74, 74, 74, 0.4)", blendMode: "multiply" },
+    { name: "black", label: "Black", hex: "#000000", overlay: "rgba(0, 0, 0, 0.3)", blendMode: "multiply" },
+    { name: "dark-brown", label: "Dark Brown", hex: "#5C4033", overlay: "rgba(92, 64, 51, 0.5)", blendMode: "overlay" },
+  ]
+
+  const selectedColorData = colors.find(c => c.name === selectedColor) || colors[0]
+
+  const currentImages = colorImages[selectedColor] || colorImages["royal-blue"]
+
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color)
+    setSelectedImageIndex(0) // Reset to first image when color changes
+  }
   
   const hamperImages = [
     { src: "/productmattress.jpg", item: "Mattress" },
@@ -73,11 +99,13 @@ export default function JoyPage() {
         ? `${mattressVariant || "Standard"} - ${mattressDimension}${mattressApplicator ? ` - ${mattressApplicator}` : ""}`
         : "Standard"
       
+      const colorInfo = selectedColor ? ` - ${colors.find(c => c.name === selectedColor)?.label || selectedColor}` : ""
+      
       const cartItem: CartItem = {
-        id: `joy-hamper-${product.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        id: `joy-hamper-${product.id}-${selectedColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         name: `JOY ${product.name}`,
-        image: product.image,
-        size: sizeInfo,
+        image: product.id === "mattress" ? currentImages[0] : product.image,
+        size: `${sizeInfo}${colorInfo}`,
         quantity: 1,
         price: product.price,
       }
@@ -172,10 +200,10 @@ export default function JoyPage() {
     const sizeInfo = `${mattressVariant || "Standard"} - ${mattressDimension || "Standard"}${mattressFabric ? ` - ${mattressFabric}` : ""}${mattressApplicator ? ` - ${mattressApplicator}` : ""}`
     
     const mattressItem: CartItem = {
-      id: `joy-mattress-${mattressVariant}-${mattressDimension}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      id: `joy-mattress-${mattressVariant}-${mattressDimension}-${selectedColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       name: "JOY Mattress",
-      image: "/productmattress.jpg",
-      size: sizeInfo,
+      image: currentImages[0],
+      size: `${sizeInfo}${selectedColor ? ` - ${colors.find(c => c.name === selectedColor)?.label || selectedColor}` : ""}`,
       quantity: 1,
       price: 299,
     }
@@ -313,35 +341,55 @@ export default function JoyPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
               <div className="space-y-4">
                 {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden ">
+                <div className="relative aspect-square overflow-hidden">
                   <Image
-                    src={hamperImages[selectedHamperImage].src}
-                    alt={hamperImages[selectedHamperImage].item}
+                    src={currentImages[selectedImageIndex]}
+                    alt="JOY Baby Hamper"
                     fill
                     className="object-cover"
                   />
+                  {/* Color Overlay */}
+                  <div 
+                    className="absolute inset-0 transition-all duration-300"
+                    style={{
+                      backgroundColor: selectedColorData.overlay,
+                      mixBlendMode: selectedColorData.blendMode as any,
+                    }}
+                  />
                 </div>
-                {/* Thumbnail Images */}
-                <div className="grid grid-cols-5 gap-2">
-                  {hamperImages.map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedHamperImage(index)}
-                      className={`relative aspect-square overflow-hidden  border-2 transition-all ${
-                        selectedHamperImage === index
-                          ? "border-foreground"
-                          : "border-transparent hover:border-foreground/50"
-                      }`}
-                    >
-                      <Image
-                        src={image.src}
-                        alt={image.item}
-                        fill
-                        className="object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
+                
+                {/* Thumbnail Gallery */}
+                {currentImages.length > 1 && (
+                  <div className="grid grid-cols-5 gap-2">
+                    {currentImages.map((image, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedImageIndex(index)}
+                        type="button"
+                        className={`relative aspect-square overflow-hidden border-2 transition-all cursor-pointer hover:opacity-80 ${
+                          selectedImageIndex === index
+                            ? "border-[#EED9C4] opacity-100"
+                            : "border-transparent opacity-60"
+                        }`}
+                      >
+                        <Image
+                          src={image}
+                          alt={`JOY Baby Hamper view ${index + 1}`}
+                          fill
+                          className="object-cover pointer-events-none"
+                        />
+                        {/* Color Overlay for Thumbnails */}
+                        <div 
+                          className="absolute inset-0"
+                          style={{
+                            backgroundColor: selectedColorData.overlay,
+                            mixBlendMode: selectedColorData.blendMode as any,
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="space-y-6">
                 {/* Mattress Customization */}
@@ -413,6 +461,42 @@ export default function JoyPage() {
                     ))}
                   </div>
                 </div>
+                
+                {/* Color Selection */}
+                <div className="p-6 bg-white border-2 border-[#EED9C4]">
+                  <h3 className="text-lg font-medium text-foreground mb-4">More Colors</h3>
+                  <div className="flex gap-3">
+                    {colors.map((color) => (
+                      <button
+                        key={color.name}
+                        onClick={() => handleColorChange(color.name)}
+                        type="button"
+                        className="relative transition-all hover:scale-110"
+                        aria-label={`Select ${color.label} color`}
+                      >
+                        <div
+                          className={`w-10 h-10 rounded-full border-2 transition-all shadow-sm ${
+                            selectedColor === color.name
+                              ? "border-[#EED9C4] ring-2 ring-[#EED9C4] ring-offset-2"
+                              : "border-gray-300 hover:border-[#EED9C4]"
+                          }`}
+                          style={{
+                            backgroundColor: color.hex,
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Price Section */}
+                <div className="p-6 bg-white border-2 border-[#EED9C4]">
+                  <h3 className="text-lg font-medium text-foreground mb-2">Price</h3>
+                  <div className="text-3xl font-semibold text-foreground">
+                    ₹{babyProducts.reduce((sum, product) => sum + product.price, 0).toLocaleString()} <span className="text-base font-normal text-foreground/70">(inclusive of all taxes)</span>
+                  </div>
+                </div>
+                
                 <Button 
                   className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleAddHamperToCart}
