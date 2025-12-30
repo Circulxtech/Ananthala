@@ -1,9 +1,8 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
-import { Upload, Plus, Trash2, AlertCircle, X } from "lucide-react"
+import { Upload, Plus, Trash2, AlertCircle, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,6 +14,7 @@ import type { ProductFormData, ProductVariant } from "@/types/product"
 interface AddProductModalProps {
   isOpen: boolean
   onClose: () => void
+  onProductAdded?: () => void
 }
 
 interface ProductImage {
@@ -23,7 +23,7 @@ interface ProductImage {
   preview: string
 }
 
-export default function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
+export default function AddProductModal({ isOpen, onClose, onProductAdded }: AddProductModalProps) {
   const [formData, setFormData] = useState<ProductFormData>({
     productTitle: "",
     description: "",
@@ -32,7 +32,7 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
     sellerEmail: "",
     location: "",
     category: "",
-    subCategory: "",
+    subCategory: "", // Will be removed from form, kept for backward compatibility
     variants: [
       {
         id: crypto.randomUUID(),
@@ -47,6 +47,8 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
   })
 
   const [productImages, setProductImages] = useState<ProductImage[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -126,12 +128,67 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[v0] Submitting product with variants:", formData)
-    console.log("[v0] Product images:", productImages)
-    // Add API call here
-    onClose()
+    setIsSubmitting(true)
+    setSubmitError(null)
+
+    if (productImages.length === 0) {
+      setSubmitError("Please upload at least one product image")
+      setIsSubmitting(false)
+      return
+    }
+
+    try {
+      const formDataToSend = new FormData()
+
+      formDataToSend.append("productTitle", formData.productTitle)
+      formDataToSend.append("description", formData.description)
+      formDataToSend.append("units", formData.units)
+      formDataToSend.append("sellerName", formData.sellerName)
+      formDataToSend.append("sellerEmail", formData.sellerEmail)
+      formDataToSend.append("location", formData.location)
+      formDataToSend.append("category", formData.category)
+      formDataToSend.append("subCategory", formData.subCategory)
+
+      formDataToSend.append("variants", JSON.stringify(formData.variants))
+
+      productImages.forEach((image, index) => {
+        formDataToSend.append(`image_${index}`, image.file)
+      })
+
+      console.log(
+        "[v0] Submitting product with",
+        productImages.length,
+        "images and",
+        formData.variants.length,
+        "variants",
+      )
+
+      const response = await fetch("/api/products", {
+        method: "POST",
+        body: formDataToSend,
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create product")
+      }
+
+      console.log("[v0] Product created successfully:", data)
+
+      if (onProductAdded) {
+        onProductAdded()
+      }
+
+      handleCancel()
+    } catch (error: any) {
+      console.error("[v0] Error creating product:", error)
+      setSubmitError(error.message || "Failed to create product. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleCancel = () => {
@@ -157,6 +214,7 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
       ],
     })
     setProductImages([])
+    setSubmitError(null)
     onClose()
   }
 
@@ -182,6 +240,13 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+          {submitError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 flex gap-2 sm:gap-3">
+              <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="text-xs sm:text-sm text-red-900">{submitError}</div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Basic Information */}
             <div className="space-y-4 sm:space-y-5">
@@ -500,62 +565,19 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
               Category
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="category" className="text-sm sm:text-base text-[#6D4530]">
-                  Category*
-                </Label>
-                <div className="flex gap-2">
-                  <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
-                    <SelectTrigger className="border-[#D9CFC7] h-10 sm:h-11">
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="welding">Welding & Soldering</SelectItem>
-                      <SelectItem value="solar">Solar</SelectItem>
-                      <SelectItem value="electrical">Electrical</SelectItem>
-                      <SelectItem value="tools">Tools</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="border-[#D9CFC7] flex-shrink-0 bg-transparent h-10 w-10 sm:h-11 sm:w-11"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="subCategory" className="text-sm sm:text-base text-[#6D4530]">
-                  Sub Category
-                </Label>
-                <div className="flex gap-2">
-                  <Select
-                    value={formData.subCategory}
-                    onValueChange={(value) => handleInputChange("subCategory", value)}
-                  >
-                    <SelectTrigger className="border-[#D9CFC7] h-10 sm:h-11">
-                      <SelectValue placeholder="Select Sub Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="wire">Wire</SelectItem>
-                      <SelectItem value="panels">Panels</SelectItem>
-                      <SelectItem value="inverters">Inverters</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="border-[#D9CFC7] flex-shrink-0 bg-transparent h-10 w-10 sm:h-11 sm:w-11"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="category" className="text-sm sm:text-base text-[#6D4530]">
+                Product Category*
+              </Label>
+              <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
+                <SelectTrigger className="border-[#D9CFC7] h-10 sm:h-11">
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mattress">Mattress</SelectItem>
+                  <SelectItem value="pillow">Pillow</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -565,12 +587,24 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
               type="button"
               variant="outline"
               onClick={handleCancel}
-              className="border-[#D9CFC7] hover:bg-[#F5F1ED] w-full sm:w-auto bg-transparent"
+              className="w-full sm:w-auto border-[#D9CFC7] text-[#6D4530] hover:bg-[#8B5A3C]/10 bg-transparent"
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <Button type="submit" className="bg-[#6D4530] hover:bg-[#8B5A3C] text-white w-full sm:w-auto">
-              Add Product
+            <Button
+              type="submit"
+              className="w-full sm:flex-1 bg-[#6D4530] hover:bg-[#8B5A3C] text-white font-semibold h-11 sm:h-12"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 mr-2 animate-spin" />
+                  Creating Product...
+                </>
+              ) : (
+                "Add Product"
+              )}
             </Button>
           </div>
         </form>
