@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import SecurityPasswordForm from "@/components/agent/security-password-form"
 
 export default function AgentSettingsPage() {
   const [emailNotifications, setEmailNotifications] = useState(true)
@@ -162,28 +163,7 @@ export default function AgentSettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="current-password" className="text-[#6D4530]">
-                  Current Password
-                </Label>
-                <Input id="current-password" type="password" className="border-[#D9CFC7] focus:border-[#8B5A3C]" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="new-password" className="text-[#6D4530]">
-                  New Password
-                </Label>
-                <Input id="new-password" type="password" className="border-[#D9CFC7] focus:border-[#8B5A3C]" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password" className="text-[#6D4530]">
-                  Confirm New Password
-                </Label>
-                <Input id="confirm-password" type="password" className="border-[#D9CFC7] focus:border-[#8B5A3C]" />
-              </div>
-              <Button className="bg-[#8B5A3C] hover:bg-[#6D4530] text-white">
-                <Lock className="h-4 w-4 mr-2" />
-                Update Password
-              </Button>
+              <SecurityPasswordForm />
             </CardContent>
           </Card>
         </TabsContent>

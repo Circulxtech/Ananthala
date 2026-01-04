@@ -2,13 +2,79 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { UserCheck, HelpCircle, LogOut } from "lucide-react"
+import { UserCheck, HelpCircle, LogOut, TrendingUp, Calendar, DollarSign, Tag } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
 
 export default function AgentDashboard() {
   const [isVerifying, setIsVerifying] = useState(true)
   const [agentData, setAgentData] = useState<{ fullname: string; email: string } | null>(null)
+  const [couponStats, setCouponStats] = useState<any>({
+    totalCoupons: 0,
+    activeCoupons: 0,
+    expiringSoon: 0,
+    totalSavings: 0,
+    usedToday: 0,
+    usageData: [],
+    recentCoupons: [],
+  })
+  const [isLoadingStats, setIsLoadingStats] = useState(false)
   const router = useRouter()
+
+  const fetchCouponStats = async () => {
+    try {
+      setIsLoadingStats(true)
+      const response = await fetch("/api/agent/coupons", {
+        credentials: "include",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch coupons")
+      }
+
+      const data = await response.json()
+
+      if (data.success && data.coupons) {
+        const coupons = data.coupons
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        const active = coupons.filter((c: any) => c.status === "active").length
+        const expiring = coupons.filter((c: any) => {
+          const expDate = new Date(c.expiryDate)
+          const daysUntilExpiry = Math.ceil((expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+          return daysUntilExpiry > 0 && daysUntilExpiry <= 7
+        }).length
+
+        const totalSavings = coupons.reduce((sum: number, coupon: any) => {
+          if (coupon.type === "percentage") {
+            return sum + coupon.discount * coupon.usedCount
+          } else {
+            return sum + coupon.discount * coupon.usedCount
+          }
+        }, 0)
+
+        const usageData = coupons.slice(0, 5).map((c: any) => ({
+          name: c.code,
+          count: c.usedCount,
+        }))
+
+        setCouponStats({
+          totalCoupons: coupons.length,
+          activeCoupons: active,
+          expiringSoon: expiring,
+          totalSavings: Math.round(totalSavings),
+          usedToday: coupons.reduce((sum: number, c: any) => sum + (c.usedCount || 0), 0),
+          usageData,
+          recentCoupons: coupons.slice(0, 3),
+        })
+      }
+    } catch (error) {
+      console.error("Error fetching coupon stats:", error)
+    } finally {
+      setIsLoadingStats(false)
+    }
+  }
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -21,9 +87,9 @@ export default function AgentDashboard() {
           throw new Error("Authentication failed")
         }
 
-        const data = await response.json()
+        const userData = await response.json()
 
-        if (!data.authenticated || data.user?.role !== "agent") {
+        if (!userData.authenticated || userData.user?.role !== "agent") {
           sessionStorage.removeItem("agent_session")
           router.replace("/agent")
           return
@@ -31,10 +97,12 @@ export default function AgentDashboard() {
 
         sessionStorage.setItem("agent_session", "active")
         setAgentData({
-          fullname: data.user.fullname,
-          email: data.user.email,
+          fullname: userData.user.fullname,
+          email: userData.user.email,
         })
         setIsVerifying(false)
+
+        fetchCouponStats()
       } catch (error) {
         sessionStorage.removeItem("agent_session")
         router.replace("/agent")
@@ -102,110 +170,189 @@ export default function AgentDashboard() {
     )
   }
 
+  const statCards = [
+    {
+      label: "Total Coupons",
+      value: couponStats.totalCoupons,
+      icon: <Tag className="w-6 h-6" />,
+      color: "#8B5A3C",
+      bgColor: "#F5F1ED",
+    },
+    {
+      label: "Active Coupons",
+      value: couponStats.activeCoupons,
+      icon: <TrendingUp className="w-6 h-6" />,
+      color: "#22C55E",
+      bgColor: "#F0FDF4",
+    },
+    {
+      label: "Total Savings",
+      value: `₹${couponStats.totalSavings.toLocaleString()}`,
+      icon: <DollarSign className="w-6 h-6" />,
+      color: "#2563EB",
+      bgColor: "#EFF6FF",
+    },
+    {
+      label: "Expiring Soon",
+      value: couponStats.expiringSoon,
+      icon: <Calendar className="w-6 h-6" />,
+      color: "#EF4444",
+      bgColor: "#FEF2F2",
+    },
+  ]
+
+  const COLORS = ["#8B5A3C", "#6D4530", "#A67C52", "#C89968", "#D4A574"]
+
   return (
     <div className="min-h-screen bg-[#F5F1ED]">
-      {/* Header */}
-      <header className="bg-white border-b border-[#E5D5C5] shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#8B5A3C] flex items-center justify-center">
-                <UserCheck className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-normal text-[#6D4530] tracking-wide">Ananthala Agent</h1>
-                <p className="text-xs text-[#B8A396]">Dashboard</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              {agentData && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none">
-                      <div
-                        className={`w-10 h-10 rounded-full bg-gradient-to-br ${getGradientColor(agentData.fullname)} flex items-center justify-center text-white font-medium shadow-md hover:shadow-lg transition-shadow`}
-                      >
-                        {agentData.fullname.charAt(0).toUpperCase()}
-                      </div>
-                      <span className="text-sm text-[#6D4530] hidden sm:inline font-medium">
-                        {getFirstName(agentData.fullname)}
-                      </span>
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-white border-[#E5D5C5]">
-                    <div className="px-3 py-2 border-b border-[#E5D5C5]">
-                      <p className="text-sm font-medium text-[#6D4530]">{agentData.fullname}</p>
-                      <p className="text-xs text-[#B8A396] mt-1">{agentData.email}</p>
-                      <p className="text-xs text-[#8B5A3C] mt-1 font-medium">Agent Access</p>
-                    </div>
-                    <DropdownMenuItem
-                      onClick={handleLogout}
-                      className="text-[#8B5A3C] cursor-pointer hover:bg-[#F5F1ED] focus:bg-[#F5F1ED]"
-                    >
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+     
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Title */}
         <div className="mb-8">
-          <h2 className="text-3xl font-normal text-[#6D4530] mb-2">Dashboard Overview</h2>
-          <p className="text-[#8B5A3C]">Manage your Ananthala agent portal</p>
+          <h2 className="text-3xl sm:text-4xl font-semibold text-[#6D4530] mb-2">Dashboard Overview</h2>
+          <p className="text-[#8B5A3C]">Manage your coupon strategy and track performance metrics</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          <div
-            onClick={handleCouponManagementClick}
-            className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-8 hover:shadow-xl transition-all duration-200 cursor-pointer group hover:border-[#8B5A3C]"
-          >
-            <div className="flex items-start justify-between mb-6">
-              <div className="w-16 h-16 rounded-xl bg-[#F5F1ED] flex items-center justify-center group-hover:bg-[#8B5A3C] transition-colors">
-                <svg
-                  className="w-8 h-8 text-[#8B5A3C] group-hover:text-white transition-colors"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+        {/* Quick Action Card */}
+        
+        {/* Statistics Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {statCards.map((stat, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-lg border border-[#E5D5C5] p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div
+                  className="w-12 h-12 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: stat.bgColor }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                  />
-                </svg>
+                  <div style={{ color: stat.color }}>{stat.icon}</div>
+                </div>
               </div>
+              <p className="text-sm text-[#8B5A3C]/70 font-medium mb-2">{stat.label}</p>
+              <p className="text-3xl font-bold text-[#6D4530]">{stat.value}</p>
             </div>
-            <h3 className="text-[#6D4530] font-medium mb-3 text-2xl">Coupon Management</h3>
-            <p className="text-[#B8A396] text-base leading-relaxed">Create and manage discount coupons</p>
+          ))}
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Usage Chart */}
+          <div className="bg-white rounded-lg border border-[#E5D5C5] p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-[#6D4530] mb-6">Top Coupon Usage</h3>
+            {isLoadingStats ? (
+              <div className="h-64 flex items-center justify-center">
+                <p className="text-[#8B5A3C]/50">Loading chart...</p>
+              </div>
+            ) : couponStats.usageData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={couponStats.usageData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5D5C5" />
+                  <XAxis dataKey="name" stroke="#8B5A3C" />
+                  <YAxis stroke="#8B5A3C" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#F5F1ED",
+                      border: "1px solid #E5D5C5",
+                      borderRadius: "8px",
+                    }}
+                    labelStyle={{ color: "#6D4530" }}
+                  />
+                  <Bar dataKey="count" fill="#8B5A3C" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-64 flex items-center justify-center">
+                <p className="text-[#8B5A3C]/50">No coupon data available</p>
+              </div>
+            )}
+          </div>
+
+          {/* Coupon Status Distribution */}
+          <div className="bg-white rounded-lg border border-[#E5D5C5] p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-[#6D4530] mb-6">Coupon Status</h3>
+            {isLoadingStats ? (
+              <div className="h-64 flex items-center justify-center">
+                <p className="text-[#8B5A3C]/50">Loading chart...</p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: "Active", value: couponStats.activeCoupons },
+                      { name: "Expiring Soon", value: couponStats.expiringSoon },
+                      {
+                        name: "Other",
+                        value: Math.max(
+                          0,
+                          couponStats.totalCoupons - couponStats.activeCoupons - couponStats.expiringSoon,
+                        ),
+                      },
+                    ]}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${value}`}
+                    outerRadius={100}
+                    fill="#8B5A3C"
+                    dataKey="value"
+                  >
+                    {COLORS.map((color, index) => (
+                      <Cell key={`cell-${index}`} fill={color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#F5F1ED",
+                      border: "1px solid #E5D5C5",
+                      borderRadius: "8px",
+                    }}
+                    labelStyle={{ color: "#6D4530" }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
-        {/* Quick Stats Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-5 shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-2 font-medium">Active Coupons</p>
-            <p className="text-3xl font-medium text-[#6D4530]">0</p>
-          </div>
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-5 shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-2 font-medium">Used Today</p>
-            <p className="text-3xl font-medium text-[#6D4530]">0</p>
-          </div>
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-5 shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-2 font-medium">Total Savings</p>
-            <p className="text-3xl font-medium text-[#6D4530]">₹0</p>
-          </div>
-          <div className="bg-white rounded-lg border border-[#E5D5C5] p-5 shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-xs text-[#B8A396] uppercase tracking-wide mb-2 font-medium">Expiring Soon</p>
-            <p className="text-3xl font-medium text-[#6D4530]">0</p>
-          </div>
+        {/* Recent Coupons Section */}
+        <div className="bg-white rounded-lg border border-[#E5D5C5] p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-[#6D4530] mb-6">Recent Coupons</h3>
+          {isLoadingStats ? (
+            <div className="h-32 flex items-center justify-center">
+              <p className="text-[#8B5A3C]/50">Loading coupons...</p>
+            </div>
+          ) : couponStats.recentCoupons.length > 0 ? (
+            <div className="space-y-3">
+              {couponStats.recentCoupons.map((coupon: any, index: number) => (
+                <div key={index} className="flex items-center justify-between p-4 bg-[#F5F1ED] rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-[#8B5A3C]/10 flex items-center justify-center">
+                      <Tag className="w-5 h-5 text-[#8B5A3C]" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[#6D4530]">{coupon.code}</p>
+                      <p className="text-sm text-[#8B5A3C]/70">
+                        {coupon.type === "percentage" ? `${coupon.discount}%` : `₹${coupon.discount}`} discount
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-[#6D4530]">{coupon.usedCount || 0} uses</p>
+                    <p className="text-xs text-[#8B5A3C]/70">Status: {coupon.status}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="h-32 flex items-center justify-center">
+              <p className="text-[#8B5A3C]/50">No recent coupons available</p>
+            </div>
+          )}
         </div>
       </main>
     </div>
