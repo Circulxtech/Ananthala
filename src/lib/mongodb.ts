@@ -10,9 +10,7 @@ if (!cached) {
 
 async function connectDB() {
   if (!MONGODB_URI) {
-    throw new Error(
-      "Please define the MONGODB_URI environment variable inside .env.local\n" 
-    )
+    throw new Error("Please define the MONGODB_URI environment variable inside .env.local\n")
   }
 
   if (cached.conn) {
@@ -51,4 +49,5 @@ async function connectDB() {
   return cached.conn
 }
 
+export { connectDB }
 export default connectDB

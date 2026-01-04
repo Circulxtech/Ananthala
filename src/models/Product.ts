@@ -6,6 +6,7 @@ export interface IProductVariant {
   length: number // in cm
   width: number // in cm
   height: number // in cm
+  color: string
   price: number
   stock: number
 }
@@ -51,6 +52,12 @@ const ProductVariantSchema = new Schema<IProductVariant>(
       type: Number,
       required: [true, "Height is required"],
       min: [0, "Height must be positive"],
+    },
+    color: {
+      type: String,
+      required: [true, "Color is required"],
+      trim: true,
+      maxlength: [50, "Color cannot exceed 50 characters"],
     },
     price: {
       type: Number,
@@ -107,8 +114,8 @@ const ProductSchema = new Schema<IProduct>(
       type: String,
       required: [true, "Category is required"],
       enum: {
-        values: ["mattress", "pillow"],
-        message: "Category must be either mattress or pillow",
+        values: ["mattress", "pillow", "bedding"],
+        message: "Category must be either mattress, pillow, or bedding",
       },
       trim: true,
     },

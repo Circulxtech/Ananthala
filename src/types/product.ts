@@ -4,6 +4,7 @@ export interface ProductVariant {
   length: string // in cm
   width: string // in cm
   height: string // in cm
+  color: string // added color field to ProductVariant interface
   price: string
   stock: string
 }

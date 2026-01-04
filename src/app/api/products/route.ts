@@ -77,10 +77,10 @@ export async function POST(request: Request) {
     }
 
     const categoryLower = category.toLowerCase()
-    if (categoryLower !== "mattress" && categoryLower !== "pillow") {
+    if (categoryLower !== "mattress" && categoryLower !== "pillow" && categoryLower !== "bedding") {
       console.error("[v0] Invalid category:", category)
       return NextResponse.json(
-        { success: false, message: "Category must be either Mattress or Pillow" },
+        { success: false, message: "Category must be either Mattress, Pillow, or Bedding" },
         { status: 400 },
       )
     }
@@ -106,12 +106,18 @@ export async function POST(request: Request) {
       const length = Number.parseFloat(variant.length)
       const width = Number.parseFloat(variant.width)
       const height = Number.parseFloat(variant.height)
+      const color = variant.color?.trim()
       const price = Number.parseFloat(variant.price)
       const stock = Number.parseInt(variant.stock, 10)
 
       if (isNaN(weight) || isNaN(length) || isNaN(width) || isNaN(height) || isNaN(price) || isNaN(stock)) {
         console.error(`[v0] Invalid numeric values in variant ${index + 1}:`, variant)
         throw new Error(`Variant ${index + 1} has invalid numeric values. Please check all fields.`)
+      }
+
+      if (!color) {
+        console.error(`[v0] Missing color in variant ${index + 1}`)
+        throw new Error(`Variant ${index + 1} requires a color.`)
       }
 
       if (weight <= 0 || length <= 0 || width <= 0 || height <= 0 || price <= 0 || stock < 0) {
@@ -125,6 +131,7 @@ export async function POST(request: Request) {
         length,
         width,
         height,
+        color,
         price,
         stock,
       }

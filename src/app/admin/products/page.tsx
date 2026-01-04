@@ -37,6 +37,8 @@ export default function ProductManagementPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
   const fetchProducts = async () => {
     try {
@@ -97,6 +99,15 @@ export default function ProductManagementPage() {
   const filteredProducts =
     selectedCategory === "all" ? products : products.filter((p) => p.category === selectedCategory.toLowerCase())
 
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedCategory])
+
   const getProductStats = (product: Product) => {
     const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0)
     const basePrice = product.variants.length > 0 ? product.variants[0].price : 0
@@ -115,13 +126,13 @@ export default function ProductManagementPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#6D4530]">Product Management</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#4A2F1F]">Product Management</h1>
       </div>
 
       {/* Product Stock Section */}
       <div className="bg-white rounded-lg shadow-sm border border-[#D9CFC7] p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-[#6D4530]">
+          <h2 className="text-lg sm:text-xl font-semibold text-[#4A2F1F]">
             Product Stock ({filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""})
           </h2>
 
@@ -139,7 +150,7 @@ export default function ProductManagementPage() {
 
             <Button
               variant="outline"
-              className="border-[#D9CFC7] text-[#6D4530] hover:bg-[#8B5A3C]/10 bg-transparent"
+              className="border-[#D9CFC7] text-[#4A2F1F] hover:bg-[#8B5A3C]/10 bg-transparent font-medium"
               onClick={handleRefresh}
               disabled={isRefreshing}
             >
@@ -162,17 +173,17 @@ export default function ProductManagementPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#D9CFC7]">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#6D4530]">Product Image</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#6D4530]">Category</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#6D4530]">Product Name</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#6D4530]">Variants</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#6D4530]">Total Stock</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#6D4530]">Base Price (₹)</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#6D4530]">Action</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Product Image</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Category</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Product Name</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Variants</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Total Stock</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Base Price (₹)</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Action</th>
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product) => {
+              {paginatedProducts.map((product) => {
                 const { totalStock, basePrice } = getProductStats(product)
                 return (
                   <tr key={product._id} className="border-b border-[#D9CFC7] hover:bg-[#F5F1ED]/50">
@@ -183,16 +194,18 @@ export default function ProductManagementPage() {
                         className="w-12 h-12 object-cover rounded"
                       />
                     </td>
-                    <td className="py-4 px-4 text-[#6D4530] capitalize">{product.category}</td>
+                    <td className="py-4 px-4 text-[#6D4530] font-medium capitalize">{product.category}</td>
                     <td className="py-4 px-4">
                       <div>
-                        <div className="font-medium text-[#6D4530]">{product.productTitle}</div>
-                        {product.subCategory && <div className="text-sm text-[#8B5A3C]/70">{product.subCategory}</div>}
+                        <div className="font-semibold text-[#4A2F1F]">{product.productTitle}</div>
+                        {product.subCategory && (
+                          <div className="text-sm text-[#6D4530] mt-0.5">{product.subCategory}</div>
+                        )}
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-[#6D4530]">{product.variants.length}</td>
-                    <td className="py-4 px-4 text-[#6D4530]">{totalStock}</td>
-                    <td className="py-4 px-4 text-[#6D4530]">₹{basePrice.toLocaleString()}</td>
+                    <td className="py-4 px-4 text-[#4A2F1F] font-medium">{product.variants.length}</td>
+                    <td className="py-4 px-4 text-[#4A2F1F] font-medium">{totalStock}</td>
+                    <td className="py-4 px-4 text-[#4A2F1F] font-semibold">₹{basePrice.toLocaleString()}</td>
                     <td className="py-4 px-4">
                       <Button
                         variant="ghost"
@@ -212,7 +225,7 @@ export default function ProductManagementPage() {
 
         {/* Mobile/Tablet Card View */}
         <div className="lg:hidden space-y-4">
-          {filteredProducts.map((product) => {
+          {paginatedProducts.map((product) => {
             const { totalStock, basePrice } = getProductStats(product)
             return (
               <div key={product._id} className="border border-[#D9CFC7] rounded-lg p-4 space-y-3">
@@ -223,20 +236,20 @@ export default function ProductManagementPage() {
                     className="w-16 h-16 object-cover rounded flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-[#6D4530] truncate">{product.productTitle}</h3>
-                    <p className="text-sm text-[#8B5A3C]/70 capitalize">{product.category}</p>
-                    <p className="text-sm text-[#8B5A3C]/70">{product.variants.length} variants</p>
+                    <h3 className="font-semibold text-[#4A2F1F] truncate">{product.productTitle}</h3>
+                    <p className="text-sm text-[#6D4530] font-medium capitalize">{product.category}</p>
+                    <p className="text-sm text-[#6D4530]">{product.variants.length} variants</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-[#8B5A3C]/70">Total Stock:</span>
-                    <span className="ml-2 font-medium text-[#6D4530]">{totalStock}</span>
+                    <span className="text-[#6D4530]">Total Stock:</span>
+                    <span className="ml-2 font-semibold text-[#4A2F1F]">{totalStock}</span>
                   </div>
                   <div>
-                    <span className="text-[#8B5A3C]/70">Base Price:</span>
-                    <span className="ml-2 font-medium text-[#6D4530]">₹{basePrice.toLocaleString()}</span>
+                    <span className="text-[#6D4530]">Base Price:</span>
+                    <span className="ml-2 font-semibold text-[#4A2F1F]">₹{basePrice.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -257,7 +270,7 @@ export default function ProductManagementPage() {
 
         {filteredProducts.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-[#8B5A3C]/70">
+            <p className="text-[#6D4530] font-medium">
               {selectedCategory === "all"
                 ? "No products found. Add your first product to get started!"
                 : `No ${selectedCategory} products found.`}
@@ -266,12 +279,36 @@ export default function ProductManagementPage() {
         )}
 
         {/* Pagination */}
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#D9CFC7]">
-          <p className="text-sm text-[#8B5A3C]/70">
-            Showing 1-{filteredProducts.length} of {filteredProducts.length}
-          </p>
-          <p className="text-sm text-[#8B5A3C]/70">1 of 1</p>
-        </div>
+        {filteredProducts.length > 0 && (
+          <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#D9CFC7]">
+            <p className="text-sm text-[#4A2F1F] font-medium">
+              Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="border-[#D9CFC7] text-[#4A2F1F] disabled:opacity-50"
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-[#4A2F1F] font-medium px-3">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="border-[#D9CFC7] text-[#4A2F1F] disabled:opacity-50"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Add Product Modal */}

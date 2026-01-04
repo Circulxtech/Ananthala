@@ -40,6 +40,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
         length: "",
         width: "",
         height: "",
+        color: "",
         price: "",
         stock: "",
       },
@@ -110,6 +111,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
           length: "",
           width: "",
           height: "",
+          color: "",
           price: "",
           stock: "",
         },
@@ -208,6 +210,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
           length: "",
           width: "",
           height: "",
+          color: "",
           price: "",
           stock: "",
         },
@@ -226,7 +229,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
             Add New Product
           </DialogTitle>
           <p className="text-xs sm:text-sm text-[#8B5A3C]/70">
-            Fill in the product details and add variants with different dimensions, weights, and pricing
+            Fill in the product details and add variants with different dimensions, weights, colors, and pricing
           </p>
         </DialogHeader>
 
@@ -460,6 +463,21 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                     </div>
 
                     <div className="space-y-2">
+                      <Label htmlFor={`color-${variant.id}`} className="text-sm text-[#6D4530]">
+                        Color*
+                      </Label>
+                      <Input
+                        id={`color-${variant.id}`}
+                        type="text"
+                        placeholder="e.g., Blue, White, Gray"
+                        value={variant.color}
+                        onChange={(e) => handleVariantChange(variant.id, "color", e.target.value)}
+                        className="border-[#D9CFC7] h-10 sm:h-11"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
                       <Label htmlFor={`price-${variant.id}`} className="text-sm text-[#6D4530]">
                         Price (₹)*
                       </Label>
@@ -493,9 +511,9 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
 
                   <div className="bg-white rounded p-3 text-xs sm:text-sm text-[#6D4530] border border-[#D9CFC7]">
                     <strong>Summary:</strong>{" "}
-                    {variant.weight && variant.length && variant.width && variant.height
-                      ? `${variant.weight}kg · ${variant.length}×${variant.width}×${variant.height}cm`
-                      : "Fill dimensions"}{" "}
+                    {variant.color && variant.weight && variant.length && variant.width && variant.height
+                      ? `${variant.color} · ${variant.weight}kg · ${variant.length}×${variant.width}×${variant.height}cm`
+                      : "Fill dimensions and color"}{" "}
                     {variant.price ? `· ₹${variant.price}` : ""}
                     {variant.stock ? ` · ${variant.stock} in stock` : ""}
                   </div>
@@ -570,12 +588,13 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                 Product Category*
               </Label>
               <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
-                <SelectTrigger className="border-[#D9CFC7] h-10 sm:h-11">
+                <SelectTrigger className="border-[#D9CFC7] h-10 sm:h-11 bg-white">
                   <SelectValue placeholder="Select Category" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="mattress">Mattress</SelectItem>
                   <SelectItem value="pillow">Pillow</SelectItem>
+                  <SelectItem value="bedding">Bedding</SelectItem>
                 </SelectContent>
               </Select>
             </div>

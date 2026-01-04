@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken"
 const JWT_SECRET = process.env.JWT_SECRET || "9e00ca4a7a7f9dcd01cf6b8ae3de0d10"
 
 export interface JWTPayload {
+  id: any
   userId: string
   email: string
   fullname: string
@@ -33,3 +34,5 @@ export function verifyToken(token: string): JWTPayload | null {
     return null
   }
 }
+
+export const jwtVerify = verifyToken
