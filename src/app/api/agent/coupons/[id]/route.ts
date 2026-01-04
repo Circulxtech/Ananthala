@@ -4,7 +4,7 @@ import { verifyToken } from "@/lib/jwt"
 import Coupon from "@/models/Coupons"
 import { ObjectId } from "mongodb"
 
-export async function DELETE(request: NextRequest, { params }: { params: any }) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     // Verify authentication
     const token = request.cookies.get("agent_token")?.value
