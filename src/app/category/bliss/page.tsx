@@ -373,7 +373,7 @@ export default function BlissPage() {
                       Adding to Cart...
                     </>
                   ) : (
-                    "Add to Cart"
+                    "Choose Your Comfort"
                   )}
                 </Button>
               </div>

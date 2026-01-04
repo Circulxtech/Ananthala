@@ -278,7 +278,7 @@ export default function AboutPage() {
                     <p className="text-lg font-semibold text-black text-center">
                       Free pickup and eco-friendly disposal of your old mattress. We partner with recycling facilities
                       to ensure that up to 95% of your old mattress materials are recycled or repurposed, keeping waste out
-                      of landfills.
+                      of    landfills.
                     </p>
                   </div>
                 </div>
