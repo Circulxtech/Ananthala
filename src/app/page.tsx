@@ -8,6 +8,13 @@ import { ArrowRight, Volume2, VolumeX, ChevronLeft, ChevronRight } from "lucide-
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 // Categories data
 const categories = [
@@ -62,24 +69,50 @@ const products = [
   },
 ]
 
-// Reviews data
-interface Review {
-  text: string
-  author: string
+// Testimonials data
+interface Testimonial {
+  id: number
+  video: string
+  poster: string
+  name: string
 }
 
-const reviews: Review[] = [
+const testimonials: Testimonial[] = [
   {
-    text: "Best sleep I've had in years! The Cloud mattress is incredibly comfortable and I wake up without any back pain.",
-    author: "Sarah Johnson",
+    id: 1,
+    video: "/ananthala hero section video.mp4",
+    poster: "/productmattress.jpg",
+    name: "Sarah Johnson",
   },
   {
-    text: "The Harmony hybrid is perfect. Great support with just the right amount of softness. Worth every penny!",
-    author: "Michael Chen",
+    id: 2,
+    video: "/ananthala hero section video.mp4",
+    poster: "/productmattress.jpg",
+    name: "Michael Chen",
   },
   {
-    text: "Amazing customer service and the delivery was seamless. The mattress exceeded my expectations.",
-    author: "Emily Davis",
+    id: 3,
+    video: "/ananthala hero section video.mp4",
+    poster: "/productmattress.jpg",
+    name: "Emily Rodriguez",
+  },
+  {
+    id: 4,
+    video: "/ananthala hero section video.mp4",
+    poster: "/productmattress.jpg",
+    name: "David Thompson",
+  },
+  {
+    id: 5,
+    video: "/ananthala hero section video.mp4",
+    poster: "/productmattress.jpg",
+    name: "Priya Sharma",
+  },
+  {
+    id: 6,
+    video: "/ananthala hero section video.mp4",
+    poster: "/productmattress.jpg",
+    name: "James Wilson",
   },
 ]
 
@@ -203,7 +236,7 @@ export default function Home() {
               Experience The Difference
             </h2>
             <p
-              className="max-w-2xl mx-auto text-xl font-semibold text-foreground"
+              className="max-w-2xl mx-auto text-xl font-medium text-foreground"
               style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
             >
               See how our mattresses are crafted with precision
@@ -426,33 +459,53 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Reviews Section */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        {/* Customer Testimonials */}
+        <section className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
-            {/* Section Header */}
-            <div className="text-center mb-12">
-              <h2 className="text-4xl sm:text-4xl lg:text-4xl font-medium text-foreground mb-4 text-balance">
-                What Our Divas Say
-              </h2>
-              <p className="text-xl sm:text-2xl text-foreground font-medium">Join thousands of happy sleepers</p>
-            </div>
-
-            {/* Reviews Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-8">
-              {reviews.map((review, index) => (
-                <div key={index} className="bg-[#EED9C4] rounded-lg p-8 flex flex-col">
-                  {/* Review Text */}
-                  <p className="text-foreground text-base sm:text-lg mb-6 grow leading-relaxed font-semibold">{review.text}</p>
-
-                  {/* Author */}
-                  <p className="text-foreground font-semibold">— {review.author}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Rating Summary */}
-            <div className="text-center">
-              <p className="text-foreground text-lg font-semibold">Rated 4.9/5 from over 10,000 reviews</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center font-cormorant">
+              What Our Divas Say
+            </h2>
+            <p className="text-center text-foreground mb-8 max-w-2xl mx-auto">
+              Hear from our satisfied customers about their experience with Ananthala products
+            </p>
+            <div className="relative">
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-2 md:-ml-4">
+                  {testimonials.map((testimonial) => (
+                    <CarouselItem
+                      key={testimonial.id}
+                      className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
+                    >
+                      <div className="space-y-2">
+                        <div className="relative aspect-video overflow-hidden border border-[#EED9C4]">
+                          <video
+                            className="w-full h-full object-cover"
+                            controls
+                            controlsList="nodownload nofullscreen noremoteplayback"
+                            disablePictureInPicture
+                            onContextMenu={(e) => e.preventDefault()}
+                            poster={testimonial.poster}
+                          >
+                            <source src={testimonial.video} type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                        </div>
+                        <p className="text-left text-foreground font-medium">
+                          {testimonial.name}
+                        </p>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
+                <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
+              </Carousel>
             </div>
           </div>
         </section>
