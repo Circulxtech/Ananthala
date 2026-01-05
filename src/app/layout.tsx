@@ -1,13 +1,14 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Cormorant_Garamond, Geist_Mono } from "next/font/google"
+import Script from "next/script"
 import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/contexts/cart-context"
 import { FixedSidebar } from "@/components/layout/fixed-sidebar"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
-const cormorantGaramond = Cormorant_Garamond({ 
+const cormorantGaramond = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-cormorant-garamond",
@@ -45,6 +46,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          id="clarity-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+            (function(c,l,a,r,i,t,y){
+              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "uwococqrjx");
+            `,
+          }}
+        />
+      </head>
       <body className={`${cormorantGaramond.className} antialiased`} style={{ fontWeight: 300 }}>
         <CartProvider>
           {children}
