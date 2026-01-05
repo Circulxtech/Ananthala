@@ -99,7 +99,7 @@ export function Header() {
     <>
       <header className="bg-[#F5F1ED] border-b sticky top-0 z-50" style={{ borderColor: "#D9CFC7" }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -123,9 +123,11 @@ export function Header() {
 
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <Link href="/" className="flex items-center">
-                <span className="text-[#8B5A3C] text-xl font-normal tracking-wider hover:text-[#6D4530] transition-colors">
-                  ANANTHALA
-                </span>
+                <img
+                  src="/logo.png"
+                  alt="Ananthala Logo"
+                  className="h-20 w-auto hover:opacity-90 transition-opacity"
+                />
               </Link>
             </div>
 

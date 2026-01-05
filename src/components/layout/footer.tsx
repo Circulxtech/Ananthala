@@ -16,10 +16,10 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <p className="tracking-widest mb-4 text-foreground font-bold text-2xl">ANANTHALA</p>
+            <img src="/logo.png" alt="Ananthala Logo" className="h-20 w-auto mb-4" />
             <p className="text-foreground mb-6 font-semibold text-lg">
-              Premium mattresses crafted for your best sleep. Experience luxury comfort with our 100-night trial
-              and 15-year warranty.
+              Premium mattresses crafted for your best sleep. Experience luxury comfort with our 100-night trial and
+              15-year warranty.
             </p>
             {/* Contact Details */}
             <div className="space-y-2 mb-6 text-foreground">
@@ -84,10 +84,14 @@ export function Footer() {
                 <button className="hover:text-amber-950 transition-colors font-semibold text-lg">T&C</button>
               </li>
               <li>
-                <button className="hover:text-amber-950 transition-colors font-semibold text-lg">Shipping & Return</button>
+                <button className="hover:text-amber-950 transition-colors font-semibold text-lg">
+                  Shipping & Return
+                </button>
               </li>
               <li>
-                <button className="hover:text-amber-950 transition-colors font-semibold text-lg">Terms of Service</button>
+                <button className="hover:text-amber-950 transition-colors font-semibold text-lg">
+                  Terms of Service
+                </button>
               </li>
               <li>
                 <button className="hover:text-amber-950 transition-colors font-semibold text-lg">Refund Policy</button>
