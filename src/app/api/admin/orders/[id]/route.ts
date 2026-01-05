@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { jwtVerify } from "@/lib/jwt"
 import { connectDB } from "@/lib/mongodb"
-import Order from "@/models/Order"
+import Order from "@/models/order"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
