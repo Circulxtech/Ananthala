@@ -49,6 +49,11 @@ const menuItems = [
     icon: Users,
   },
   {
+    label: "Agent Management",
+    href: "/admin/agents",
+    icon: Users,
+  },
+  {
     label: "Order Management",
     href: "/admin/orders",
     icon: ShoppingCart,
