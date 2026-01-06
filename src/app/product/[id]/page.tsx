@@ -7,6 +7,7 @@ import Image from "next/image"
 import Link from "next/link"
 import {
   ChevronLeft,
+  ChevronRight,
   Check,
   Truck,
   Shield,
@@ -61,6 +62,7 @@ export default function ProductDetailPage() {
   const isBabyProduct = product.category === "baby"
   const isBabyHamper = productId === 12
   const isIndividualBabyProduct = [7, 8, 9, 10, 11].includes(productId)
+  const isJoyProduct = [7, 8, 9, 10, 11, 12].includes(productId)
   const [selectedImage, setSelectedImage] = useState(0)
   const [selectedSize, setSelectedSize] = useState(product.sizes[0].name)
   const [quantity, setQuantity] = useState(1)
@@ -228,25 +230,55 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <main className="pt-16">
-        {/* Breadcrumb */}
-        <div
-          className="py-4 px-4 border-b"
-          style={{ backgroundColor: "white", borderColor: colors.border }}
-        >
-          <div className="max-w-7xl mx-auto">
-            <button
-              onClick={() => router.back()}
-              className="flex text-lg font-medium items-center gap-2 hover:opacity-70 transition-opacity"
-              style={{ color: "#000000" }}
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Back to Products
-            </button>
+      <main className={isJoyProduct ? "" : "pt-16"}>
+        {/* Breadcrumb - Only for Joy Products */}
+        {isJoyProduct ? (
+          <div className="sticky top-16 z-40 bg-white border-b" style={{ borderColor: "#D9CFC7" }}>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+              <nav className="py-2">
+                <ol className="flex items-center gap-2 text-base">
+                  <li>
+                    <Link href="/" className="text-foreground hover:text-[#6D4530] transition-colors">
+                      Home
+                    </Link>
+                  </li>
+                  <li>
+                    <ChevronRight className="w-4 h-4 text-foreground/50" />
+                  </li>
+                  <li>
+                    <Link href="/category/joy" className="text-foreground hover:text-[#6D4530] transition-colors">
+                      Joy
+                    </Link>
+                  </li>
+                  <li>
+                    <ChevronRight className="w-4 h-4 text-foreground/50" />
+                  </li>
+                  <li className="text-foreground font-medium">
+                    {product.name}
+                  </li>
+                </ol>
+              </nav>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div
+            className="py-4 px-4 border-b"
+            style={{ backgroundColor: "white", borderColor: colors.border }}
+          >
+            <div className="max-w-7xl mx-auto">
+              <button
+                onClick={() => router.back()}
+                className="flex text-lg font-medium items-center gap-2 hover:opacity-70 transition-opacity"
+                style={{ color: "#000000" }}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Back to Products
+              </button>
+            </div>
+          </div>
+        )}
 
-        <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className={`max-w-7xl mx-auto px-4 ${isJoyProduct ? "pt-16 pb-12" : "py-12"}`}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Image Gallery */}
             <div>
@@ -902,7 +934,7 @@ export default function ProductDetailPage() {
                     ].map((product) => (
                       <CarouselItem
                         key={product.id}
-                        className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3"
+                        className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
                       >
                         <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white">
                           <div className="relative aspect-square overflow-hidden mb-3">
@@ -923,6 +955,96 @@ export default function ProductDetailPage() {
                             </Button>
                           </Link>
                         </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
+                  <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
+                </Carousel>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Popular Products Section - Only for Joy Products */}
+        {isJoyProduct && (
+          <section className="py-16 px-4 bg-white">
+            <div className="max-w-7xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-8 text-center font-cormorant">
+                Popular Products
+              </h2>
+              <div className="relative">
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: true,
+                    dragFree: true,
+                  }}
+                  className="w-full"
+                >
+                  <CarouselContent className="-ml-2 md:-ml-4">
+                    {/* Baby Hamper */}
+                    {productId !== 12 && (() => {
+                      const hamperProduct = getProductDetailById(12)
+                      if (!hamperProduct) return null
+                      return (
+                        <CarouselItem key="hamper" className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                          <Link href={`/product/12`} className="block">
+                            <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white cursor-pointer">
+                              <div className="relative aspect-square overflow-hidden mb-3">
+                                <Image
+                                  src={hamperProduct.images[0] || "/productmattress.jpg"}
+                                  alt={hamperProduct.name}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized
+                                />
+                              </div>
+                              <h3 className="text-base font-semibold text-foreground mb-3 text-center">{hamperProduct.name}</h3>
+                              <Button 
+                                className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
+                                onClick={(e) => e.preventDefault()}
+                              >
+                                Add to Cart
+                              </Button>
+                            </div>
+                          </Link>
+                        </CarouselItem>
+                      )
+                    })()}
+                    
+                    {/* Individual Products */}
+                    {[
+                      { id: "mattress", name: "Mattress", image: "/productmattress.jpg", productDetailId: 7 },
+                      { id: "topper", name: "Topper", image: "/topper.jpg", productDetailId: 8 },
+                      { id: "lounger", name: "Lounger", image: "/lounger.jpg", productDetailId: 9 },
+                      { id: "head-pillow", name: "Head Pillow", image: "/pillow.jpg", productDetailId: 10 },
+                      { id: "pillow-bumpers", name: "Pillow Bumpers", image: "/bumpers.jpg", productDetailId: 11 },
+                    ].filter((product) => product.productDetailId !== productId).map((product) => (
+                      <CarouselItem
+                        key={product.id}
+                        className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                      >
+                        <Link href={`/product/${product.productDetailId}`} className="block">
+                          <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white cursor-pointer">
+                            <div className="relative aspect-square overflow-hidden mb-3">
+                              <Image
+                                src={product.image}
+                                alt={product.name}
+                                fill
+                                className="object-cover"
+                                unoptimized
+                              />
+                            </div>
+                            <h3 className="text-base font-semibold text-foreground mb-3 text-center">{product.name}</h3>
+                            <Button 
+                              className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
+                              onClick={(e) => e.preventDefault()}
+                            >
+                              Add to Cart
+                            </Button>
+                          </div>
+                        </Link>
                       </CarouselItem>
                     ))}
                   </CarouselContent>
