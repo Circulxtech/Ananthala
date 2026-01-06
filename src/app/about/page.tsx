@@ -129,7 +129,7 @@ export default function AboutPage() {
                     <div className="w-10 h-10 bg-[#EED9C4] text-black rounded-full flex items-center justify-center">
                       <Heart className="w-5 h-5" />
                     </div>
-                    <h3 className="text-xl font-semibold text-black">Our Mission</h3>
+                    <h3 className="text-xl font-semibold text-black">Our Mission </h3>
                   </div>
                   <p className="text-lg font-medium text-black leading-relaxed mb-3">
                     To craft exceptional mattresses that transform the way people sleep, using sustainable materials and
