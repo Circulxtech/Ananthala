@@ -115,4 +115,3 @@ export function getProductById(id: number): Product | undefined {
   return products.find((p) => p.id === id)
 }
 
-

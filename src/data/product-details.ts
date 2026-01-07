@@ -237,14 +237,9 @@ export const productDetails: Record<number, ProductDetail> = {
     specifications: {
       "Firmness Level": "Firm (9/10)",
       "Mattress Height": "5 inches",
-      "Top Layer": "Organic Cotton Cover",
-      "Core Layer": '4" Natural Coconut Fiber & Foam',
-      "Bottom Layer": "Waterproof Barrier",
       Cover: "100% Organic Cotton",
-      "Weight Capacity": "Up to 50 lbs",
       Warranty: "10 Years",
       "Trial Period": "100 Nights",
-      Certifications: "GREENGUARD Gold, CertiPUR-US",
     },
     sizes: [
       { name: "Standard Crib", price: 299 },
@@ -342,8 +337,6 @@ export const productDetails: Record<number, ProductDetail> = {
       { name: "Standard Crib", price: 349 },
     ],
   },
-<<<<<<< HEAD
-=======
   10: {
     id: 10,
     name: "JOY Head Pillow",
@@ -477,11 +470,9 @@ export const productDetails: Record<number, ProductDetail> = {
       { name: "Standard", price: 815 },
     ],
   },
->>>>>>> 19d03249011ae9a847dc8de3a38788653eed5650
 }
 
 export function getProductDetailById(id: number): ProductDetail | undefined {
   return productDetails[id]
 }
-
 
