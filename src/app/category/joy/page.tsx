@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/carousel"
 import Image from "next/image"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Loader2 } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
 import { type CartItem } from "@/components/cart/cart-drawer"
@@ -77,6 +77,17 @@ export default function JoyPage() {
   ]
 
   const { addToCart, setIsCartOpen } = useCart()
+  
+  const shopSectionRef = useRef<HTMLDivElement>(null)
+  const aboutUsSectionRef = useRef<HTMLDivElement>(null)
+  
+  const scrollToShop = () => {
+    shopSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+  
+  const scrollToAboutUs = () => {
+    aboutUsSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
 
   const toggleItem = (itemId: string) => {
     setSelectedItems((prev) =>
@@ -253,6 +264,39 @@ export default function JoyPage() {
               className="object-cover"
               priority
             />
+            {/* Overlay content on the left */}
+            <div className="absolute inset-0 z-10 flex items-center">
+              <div className="pl-4 sm:pl-6 lg:pl-8 xl:pl-12">
+                <div className="max-w-md space-y-6">
+                  <div className="bg-[#EED9C4] p-4 md:p-8 rounded-lg shadow-lg">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-foreground font-cormorant">
+                      Joy Collection
+                    </h1>
+                  
+                    <p className="text-foreground text-base md:text-lg mt-4 leading-relaxed font-medium">
+                      Experience the purest comfort for your little one with our premium organic baby products, designed with love and care for your baby's health and happiness.
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Button 
+                      onClick={scrollToShop}
+                      className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md"
+                      style={{ fontFamily: '"Playfair Display", serif' }}
+                    >
+                      Shop
+                    </Button>
+                    <Button
+                      onClick={scrollToAboutUs}
+                      variant="outline"
+                      className="border-2 border-white text-white hover:bg-white hover:text-[#8B5A3C] px-8 py-6 text-lg bg-transparent rounded-md"
+                      style={{ fontFamily: '"Playfair Display", serif' }}
+                    >
+                      Learn More
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -331,7 +375,7 @@ export default function JoyPage() {
 
        
         {/* Baby Hamper Section */}
-        <section className="py-16 px-4 bg-stone-50">
+        <section ref={shopSectionRef} className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
           <h1 className="text-xl md:text-2xl lg:text-3xl font-medium font-cormorant text-foreground text-center mb-8">
             Baby Hamper
@@ -743,7 +787,7 @@ export default function JoyPage() {
         </section>
 
         {/* About Us Section */}
-        <section className="py-16 px-4 bg-white">
+        <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
               <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">

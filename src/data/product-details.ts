@@ -342,6 +342,142 @@ export const productDetails: Record<number, ProductDetail> = {
       { name: "Standard Crib", price: 349 },
     ],
   },
+<<<<<<< HEAD
+=======
+  10: {
+    id: 10,
+    name: "JOY Head Pillow",
+    category: "baby",
+    price: 79,
+    rating: 4.8,
+    reviews: 142,
+    description:
+      "Comfortable and supportive head pillow designed for babies. Made with 100% organic materials, providing the perfect support for your little one's head and neck while ensuring breathability and safety.",
+    images: [
+      "/pillow.jpg",
+      "https://images.unsplash.com/photo-1619490742661-8949b7d3a612?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYWJ5JTIwY3JpYiUyMG1hdHRyZXNzfGVufDF8fHx8MTc2NDc3MTk0OXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1542901689-8917f44e3541?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxudXJzZXJ5JTIwYmFieSUyMHJvb218ZW58MXx8fHwxNzY0NzcxOTUwfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    ],
+    firmness: "Medium",
+    height: "2 inches",
+    materials: [
+      "100% Organic Cotton Cover",
+      "Natural Latex Fill",
+      "Breathable Mesh Sides",
+      "Hypoallergenic Materials",
+    ],
+    features: [
+      "100% organic cotton cover",
+      "Natural latex fill for support",
+      "Breathable design prevents overheating",
+      "Hypoallergenic and safe for sensitive skin",
+      "Machine washable cover",
+      "Pediatrician recommended",
+    ],
+    specifications: {
+      "Pillow Height": "2 inches",
+      "Cover Material": "100% Organic Cotton",
+      "Fill Material": "Natural Latex",
+      "Sizes Available": "Small, Medium, Large",
+      "Firmness Options": "Soft, Medium, Firm",
+      "Care Instructions": "Machine washable cover",
+      Warranty: "2 Years",
+      Certifications: "GOTS, GREENGUARD Gold",
+    },
+    sizes: [
+      { name: "Small", price: 79 },
+      { name: "Medium", price: 89 },
+      { name: "Large", price: 99 },
+    ],
+  },
+  11: {
+    id: 11,
+    name: "JOY Pillow Bumpers",
+    category: "baby",
+    price: 89,
+    rating: 4.7,
+    reviews: 128,
+    description:
+      "Safe and stylish pillow bumpers for your baby's crib. Made with organic materials and breathable mesh design, providing protection while ensuring proper air circulation for your little one's safety.",
+    images: [
+      "/bumpers.jpg",
+      "https://images.unsplash.com/photo-1616843777706-c6954ffc764a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYWJ5JTIwc2xlZXBpbmclMjBjcmlifGVufDF8fHx8MTc2NDc1MTIxN3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1619490742661-8949b7d3a612?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYWJ5JTIwY3JpYiUyMG1hdHRyZXNzfGVufDF8fHx8MTc2NDc3MTk0OXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    ],
+    firmness: "Soft",
+    height: "1.5 inches",
+    materials: [
+      "Organic Cotton Fabric",
+      "Breathable Mesh Panels",
+      "Organic Cotton Fill",
+      "Safe Ties and Fasteners",
+    ],
+    features: [
+      "100% organic cotton construction",
+      "Breathable mesh panels for air circulation",
+      "Safe ties and fasteners",
+      "Machine washable",
+      "Hypoallergenic materials",
+      "Meets safety standards",
+    ],
+    specifications: {
+      "Bumper Height": "1.5 inches",
+      "Material": "100% Organic Cotton",
+      "Panel Design": "Breathable Mesh",
+      "Fastening": "Safe Ties",
+      "Care Instructions": "Machine washable",
+      "Safety Standards": "CPSC Compliant",
+      Warranty: "2 Years",
+      Certifications: "GOTS, OEKO-TEX",
+    },
+    sizes: [
+      { name: "Standard Crib", price: 89 },
+    ],
+  },
+  12: {
+    id: 12,
+    name: "JOY Baby Hamper",
+    category: "baby",
+    price: 815,
+    rating: 4.9,
+    reviews: 234,
+    description:
+      "Complete baby sleep solution with mattress, topper, lounger, head pillow, and pillow bumpers. All items included in one convenient hamper.",
+    images: [
+      "/productmattress.jpg",
+      "/topper.jpg",
+      "/lounger.jpg",
+      "/pillow.jpg",
+      "/bumpers.jpg",
+    ],
+    firmness: "Firm",
+    height: "5 inches",
+    materials: [
+      "Organic Cotton Cover",
+      "Natural Coconut Fiber",
+      "Breathable Foam Core",
+      "Waterproof Layer",
+    ],
+    features: [
+      "Complete baby sleep solution",
+      "All essential items included",
+      "100% organic materials",
+      "GREENGUARD Gold Certified",
+      "Customizable options available",
+    ],
+    specifications: {
+      "Hamper Includes": "Mattress, Topper, Lounger, Head Pillow, Pillow Bumpers",
+      "Firmness Level": "Firm (9/10)",
+      "Mattress Height": "5 inches",
+      Cover: "100% Organic Cotton",
+      Warranty: "10 Years",
+      "Trial Period": "100 Nights",
+    },
+    sizes: [
+      { name: "Standard", price: 815 },
+    ],
+  },
+>>>>>>> 19d03249011ae9a847dc8de3a38788653eed5650
 }
 
 export function getProductDetailById(id: number): ProductDetail | undefined {
