@@ -373,7 +373,7 @@ export default function GracePage() {
                       Adding to Cart...
                     </>
                   ) : (
-                    "Choose Your Comfort"
+                    "Add to Cart"
                   )}
                 </Button>
               </div>

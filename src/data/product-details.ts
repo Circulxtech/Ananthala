@@ -237,9 +237,14 @@ export const productDetails: Record<number, ProductDetail> = {
     specifications: {
       "Firmness Level": "Firm (9/10)",
       "Mattress Height": "5 inches",
+      "Top Layer": "Organic Cotton Cover",
+      "Core Layer": '4" Natural Coconut Fiber & Foam',
+      "Bottom Layer": "Waterproof Barrier",
       Cover: "100% Organic Cotton",
+      "Weight Capacity": "Up to 50 lbs",
       Warranty: "10 Years",
       "Trial Period": "100 Nights",
+      Certifications: "GREENGUARD Gold, CertiPUR-US",
     },
     sizes: [
       { name: "Standard Crib", price: 299 },
@@ -335,49 +340,6 @@ export const productDetails: Record<number, ProductDetail> = {
     },
     sizes: [
       { name: "Standard Crib", price: 349 },
-    ],
-  },
-  12: {
-    id: 12,
-    name: "JOY Baby Hamper",
-    category: "baby",
-    price: 815,
-    rating: 4.9,
-    reviews: 234,
-    description:
-      "Complete baby sleep solution with mattress, topper, lounger, head pillow, and pillow bumpers. All items included in one convenient hamper.",
-    images: [
-      "/productmattress.jpg",
-      "/topper.jpg",
-      "/lounger.jpg",
-      "/pillow.jpg",
-      "/bumpers.jpg",
-    ],
-    firmness: "Firm",
-    height: "5 inches",
-    materials: [
-      "Organic Cotton Cover",
-      "Natural Coconut Fiber",
-      "Breathable Foam Core",
-      "Waterproof Layer",
-    ],
-    features: [
-      "Complete baby sleep solution",
-      "All essential items included",
-      "100% organic materials",
-      "GREENGUARD Gold Certified",
-      "Customizable options available",
-    ],
-    specifications: {
-      "Hamper Includes": "Mattress, Topper, Lounger, Head Pillow, Pillow Bumpers",
-      "Firmness Level": "Firm (9/10)",
-      "Mattress Height": "5 inches",
-      Cover: "100% Organic Cotton",
-      Warranty: "10 Years",
-      "Trial Period": "100 Nights",
-    },
-    sizes: [
-      { name: "Standard", price: 815 },
     ],
   },
 }

@@ -1,39 +1,35 @@
 "use client"
 
 import { Instagram, Facebook, Twitter, Mail, Phone, MapPin } from "lucide-react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export function Footer() {
-  const router = useRouter()
-
-  const onNavigate = (page: string) => {
-    router.push(`/${page}`)
-  }
-
   return (
     <footer className="bg-stone-50 border-t border-amber-100 py-16 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 mb-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <img src="/logo.png" alt="Ananthala Logo" className="h-20 w-auto mb-4" />
-            <p className="text-foreground mb-6 font-semibold text-lg">
+            <Link href="/" className="inline-block mb-4 hover:opacity-90 transition-opacity">
+              <img src="/logo.png" alt="Ananthala Logo" className="h-16 w-auto" />
+            </Link>
+            <p className="text-foreground mb-6 font-medium text-base leading-relaxed">
               Premium mattresses crafted for your best sleep. Experience luxury comfort with our 100-night trial and
               15-year warranty.
             </p>
             {/* Contact Details */}
-            <div className="space-y-2 mb-6 text-foreground">
-              <div className="flex items-center gap-2">
-                <Phone className="w-5 h-5 text-foreground" />
-                <span className="font-semibold text-lg">1-800-SLEEP-WELL</span>
+            <div className="space-y-3 mb-6 text-foreground text-sm">
+              <div className="flex items-center gap-3">
+                <Phone className="w-4 h-4 text-foreground flex-shrink-0" />
+                <span className="font-medium">1-800-SLEEP-WELL</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Mail className="w-5 h-5 text-foreground" />
-                <span className="font-semibold text-lg">support@ananthala.com</span>
+              <div className="flex items-center gap-3">
+                <Mail className="w-4 h-4 text-foreground flex-shrink-0" />
+                <span className="font-medium">support@ananthala.com</span>
               </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-foreground" />
-                <span className="font-semibold text-lg">123 Sleep Street, San Francisco, CA</span>
+              <div className="flex items-center gap-3">
+                <MapPin className="w-4 h-4 text-foreground flex-shrink-0" />
+                <span className="font-medium">123 Sleep Street, San Francisco, CA</span>
               </div>
             </div>
             {/* Social Media */}
@@ -42,142 +38,123 @@ export function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center hover:bg-amber-200 transition-colors text-amber-900"
+                className="w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center hover:bg-amber-200 transition-colors text-amber-900"
+                aria-label="Instagram"
               >
-                <Instagram className="w-5 h-5" />
+                <Instagram className="w-4 h-4" />
               </a>
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center hover:bg-amber-200 transition-colors text-amber-900"
+                className="w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center hover:bg-amber-200 transition-colors text-amber-900"
+                aria-label="Facebook"
               >
-                <Facebook className="w-5 h-5" />
+                <Facebook className="w-4 h-4" />
               </a>
               <a
                 href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center hover:bg-amber-200 transition-colors text-amber-900"
+                className="w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center hover:bg-amber-200 transition-colors text-amber-900"
+                aria-label="Twitter"
               >
-                <Twitter className="w-5 h-5" />
+                <Twitter className="w-4 h-4" />
               </a>
             </div>
           </div>
 
-          {/* contact */}
+          {/* CONTACT */}
           <div>
-            <h4 className="mb-4 text-foreground font-bold text-xl">CONTACT</h4>
-            <ul className="space-y-2 text-foreground">
+            <h4 className="mb-4 text-foreground font-semibold text-base">CONTACT</h4>
+            <ul className="space-y-3 text-foreground text-sm">
               <li>
-                <button
-                  onClick={() => onNavigate("products")}
-                  className="hover:text-amber-950 transition-colors font-semibold text-lg"
-                >
+                <Link href="/dealer-enquiry" className="hover:text-amber-950 transition-colors font-medium">
                   Dealer Enquiry
-                </button>
+                </Link>
               </li>
               <li>
-                <button className="hover:text-amber-950 transition-colors font-semibold text-lg">Contact Us</button>
+                <Link href="/contact-us" className="hover:text-amber-950 transition-colors font-medium">
+                  Contact Us
+                </Link>
               </li>
               <li>
-                <button className="hover:text-amber-950 transition-colors font-semibold text-lg">T&C</button>
+                <Link href="/policy-terms" className="hover:text-amber-950 transition-colors font-medium">
+                  T&C
+                </Link>
               </li>
               <li>
-                <button className="hover:text-amber-950 transition-colors font-semibold text-lg">
+                <Link href="/policy-shipping" className="hover:text-amber-950 transition-colors font-medium">
                   Shipping & Return
-                </button>
+                </Link>
               </li>
               <li>
-                <button className="hover:text-amber-950 transition-colors font-semibold text-lg">
+                <Link href="/policy-terms" className="hover:text-amber-950 transition-colors font-medium">
                   Terms of Service
-                </button>
+                </Link>
               </li>
               <li>
-                <button className="hover:text-amber-950 transition-colors font-semibold text-lg">Refund Policy</button>
+                <Link href="/policy-refund" className="hover:text-amber-950 transition-colors font-medium">
+                  Refund Policy
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Ananthala */}
+          {/* ANANTHALA */}
           <div>
-            <h4 className="mb-4 text-foreground font-bold text-xl">ANANTHALA</h4>
-            <ul className="space-y-2 text-foreground">
+            <h4 className="mb-4 text-foreground font-semibold text-base">ANANTHALA</h4>
+            <ul className="space-y-3 text-foreground text-sm">
               <li>
-                <button
-                  onClick={() => onNavigate("contact")}
-                  className="hover:text-amber-950 transition-colors font-semibold text-lg"
-                >
+                <Link href="/" className="hover:text-amber-950 transition-colors font-medium">
                   Home
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => onNavigate("contact")}
-                  className="hover:text-amber-950 transition-colors font-semibold text-lg"
-                >
+                <Link href="/mattress" className="hover:text-amber-950 transition-colors font-medium">
                   Mattress
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => onNavigate("track-order")}
-                  className="hover:text-amber-950 transition-colors font-semibold text-lg"
-                >
+                <Link href="/bedding" className="hover:text-amber-950 transition-colors font-medium">
                   Bedding
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => onNavigate("policy-refund")}
-                  className="hover:text-amber-950 transition-colors font-semibold text-lg"
-                >
+                <Link href="/press" className="hover:text-amber-950 transition-colors font-medium">
                   Press
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => onNavigate("policy-shipping")}
-                  className="hover:text-amber-950 transition-colors font-semibold text-lg"
-                >
+                <Link href="/blog" className="hover:text-amber-950 transition-colors font-medium">
                   Blog
-                </button>
+                </Link>
               </li>
               <li>
-                <button className="hover:text-amber-950 transition-colors font-semibold text-lg">Story</button>
+                <Link href="/story" className="hover:text-amber-950 transition-colors font-medium">
+                  Story
+                </Link>
               </li>
             </ul>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-amber-100 flex flex-col md:flex-row justify-between items-center gap-4 text-foreground">
-          <p className="font-semibold text-lg">© 2025 Ananthala. All rights reserved.</p>
-          <div className="flex gap-6">
-            <button
-              onClick={() => onNavigate("policy-privacy")}
-              className="hover:text-amber-950 transition-colors font-semibold text-lg"
-            >
+        <div className="pt-8 border-t border-amber-100 flex flex-col md:flex-row justify-between items-center gap-4 text-foreground text-sm">
+          <p className="font-medium">© 2025 Ananthala. All rights reserved.</p>
+          <div className="flex flex-wrap gap-4 md:gap-6 justify-center md:justify-end">
+            <Link href="/policy-privacy" className="hover:text-amber-950 transition-colors font-medium">
               Privacy Policy
-            </button>
-            <button
-              onClick={() => onNavigate("policy-terms")}
-              className="hover:text-amber-950 transition-colors font-semibold text-lg"
-            >
+            </Link>
+            <Link href="/policy-terms" className="hover:text-amber-950 transition-colors font-medium">
               Terms & Conditions
-            </button>
-            <button
-              onClick={() => onNavigate("policy-refund")}
-              className="hover:text-amber-950 transition-colors font-semibold text-lg"
-            >
+            </Link>
+            <Link href="/policy-refund" className="hover:text-amber-950 transition-colors font-medium">
               Refund Policy
-            </button>
-            <button
-              onClick={() => onNavigate("policy-shipping")}
-              className="hover:text-amber-950 transition-colors font-semibold text-lg"
-            >
+            </Link>
+            <Link href="/policy-shipping" className="hover:text-amber-950 transition-colors font-medium">
               Shipping Policy
-            </button>
+            </Link>
           </div>
         </div>
       </div>

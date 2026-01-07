@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Plus_Jakarta_Sans } from "next/font/google"
-import { LayoutDashboard, Tag, Settings, Menu, X, LogOut, Headphones } from "lucide-react"
+import { LayoutDashboard, Tag, Settings, Menu, X, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const googleSans = Plus_Jakarta_Sans({
@@ -118,8 +118,8 @@ export default function AgentLayout({ children }: { children: React.ReactNode })
           }
         `}</style>
         <div className="text-center agent-loading">
-          <div className="w-16 h-16 rounded-full bg-white shadow-lg border-2 border-[#E5D5C5] flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Headphones className="w-8 h-8 text-[#8B5A3C]" />
+          <div className="w-16 h-16 rounded-full bg-white shadow-lg border-2 border-[#E5D5C5] flex items-center justify-center mx-auto mb-4 animate-pulse p-2">
+            <img src="/logo.png" alt="Ananthala" className="w-full h-full object-contain" />
           </div>
           <p className="text-[#8B5A3C] font-medium">Verifying agent access...</p>
         </div>
@@ -162,15 +162,13 @@ export default function AgentLayout({ children }: { children: React.ReactNode })
                   {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                 </Button>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#8B5A3C] flex items-center justify-center">
-                    <Headphones className="w-4 h-4 text-white" />
-                  </div>
+                  <img src="/logo.png" alt="Ananthala" className="h-8 w-auto" />
                   <div>
                     <Link
                       href="/agent/dashboard"
                       className="text-[#8B5A3C] text-lg font-normal tracking-wider hover:text-[#6D4530] transition-colors"
                     >
-                      ANANTHALA AGENT
+                      ANANTHALA
                     </Link>
                     <p className="text-xs text-[#B8A396]">Agent Portal</p>
                   </div>

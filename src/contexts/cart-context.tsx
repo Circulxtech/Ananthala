@@ -57,7 +57,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         updatedItems[existingItemIndex].quantity += newItem.quantity
         return updatedItems
       }
-      // New item, choose your comfort
+      // New item, add to cart
       return [...prevItems, newItem]
     })
   }

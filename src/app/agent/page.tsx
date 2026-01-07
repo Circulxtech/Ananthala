@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Mail, Lock, Eye, EyeOff, UserCheck, ShieldCheck, Headphones, TrendingUp, ArrowLeft } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff, ShieldCheck, Headphones, TrendingUp, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
@@ -118,9 +118,7 @@ export default function AgentLoginPage() {
         <div className="space-y-8 text-center lg:text-left order-2 lg:order-1">
           {/* Logo/Icon */}
           <div className="flex justify-center lg:justify-start">
-            <div className="w-24 h-24 rounded-full bg-white shadow-xl border-2 border-[#E5D5C5] flex items-center justify-center">
-              <UserCheck className="w-12 h-12 text-[#8B5A3C]" />
-            </div>
+            <img src="/logo.png" alt="Ananthala Agent" className="h-20 md:h-24 w-auto" />
           </div>
 
           {/* Welcome Message */}
