@@ -11,7 +11,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import { Loader2 } from "lucide-react"
+import { Loader2, ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
@@ -106,6 +106,28 @@ export default function GracePage() {
     <div className="min-h-screen">
       <Header />
       <main>
+        {/* Fixed Breadcrumb */}
+        <div className="fixed top-20 left-0 right-0 z-40 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="py-2">
+              <ol className="flex items-center gap-2 text-base">
+                <li>
+                  <Link href="/" className="text-foreground hover:text-[#6D4530] transition-colors">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <ChevronRight className="w-4 h-4 text-foreground/50" />
+                </li>
+                <li className="text-foreground font-medium">
+                  Grace
+                </li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+        {/* Spacer to prevent content from going under fixed breadcrumb */}
+        <div className="h-[49px]"></div>
         {/* 1. Hero Section - Mattress Image */}
         <section className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
           <div className="relative w-full h-full">
@@ -208,22 +230,24 @@ export default function GracePage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
               <div className="space-y-4">
                 {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={currentImages[selectedImageIndex]}
-                    alt="GRACE Mattress"
-                    fill
-                    className="object-cover"
-                  />
-                  {/* Color Overlay */}
-                  <div 
-                    className="absolute inset-0 transition-all duration-300"
-                    style={{
-                      backgroundColor: selectedColorData.overlay,
-                      mixBlendMode: selectedColorData.blendMode as any,
-                    }}
-                  />
-                </div>
+                <Link href="/product/2" className="block">
+                  <div className="relative aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+                    <Image
+                      src={currentImages[selectedImageIndex]}
+                      alt="GRACE Mattress"
+                      fill
+                      className="object-cover"
+                    />
+                    {/* Color Overlay */}
+                    <div 
+                      className="absolute inset-0 transition-all duration-300"
+                      style={{
+                        backgroundColor: selectedColorData.overlay,
+                        mixBlendMode: selectedColorData.blendMode as any,
+                      }}
+                    />
+                  </div>
+                </Link>
                 
                 {/* Thumbnail Gallery */}
                 {currentImages.length > 1 && (

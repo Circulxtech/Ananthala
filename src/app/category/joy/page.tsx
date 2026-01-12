@@ -14,7 +14,7 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 import { useState, useRef } from "react"
-import { Loader2 } from "lucide-react"
+import { Loader2, ChevronRight } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
 import { type CartItem } from "@/components/cart/cart-drawer"
 
@@ -254,6 +254,28 @@ export default function JoyPage() {
     <div className="min-h-screen">
       <Header />
       <main>
+        {/* Fixed Breadcrumb */}
+        <div className="fixed top-20 left-0 right-0 z-40 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="py-2">
+              <ol className="flex items-center gap-2 text-base">
+                <li>
+                  <Link href="/" className="text-foreground hover:text-[#6D4530] transition-colors">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <ChevronRight className="w-4 h-4 text-foreground/50" />
+                </li>
+                <li className="text-foreground font-medium">
+                  Joy
+                </li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+        {/* Spacer to prevent content from going under fixed breadcrumb */}
+        <div className="h-[49px]"></div>
         {/* 1. Hero Section - Baby Products Image */}
         <section className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
           <div className="relative w-full h-full">
@@ -280,7 +302,7 @@ export default function JoyPage() {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Button 
                       onClick={scrollToShop}
-                      className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md"
+                      className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md w-full sm:w-auto sm:min-w-[140px]"
                       style={{ fontFamily: '"Playfair Display", serif' }}
                     >
                       Shop
@@ -288,7 +310,7 @@ export default function JoyPage() {
                     <Button
                       onClick={scrollToAboutUs}
                       variant="outline"
-                      className="border-2 border-white text-white hover:bg-white hover:text-[#8B5A3C] px-8 py-6 text-lg bg-transparent rounded-md"
+                      className="border-2 border-white text-white hover:bg-white hover:text-[#8B5A3C] px-8 py-6 text-lg bg-transparent rounded-md w-full sm:w-auto sm:min-w-[140px]"
                       style={{ fontFamily: '"Playfair Display", serif' }}
                     >
                       Learn More
@@ -374,108 +396,120 @@ export default function JoyPage() {
         </section>
 
        
-        {/* Baby Hamper Section */}
+        {/* Products Section */}
         <section ref={shopSectionRef} className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
-          
-            
-            
-            <div className="flex flex-col lg:flex-row gap-40 items-start justify-center">
-              {/* Left Column - Baby Hamper */}
-              <div className="space-y-6 lg:w-[calc(41.67%-1.5rem)] max-w-md">
-                <h2 className="text-2xl md:text-3xl font-medium text-center text-foreground font-cormorant">
-                  Baby Hamper
-                </h2>
-
-                {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={currentImages[0]}
-                    alt="JOY Baby Hamper"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                
-                {/* Price Section */}
-                <div className="text-center">
-                  <div className="text-3xl text-left font-semibold text-foreground">
-                    ₹{babyProducts.reduce((sum, product) => sum + product.price, 0).toLocaleString()}
+            <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-8 text-center font-cormorant">
+              Shop
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-8">
+              {/* Baby Hamper */}
+              <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white">
+                <Link href="/product/12" className="block">
+                  <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                    <Image
+                      src={currentImages[0]}
+                      alt="JOY Baby Hamper"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
                   </div>
-                  <p className="text-sm text-left text-foreground/70 mt-1">(inclusive of all taxes)</p>
+                </Link>
+                <h3 className="text-base font-semibold text-foreground mb-2 text-center">JOY Baby Hamper</h3>
+                <div className="text-sm font-medium text-foreground mb-3 text-center">
+                  Starting from ₹{babyProducts.reduce((sum, product) => sum + product.price, 0).toLocaleString()}
                 </div>
-                
-               
-                
-                
-                
-                {/* View More Button */}
                 <Link href="/product/12">
                   <Button 
-                    className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg"
+                    className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
                   >
-                    View More
+                    Customize
                   </Button>
                 </Link>
               </div>
-              
-              {/* Right Column - Individual Products */}
-              <div className="space-y-6 lg:w-[calc(41.67%-1.5rem)] max-w-md">
-              
-                <div className="relative">
-                  <Carousel
-                    opts={{
-                      align: "start",
-                      loop: true,
-                    }}
-                    className="w-full"
-                  >
-                    <CarouselContent className="ml-0">
-                      {babyProducts.map((product) => (
-                        <CarouselItem
-                          key={product.id}
-                          className="pl-0 basis-full"
-                        >
-                          <Link href={`/product/${product.productDetailId}`} className="block">
-                            <div className="space-y-6 cursor-pointer">
-                              <h3 className="text-2xl md:text-3xl text-center font-medium text-foreground font-cormorant">
-                                {product.name}
-                              </h3>
-                           
-                              {/* Main Image */}
-                              <div className="relative aspect-square overflow-hidden ">
-                                <Image
-                                  src={product.image}
-                                  alt={product.name}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                              
-                              
-                              {/* Price Section */}
-                              <div className="text-center">
-                                <div className="text-3xl text-left font-semibold text-foreground">
-                                  ₹{product.price.toLocaleString()}
-                                </div>
-                                <p className="text-sm text-left text-foreground/70 mt-1">(inclusive of all taxes)</p>
-                              </div>
-                              
-                              {/* View More Button */}
-                              <Button 
-                                className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg"
-                              >
-                                View More
-                              </Button>
-                            </div>
-                          </Link>
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                    <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-                    <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-                  </Carousel>
+
+              {/* Kids Hamper */}
+              <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white">
+                <Link href="/product/13" className="block">
+                  <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                    <Image
+                      src={currentImages[0]}
+                      alt="JOY Kids Hamper"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                </Link>
+                <h3 className="text-base font-semibold text-foreground mb-2 text-center">JOY Kids Hamper</h3>
+                <div className="text-sm font-medium text-foreground mb-3 text-center">
+                  Starting from ₹{babyProducts.reduce((sum, product) => sum + product.price, 0).toLocaleString()}
                 </div>
+                <Link href="/product/13">
+                  <Button 
+                    className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
+                  >
+                    Customize
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Individual Products */}
+              {babyProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white"
+                >
+                  <Link href={`/product/${product.productDetailId}`} className="block">
+                    <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  </Link>
+                  <h3 className="text-base font-semibold text-foreground mb-2 text-center">{product.name}</h3>
+                  <div className="text-sm font-medium text-foreground mb-3 text-center">
+                    Starting at ₹{product.price.toLocaleString()}
+                  </div>
+                  <Link href={`/product/${product.productDetailId}`}>
+                    <Button 
+                      className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
+                    >
+                      Customize
+                    </Button>
+                  </Link>
+                </div>
+              ))}
+
+              {/* Swaddles Card */}
+              <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white">
+                <Link href="/product/swaddles" className="block">
+                  <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                    <Image
+                      src="/swaddle.jpg"
+                      alt="Swaddles"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                </Link>
+                <h3 className="text-base font-semibold text-foreground mb-2 text-center">Swaddles</h3>
+                <div className="text-sm font-medium text-foreground mb-3 text-center">
+                  Starting at ₹49
+                </div>
+                <Link href="/product/swaddles">
+                  <Button 
+                    className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
+                  >
+                    Customize
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -487,43 +521,6 @@ export default function JoyPage() {
 
         
 
-        {/* Swaddles Section - Optional */}
-        <section className="py-16 px-4 bg-white">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-8 text-center font-cormorant">
-              Swaddles 
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {["Organic Cotton", "Bamboo", "Muslin", "Linen"].map((type) => (
-                <div key={type} className="border border-[#EED9C4] p-6 hover:shadow-lg transition-shadow">
-                  <div className="relative aspect-square overflow-hidden mb-4">
-                    <Image
-                      src="/swaddle.jpg"
-                      alt={`${type} Swaddle`}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-4">{type} Swaddle</h3>
-                  <Button 
-                    className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={() => handleAddSwaddleToCart(type)}
-                    disabled={addingSwaddleType === type}
-                  >
-                    {addingSwaddleType === type ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                        Adding to Cart...
-                      </>
-                    ) : (
-                      "Choose Your Comfort"
-                    )}
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* Customer Testimonials */}
         <section className="py-16 px-4 bg-stone-50">
