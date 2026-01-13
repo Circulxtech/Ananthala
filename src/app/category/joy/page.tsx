@@ -13,8 +13,11 @@ import {
 } from "@/components/ui/carousel"
 import Image from "next/image"
 import Link from "next/link"
+
 import { useState, useRef } from "react"
 import { Loader2, ChevronRight } from "lucide-react"
+
+
 import { useCart } from "@/contexts/cart-context"
 import { type CartItem } from "@/components/cart/cart-drawer"
 
@@ -76,18 +79,18 @@ export default function JoyPage() {
     { id: "pillow-bumpers", name: "Pillow Bumpers", price: 89, image: "/bumpers.jpg", productDetailId: 11 },
   ]
 
-  const { addToCart, setIsCartOpen } = useCart()
-  
-  const shopSectionRef = useRef<HTMLDivElement>(null)
-  const aboutUsSectionRef = useRef<HTMLDivElement>(null)
-  
+  const shopSectionRef = useRef<HTMLElement>(null)
+  const aboutUsSectionRef = useRef<HTMLElement>(null)
+
   const scrollToShop = () => {
     shopSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
-  
+
   const scrollToAboutUs = () => {
     aboutUsSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
+
+  const { addToCart, setIsCartOpen } = useCart()
 
   const toggleItem = (itemId: string) => {
     setSelectedItems((prev) =>
@@ -514,13 +517,6 @@ export default function JoyPage() {
             </div>
           </div>
         </section>
-
-       
-
-        
-
-        
-
 
         {/* Customer Testimonials */}
         <section className="py-16 px-4 bg-stone-50">

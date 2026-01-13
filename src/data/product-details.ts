@@ -18,7 +18,7 @@ export interface ProductDetail {
 export const productDetails: Record<number, ProductDetail> = {
   1: {
     id: 1,
-    name: "Cloud Comfort Mattress",
+    name: "Mattress",
     category: "mattress",
     price: 1299,
     rating: 4.8,
@@ -237,9 +237,14 @@ export const productDetails: Record<number, ProductDetail> = {
     specifications: {
       "Firmness Level": "Firm (9/10)",
       "Mattress Height": "5 inches",
+      "Top Layer": "Organic Cotton Cover",
+      "Core Layer": '4" Natural Coconut Fiber & Foam',
+      "Bottom Layer": "Waterproof Barrier",
       Cover: "100% Organic Cotton",
+      "Weight Capacity": "Up to 50 lbs",
       Warranty: "10 Years",
       "Trial Period": "100 Nights",
+      Certifications: "GREENGUARD Gold, CertiPUR-US",
     },
     sizes: [
       { name: "Standard Crib", price: 299 },
@@ -247,7 +252,7 @@ export const productDetails: Record<number, ProductDetail> = {
   },
   8: {
     id: 8,
-    name: "Sweet Sleep Organic Crib",
+    name: "Topper",
     category: "baby",
     price: 399,
     rating: 5.0,
@@ -293,7 +298,7 @@ export const productDetails: Record<number, ProductDetail> = {
   },
   9: {
     id: 9,
-    name: "SafeRest Baby Comfort",
+    name: "Lounger",
     category: "baby",
     price: 349,
     rating: 4.8,
@@ -339,7 +344,7 @@ export const productDetails: Record<number, ProductDetail> = {
   },
   10: {
     id: 10,
-    name: "JOY Head Pillow",
+    name: " Head Pillow",
     category: "baby",
     price: 79,
     rating: 4.8,
@@ -385,7 +390,7 @@ export const productDetails: Record<number, ProductDetail> = {
   },
   11: {
     id: 11,
-    name: "JOY Pillow Bumpers",
+    name: " Pillow Bumpers",
     category: "baby",
     price: 89,
     rating: 4.7,

@@ -69,15 +69,15 @@ const products = [
   },
 ]
 
-// Testimonials data
-interface Testimonial {
+// Testimonial videos data
+interface TestimonialVideo {
   id: number
   video: string
   poster: string
   name: string
 }
 
-const testimonials: Testimonial[] = [
+const testimonialVideos: TestimonialVideo[] = [
   {
     id: 1,
     video: "/ananthala hero section video.mp4",
@@ -236,7 +236,7 @@ export default function Home() {
               Experience The Difference
             </h2>
             <p
-              className="max-w-2xl mx-auto text-xl font-medium text-foreground"
+              className="max-w-2xl mx-auto text-xl font-semibold text-foreground"
               style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
             >
               See how our mattresses are crafted with precision
@@ -459,15 +459,18 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Customer Testimonials */}
-        <section className="py-16 px-4 bg-stone-50">
+        {/* Customer Testimonials Video Carousel Section */}
+        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center font-cormorant">
-              What Our Divas Say
-            </h2>
-            <p className="text-center text-foreground mb-8 max-w-2xl mx-auto">
-              Hear from our satisfied customers about their experience with Ananthala products
-            </p>
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <h2 className="text-4xl sm:text-4xl lg:text-4xl font-medium text-foreground mb-4 text-balance">
+                What Our Divas Say
+              </h2>
+              <p className="text-xl sm:text-2xl text-foreground font-medium">Join thousands of happy sleepers</p>
+            </div>
+
+            {/* Video Carousel */}
             <div className="relative">
               <Carousel
                 opts={{
@@ -477,7 +480,7 @@ export default function Home() {
                 className="w-full"
               >
                 <CarouselContent className="-ml-2 md:-ml-4">
-                  {testimonials.map((testimonial) => (
+                  {testimonialVideos.map((testimonial) => (
                     <CarouselItem
                       key={testimonial.id}
                       className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
@@ -496,7 +499,7 @@ export default function Home() {
                             Your browser does not support the video tag.
                           </video>
                         </div>
-                        <p className="text-left text-foreground font-medium">
+                        <p className="text-left text-foreground font-semibold text-lg">
                           {testimonial.name}
                         </p>
                       </div>
@@ -506,6 +509,11 @@ export default function Home() {
                 <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
                 <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
               </Carousel>
+            </div>
+
+            {/* Rating Summary */}
+            <div className="text-center mt-8">
+              <p className="text-foreground text-lg font-semibold">Rated 4.9/5 from over 10,000 reviews</p>
             </div>
           </div>
         </section>

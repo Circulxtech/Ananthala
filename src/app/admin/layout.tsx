@@ -15,7 +15,9 @@ import {
   Menu,
   X,
   LogOut,
-  Shield,
+  MessageSquare,
+  ChevronDown,
+  BookOpen,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -44,6 +46,11 @@ const menuItems = [
     icon: Package,
   },
   {
+    label: "Blogs",
+    href: "/admin/blogs",
+    icon: BookOpen,
+  },
+  {
     label: "User Management",
     href: "/admin/users",
     icon: Users,
@@ -57,6 +64,20 @@ const menuItems = [
     label: "Order Management",
     href: "/admin/orders",
     icon: ShoppingCart,
+  },
+  {
+    label: "Enquiry & Queries",
+    icon: MessageSquare,
+    subItems: [
+      {
+        label: "Dealer Enquiries",
+        href: "/admin/enquiries/dealer",
+      },
+      {
+        label: "Contact Us",
+        href: "/admin/enquiries/contact",
+      },
+    ],
   },
   {
     label: "Analytics",
@@ -76,6 +97,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [admin, setAdmin] = useState<AuthenticatedAdmin | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -107,6 +129,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       setIsLoading(false)
     }
   }, [router, pathname])
+
+  useEffect(() => {
+    if (pathname.startsWith("/admin/enquiries")) {
+      setOpenDropdown("Enquiry & Queries")
+    }
+  }, [pathname])
 
   const handleLogout = async () => {
     try {
@@ -141,12 +169,81 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return colors[index]
   }
 
+  const toggleDropdown = (label: string) => {
+    setOpenDropdown(openDropdown === label ? null : label)
+  }
+
+  const renderMenuItem = (item: any, isMobile = false) => {
+    const Icon = item.icon
+
+    if (item.subItems) {
+      const isOpen = openDropdown === item.label
+      const hasActiveSubItem = item.subItems.some((sub: any) => pathname === sub.href)
+
+      return (
+        <div key={item.label}>
+          <button
+            onClick={() => toggleDropdown(item.label)}
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 ${
+              hasActiveSubItem || isOpen
+                ? "bg-[#8B5A3C] text-white"
+                : "text-[#6D4530] hover:bg-[#8B5A3C]/10 hover:text-[#8B5A3C]"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <Icon className="h-5 w-5" />
+              <span className="font-medium">{item.label}</span>
+            </div>
+            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+          </button>
+          {isOpen && (
+            <div className="mt-1 ml-4 space-y-1">
+              {item.subItems.map((subItem: any) => {
+                const isActive = pathname === subItem.href
+                return (
+                  <Link
+                    key={subItem.href}
+                    href={subItem.href}
+                    onClick={() => isMobile && setIsSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 ${
+                      isActive
+                        ? "bg-[#8B5A3C]/20 text-[#8B5A3C] font-medium"
+                        : "text-[#6D4530] hover:bg-[#8B5A3C]/10 hover:text-[#8B5A3C]"
+                    }`}
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-current" />
+                    <span>{subItem.label}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    const isActive = pathname === item.href
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        onClick={() => isMobile && setIsSidebarOpen(false)}
+        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+          isActive ? "bg-[#8B5A3C] text-white" : "text-[#6D4530] hover:bg-[#8B5A3C]/10 hover:text-[#8B5A3C]"
+        }`}
+      >
+        <Icon className="h-5 w-5" />
+        <span className="font-medium">{item.label}</span>
+      </Link>
+    )
+  }
+
   if (isLoading && pathname !== "/admin") {
     return (
       <div className="min-h-screen bg-[#F5F1ED] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-white shadow-lg border-2 border-[#E5D5C5] flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Shield className="w-8 h-8 text-[#8B5A3C]" />
+          <div className="w-16 h-16 rounded-full bg-white shadow-lg border-2 border-[#E5D5C5] flex items-center justify-center mx-auto mb-4 animate-pulse p-2">
+            <img src="/logo.png" alt="Ananthala" className="w-full h-full object-contain" />
           </div>
           <p className="text-[#8B5A3C] font-medium">Verifying admin access...</p>
         </div>
@@ -180,9 +277,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                 </Button>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#8B5A3C] flex items-center justify-center">
-                    <Shield className="w-4 h-4 text-white" />
-                  </div>
+                  <img src="/logo.png" alt="Ananthala" className="h-8 w-auto" />
                   <div>
                     <Link
                       href="/admin/dashboard"
@@ -215,22 +310,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             style={{ borderColor: "#D9CFC7" }}
           >
             <nav className="p-4 space-y-1">
-              {menuItems.map((item) => {
-                const Icon = item.icon
-                const isActive = pathname === item.href
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                      isActive ? "bg-[#8B5A3C] text-white" : "text-[#6D4530] hover:bg-[#8B5A3C]/10 hover:text-[#8B5A3C]"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span className="font-medium">{item.label}</span>
-                  </Link>
-                )
-              })}
+              {menuItems.map((item) => renderMenuItem(item, false))}
               <button
                 onClick={handleLogout}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#6D4530] hover:bg-red-50 hover:text-red-600 transition-all duration-200"
@@ -249,25 +329,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 style={{ borderColor: "#D9CFC7" }}
               >
                 <nav className="p-4 space-y-1">
-                  {menuItems.map((item) => {
-                    const Icon = item.icon
-                    const isActive = pathname === item.href
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setIsSidebarOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                          isActive
-                            ? "bg-[#8B5A3C] text-white"
-                            : "text-[#6D4530] hover:bg-[#8B5A3C]/10 hover:text-[#8B5A3C]"
-                        }`}
-                      >
-                        <Icon className="h-5 w-5" />
-                        <span className="font-medium">{item.label}</span>
-                      </Link>
-                    )
-                  })}
+                  {menuItems.map((item) => renderMenuItem(item, true))}
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#6D4530] hover:bg-red-50 hover:text-red-600 transition-all duration-200"
