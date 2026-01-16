@@ -10,12 +10,12 @@ export type ProductType = "baby-hamper" | "kids-hamper" | "individual-baby" | "m
 export function getProductType(productId: number): ProductType {
   if (productId === 12) return "baby-hamper"
   if (productId === 13) return "kids-hamper"
-  if (productId === 8) return "topper"
-  if (productId === 9) return "lounger"
-  if (productId === 10) return "head-pillow"
+  if ([8, 16].includes(productId)) return "topper"
+  if ([9, 17].includes(productId)) return "lounger"
+  if ([10, 18].includes(productId)) return "head-pillow"
   if (productId === 11) return "pillow-bumpers"
   if ([14].includes(productId)) return "individual-baby"
-  if ([1, 2, 3, 4, 7].includes(productId)) return "mattress"
+  if ([1, 2, 3, 4, 7, 15, 19].includes(productId)) return "mattress"
   return "simple"
 }
 
@@ -24,4 +24,18 @@ export function getProductType(productId: number): ProductType {
  */
 export function isJoyProduct(productId: number): boolean {
   return [7, 8, 9, 10, 11, 12, 13, 14].includes(productId)
+}
+
+/**
+ * Check if product is a Bliss product
+ */
+export function isBlissProduct(productId: number): boolean {
+  return [15, 16, 17, 18].includes(productId)
+}
+
+/**
+ * Check if product is a Grace product
+ */
+export function isGraceProduct(productId: number): boolean {
+  return [19, 20, 21, 22].includes(productId)
 }

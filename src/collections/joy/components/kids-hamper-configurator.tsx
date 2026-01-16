@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Loader2 } from "lucide-react"
-import { useKidsHamper } from "@/hooks/use-kids-hamper"
+import { useKidsHamper } from "@/collections/joy/hooks/use-kids-hamper"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
 import { KIDS_HAMPER_ITEM_PRICES } from "@/utils/pricing"
@@ -18,9 +18,18 @@ interface KidsHamperConfiguratorProps {
 }
 
 const kidsProducts = [
-  { id: "mattress", name: "Mattress", price: KIDS_HAMPER_ITEM_PRICES.mattress, image: "/productmattress.jpg" },
-  { id: "pillows", name: "Pillows", price: KIDS_HAMPER_ITEM_PRICES.pillows, image: "/pillow.jpg" },
-  
+  {
+    id: "mattress",
+    name: "Mattress",
+    price: KIDS_HAMPER_ITEM_PRICES.mattress,
+    images: ["/productmattress.jpg", "/topper.jpg", "/lounger.jpg"],
+  },
+  {
+    id: "pillows",
+    name: "Pillows",
+    price: KIDS_HAMPER_ITEM_PRICES.pillows,
+    images: ["/pillow.jpg", "/bumpers.jpg", "/bedsheet.jpg"],
+  },
 ]
 
 // Standard sizes in inches (L x B x H) with price multipliers
@@ -76,7 +85,7 @@ export function KidsHamperConfigurator({
   
   const getProductImages = (itemId: string): string[] => {
     const productData = kidsProducts.find(p => p.id === itemId)
-    return productData ? [productData.image] : []
+    return productData ? productData.images : []
   }
   
   const setImageIndex = (itemId: string, index: number) => {
@@ -239,6 +248,31 @@ export function KidsHamperConfigurator({
                     className="object-cover"
                   />
                 </div>
+                
+                {/* Thumbnail Gallery */}
+                {getProductImages("mattress").length > 1 && (
+                  <div className="grid grid-cols-5 gap-2">
+                    {getProductImages("mattress").map((image, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setImageIndex("mattress", index)}
+                        type="button"
+                        className={`relative aspect-square overflow-hidden border-2 transition-all cursor-pointer hover:opacity-80 ${
+                          selectedImageIndices.mattress === index
+                            ? "border-[#EED9C4] opacity-100"
+                            : "border-transparent opacity-60"
+                        }`}
+                      >
+                        <Image
+                          src={image}
+                          alt={`Mattress view ${index + 1}`}
+                          fill
+                          className="object-cover pointer-events-none"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               
               {/* Right Side - Dimensions and Fabric */}
@@ -371,6 +405,31 @@ export function KidsHamperConfigurator({
                     className="object-cover"
                   />
                 </div>
+                
+                {/* Thumbnail Gallery */}
+                {getProductImages("pillows").length > 1 && (
+                  <div className="grid grid-cols-5 gap-2">
+                    {getProductImages("pillows").map((image, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setImageIndex("pillows", index)}
+                        type="button"
+                        className={`relative aspect-square overflow-hidden border-2 transition-all cursor-pointer hover:opacity-80 ${
+                          selectedImageIndices.pillows === index
+                            ? "border-[#EED9C4] opacity-100"
+                            : "border-transparent opacity-60"
+                        }`}
+                      >
+                        <Image
+                          src={image}
+                          alt={`Pillows view ${index + 1}`}
+                          fill
+                          className="object-cover pointer-events-none"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               
               {/* Right Side - Dimensions and Fabric */}

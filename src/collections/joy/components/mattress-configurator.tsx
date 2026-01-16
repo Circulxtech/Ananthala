@@ -6,22 +6,25 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Loader2 } from "lucide-react"
-import { usePillowBumpers } from "@/hooks/use-pillow-bumpers"
+import { useMattress } from "@/collections/joy/hooks/use-mattress"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
 
-interface PillowBumpersConfiguratorProps {
+interface MattressConfiguratorProps {
   product: ProductDetail
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
 
+// Standard sizes in inches (L x B x H) with price multipliers
 const standardSizes = [
-  { label: "10\" x 12\" x 1.5\"", value: "10x12x1.5", dimensions: { length: "10\"", breadth: "12\"", height: "1.5\"" }, priceMultiplier: 1.0 },
-  { label: "12\" x 14\" x 2\"", value: "12x14x2", dimensions: { length: "12\"", breadth: "14\"", height: "2\"" }, priceMultiplier: 1.15 },
-  { label: "14\" x 16\" x 2.5\"", value: "14x16x2.5", dimensions: { length: "14\"", breadth: "16\"", height: "2.5\"" }, priceMultiplier: 1.3 },
+  { label: "36\" x 48\" x 6\"", value: "36x48x6", dimensions: { length: "36\"", breadth: "48\"", height: "6\"" }, priceMultiplier: 1.0 },
+  { label: "42\" x 54\" x 8\"", value: "42x54x8", dimensions: { length: "42\"", breadth: "54\"", height: "8\"" }, priceMultiplier: 1.3 },
+  { label: "48\" x 60\" x 10\"", value: "48x60x10", dimensions: { length: "48\"", breadth: "60\"", height: "10\"" }, priceMultiplier: 1.6 },
+  { label: "54\" x 72\" x 12\"", value: "54x72x12", dimensions: { length: "54\"", breadth: "72\"", height: "12\"" }, priceMultiplier: 2.0 },
 ]
 
+// Fabric price multipliers
 const fabricMultipliers: Record<string, number> = {
   cotton: 1.0,
   "organic-cotton": 1.15,
@@ -34,17 +37,21 @@ const fabricOptions = [
   { value: "bamboo", label: "Bamboo" },
 ]
 
-export function PillowBumpersConfigurator({
+/**
+ * Mattress Product Configurator Component
+ * Handles mattress-specific customization and cart logic
+ */
+export function MattressConfigurator({
   product,
   onAddToCart,
   isAddingToCart,
-}: PillowBumpersConfiguratorProps) {
-  const bumpersState = usePillowBumpers()
+}: MattressConfiguratorProps) {
+  const mattressState = useMattress()
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [useCustomDimensions, setUseCustomDimensions] = useState(false)
   
   const getProductImages = (): string[] => {
-    return product.images && product.images.length > 0 ? product.images : ["/bumpers.jpg"]
+    return product.images && product.images.length > 0 ? product.images : ["/productmattress.jpg"]
   }
   
   const toggleCustomDimensions = () => {
@@ -54,17 +61,17 @@ export function PillowBumpersConfigurator({
   const handleStandardSizeChange = (value: string) => {
     const size = standardSizes.find(s => s.value === value)
     if (size) {
-      bumpersState.setStandardBumpersLength(size.dimensions.length)
-      bumpersState.setStandardBumpersBreadth(size.dimensions.breadth)
-      bumpersState.setStandardBumpersHeight(size.dimensions.height)
+      mattressState.setStandardMattressLength(size.dimensions.length)
+      mattressState.setStandardMattressBreadth(size.dimensions.breadth)
+      mattressState.setStandardMattressHeight(size.dimensions.height)
     }
   }
   
   const getCurrentStandardSize = (): string => {
     const size = standardSizes.find(s => 
-      s.dimensions.length === bumpersState.standardBumpersLength &&
-      s.dimensions.breadth === bumpersState.standardBumpersBreadth &&
-      s.dimensions.height === bumpersState.standardBumpersHeight
+      s.dimensions.length === mattressState.standardMattressLength &&
+      s.dimensions.breadth === mattressState.standardMattressBreadth &&
+      s.dimensions.height === mattressState.standardMattressHeight
     )
     return size?.value || ""
   }
@@ -74,13 +81,14 @@ export function PillowBumpersConfigurator({
     const isCustom = useCustomDimensions
     
     if (isCustom) {
-      dimensions = `${bumpersState.bumpersLength || ""} x ${bumpersState.bumpersBreadth || ""} x ${bumpersState.bumpersHeight || ""}`.trim()
+      dimensions = `${mattressState.mattressLength || ""} x ${mattressState.mattressBreadth || ""} x ${mattressState.mattressHeight || ""}`.trim()
     } else {
-      dimensions = `${bumpersState.standardBumpersLength || ""} x ${bumpersState.standardBumpersBreadth || ""} x ${bumpersState.standardBumpersHeight || ""}`.trim()
+      dimensions = `${mattressState.standardMattressLength || ""} x ${mattressState.standardMattressBreadth || ""} x ${mattressState.standardMattressHeight || ""}`.trim()
     }
     
-    const sizeInfo = dimensions ? `${dimensions}${bumpersState.bumpersFabric ? ` - ${fabricOptions.find(f => f.value === bumpersState.bumpersFabric)?.label || bumpersState.bumpersFabric}` : ""}${isCustom ? " (Custom)" : ""}` : "Standard"
+    const sizeInfo = dimensions ? `${dimensions}${mattressState.mattressFabric ? ` - ${fabricOptions.find(f => f.value === mattressState.mattressFabric)?.label || mattressState.mattressFabric}` : ""}${isCustom ? " (Custom)" : ""}` : "Standard"
     
+    // Calculate price
     let basePrice = product.price
     let dimensionMultiplier = 1.0
     let fabricMultiplier = 1.0
@@ -94,19 +102,19 @@ export function PillowBumpersConfigurator({
         }
       }
     } else {
-      dimensionMultiplier = 1.2
+      dimensionMultiplier = 1.2 // Custom dimensions multiplier
     }
     
-    if (bumpersState.bumpersFabric) {
-      fabricMultiplier = fabricMultipliers[bumpersState.bumpersFabric] || 1.0
+    if (mattressState.mattressFabric) {
+      fabricMultiplier = fabricMultipliers[mattressState.mattressFabric] || 1.0
     }
     
     const finalPrice = Math.round(basePrice * dimensionMultiplier * fabricMultiplier)
     
     const items: CartItem[] = [{
-      id: `pillow-bumpers-${product.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      id: `mattress-${product.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       name: product.name,
-      image: product.images[0] || "/bumpers.jpg",
+      image: product.images[0] || "/productmattress.jpg",
       size: sizeInfo,
       quantity: 1,
       price: finalPrice,
@@ -115,6 +123,7 @@ export function PillowBumpersConfigurator({
     onAddToCart(items)
   }
   
+  // Calculate total price
   let basePrice = product.price
   let dimensionMultiplier = 1.0
   let fabricMultiplier = 1.0
@@ -128,31 +137,35 @@ export function PillowBumpersConfigurator({
       }
     }
   } else {
-    dimensionMultiplier = 1.2
+    dimensionMultiplier = 1.2 // Custom dimensions multiplier
   }
   
-  if (bumpersState.bumpersFabric) {
-    fabricMultiplier = fabricMultipliers[bumpersState.bumpersFabric] || 1.0
+  if (mattressState.mattressFabric) {
+    fabricMultiplier = fabricMultipliers[mattressState.mattressFabric] || 1.0
   }
   
   const totalPrice = Math.round(basePrice * dimensionMultiplier * fabricMultiplier)
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      {/* Left Content - Product Customization */}
       <div className="lg:col-span-8">
         <div className="p-6 bg-white border-2 border-[#EED9C4]">
           <h3 className="text-xl font-medium text-foreground mb-6">{product.name}</h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Side - Images */}
             <div className="space-y-4">
+              {/* Main Image */}
               <div className="relative aspect-square overflow-hidden">
                 <Image
-                  src={getProductImages()[selectedImageIndex] || "/bumpers.jpg"}
+                  src={getProductImages()[selectedImageIndex] || "/productmattress.jpg"}
                   alt={product.name}
                   fill
                   className="object-cover"
                 />
               </div>
               
+              {/* Thumbnail Gallery */}
               {getProductImages().length > 1 && (
                 <div className="grid grid-cols-5 gap-2">
                   {getProductImages().map((image, index) => (
@@ -178,9 +191,11 @@ export function PillowBumpersConfigurator({
               )}
             </div>
             
+            {/* Right Side - Dimensions and Fabric */}
             <div>
               <h4 className="text-2xl font-medium text-foreground mb-4">Dimensions & Fabric</h4>
               <div className="space-y-4">
+                {/* Toggle between Standard and Custom */}
                 <div className="flex items-center gap-4 mb-4">
                   <button
                     type="button"
@@ -207,6 +222,7 @@ export function PillowBumpersConfigurator({
                 </div>
                 
                 {!useCustomDimensions ? (
+                  /* Standard Dimensions */
                   <>
                     <div>
                       <label className="text-base font-medium text-foreground mb-2 block">Dimensions(in inches)</label>
@@ -225,27 +241,28 @@ export function PillowBumpersConfigurator({
                           ))}
                         </SelectContent>
                       </Select>
-                      {bumpersState.standardBumpersLength && (
+                      {mattressState.standardMattressLength && (
                         <div className="mt-2">
                           <div className="flex items-center gap-2 text-foreground text-lg">
-                            <span>{bumpersState.standardBumpersLength || "L"}</span>
+                            <span>{mattressState.standardMattressLength || "L"}</span>
                             <span>×</span>
-                            <span>{bumpersState.standardBumpersBreadth || "B"}</span>
+                            <span>{mattressState.standardMattressBreadth || "B"}</span>
                             <span>×</span>
-                            <span>{bumpersState.standardBumpersHeight || "H"}</span>
+                            <span>{mattressState.standardMattressHeight || "H"}</span>
                           </div>
                         </div>
                       )}
                     </div>
                   </>
                 ) : (
+                  /* Custom Dimensions */
                   <div className="space-y-3">
                     <div>
                       <label className="text-base font-medium text-foreground mb-2 block">Length (inches)</label>
                       <Input
                         type="text"
-                        value={bumpersState.bumpersLength}
-                        onChange={(e) => bumpersState.setBumpersLength(e.target.value)}
+                        value={mattressState.mattressLength}
+                        onChange={(e) => mattressState.setMattressLength(e.target.value)}
                         placeholder="Enter length"
                         className="text-foreground"
                       />
@@ -254,8 +271,8 @@ export function PillowBumpersConfigurator({
                       <label className="text-base font-medium text-foreground mb-2 block">Breadth (inches)</label>
                       <Input
                         type="text"
-                        value={bumpersState.bumpersBreadth}
-                        onChange={(e) => bumpersState.setBumpersBreadth(e.target.value)}
+                        value={mattressState.mattressBreadth}
+                        onChange={(e) => mattressState.setMattressBreadth(e.target.value)}
                         placeholder="Enter breadth"
                         className="text-foreground"
                       />
@@ -264,8 +281,8 @@ export function PillowBumpersConfigurator({
                       <label className="text-base font-medium text-foreground mb-2 block">Height (inches)</label>
                       <Input
                         type="text"
-                        value={bumpersState.bumpersHeight}
-                        onChange={(e) => bumpersState.setBumpersHeight(e.target.value)}
+                        value={mattressState.mattressHeight}
+                        onChange={(e) => mattressState.setMattressHeight(e.target.value)}
                         placeholder="Enter height"
                         className="text-foreground"
                       />
@@ -273,9 +290,10 @@ export function PillowBumpersConfigurator({
                   </div>
                 )}
                 
+                {/* Fabric Dropdown */}
                 <div>
                   <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                  <Select value={bumpersState.bumpersFabric || ""} onValueChange={bumpersState.setBumpersFabric}>
+                  <Select value={mattressState.mattressFabric || ""} onValueChange={mattressState.setMattressFabric}>
                     <SelectTrigger className="w-full text-foreground">
                       <SelectValue placeholder="Select fabric" />
                     </SelectTrigger>
@@ -294,8 +312,10 @@ export function PillowBumpersConfigurator({
         </div>
       </div>
 
+      {/* Right Sidebar - Price and Add to Cart */}
       <div className="lg:col-span-4">
         <div className="sticky top-24 p-6 bg-white border-2 border-[#EED9C4]">
+          {/* Price Section */}
           <div className="mb-6">
             <h3 className="text-lg font-medium text-foreground mb-2">Total Price</h3>
             <div className="text-2xl font-semibold text-foreground">
@@ -303,6 +323,7 @@ export function PillowBumpersConfigurator({
             </div>
           </div>
           
+          {/* Add to Cart Button */}
           <Button 
             className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleAddToCart}

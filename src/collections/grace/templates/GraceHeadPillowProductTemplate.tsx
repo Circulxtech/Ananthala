@@ -2,7 +2,7 @@
 
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
-import { BabyHamperConfigurator } from "@/components/product/baby-hamper-configurator"
+import { HeadPillowConfigurator } from "@/collections/joy/components/head-pillow-configurator"
 import {
   Carousel,
   CarouselContent,
@@ -10,7 +10,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Accordion,
   AccordionContent,
@@ -20,10 +19,9 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { useBabyHamper } from "@/hooks/use-baby-hamper"
 import { Sprout, Waves, SprayCan, XCircle, Layers, Grid } from "lucide-react"
+import { CustomersAlsoBought } from "@/collections/grace/components/customers-also-bought"
 
-// Testimonial videos data
 interface TestimonialVideo {
   id: number
   video: string
@@ -35,133 +33,95 @@ const testimonialVideos: TestimonialVideo[] = [
   {
     id: 1,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/pillow.jpg",
     name: "Sarah Johnson",
   },
   {
     id: 2,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/pillow.jpg",
     name: "Michael Chen",
   },
   {
     id: 3,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/pillow.jpg",
     name: "Emily Rodriguez",
   },
   {
     id: 4,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/pillow.jpg",
     name: "David Thompson",
   },
   {
     id: 5,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/pillow.jpg",
     name: "Priya Sharma",
   },
   {
     id: 6,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/pillow.jpg",
     name: "James Wilson",
   },
 ]
 
-interface BabyHamperProductTemplateProps {
+interface GraceHeadPillowProductTemplateProps {
   product: ProductDetail
   productId: number
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
 
-/**
- * Baby Hamper Product Template
- * Complete page structure for baby hamper products with custom layout
- */
-export function BabyHamperProductTemplate({
+export function GraceHeadPillowProductTemplate({
   product,
   productId,
   onAddToCart,
   isAddingToCart,
-}: BabyHamperProductTemplateProps) {
-  const hamperState = useBabyHamper()
-  
-  // Get bedsheet dimensions based on mattress size
-  const getBedsheetDimensions = () => {
-    if (hamperState.standardLength && hamperState.standardBreadth) {
-      return `${hamperState.standardLength} x ${hamperState.standardBreadth}`
-    }
-    return "Standard Size"
-  }
-  
-  // Bedsheet color options
-  const bedsheetColors = [
-    { value: "cream", label: "Cream" },
-    { value: "beige", label: "Beige" },
-    { value: "white", label: "White" },
-    { value: "gray", label: "Gray" },
-  ]
-  
+}: GraceHeadPillowProductTemplateProps) {
   return (
     <div className="space-y-12">
-      {/* Breadcrumb - Already handled in parent, but can be customized here if needed */}
-      
-      {/* Main Product Configuration Section */}
-      <BabyHamperConfigurator
+      <HeadPillowConfigurator
         product={product}
         onAddToCart={onAddToCart}
         isAddingToCart={isAddingToCart}
       />
 
-      {/* Product Features & Information Section */}
       <section className="w-full bg-white py-16">
         <div className="w-full px-4 sm:px-6 lg:px-8">
-          {/* Features Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 mb-12 max-w-7xl mx-auto">
-            {/* Feature 1: 100% Organic Cotton */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <Sprout className="w-6 h-6 text-foreground stroke-[1.5]" />
               </div>
               <p className="text-base md:text-lg font-medium text-foreground">100% Organic Cotton</p>
             </div>
-
-            {/* Feature 2: Maximum Absorbency */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <Waves className="w-6 h-6 text-foreground stroke-[1.5]" />
               </div>
               <p className="text-base md:text-lg font-medium text-foreground">Maximum Absorbency</p>
             </div>
-
-            {/* Feature 3: No Artificial Softeners */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <SprayCan className="w-6 h-6 text-foreground stroke-[1.5]" />
               </div>
               <p className="text-base md:text-lg font-medium text-foreground">No Artificial Softeners</p>
             </div>
-
-            {/* Feature 4: Anti-Pill */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <XCircle className="w-6 h-6 text-foreground stroke-[1.5]" />
               </div>
               <p className="text-base md:text-lg font-medium text-foreground">Anti-Pill</p>
             </div>
-
-            {/* Feature 5: Plush, 700 GSM */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <Layers className="w-6 h-6 text-foreground stroke-[1.5]" />
               </div>
               <p className="text-base md:text-lg font-medium text-foreground">Plush, 700 GSM</p>
             </div>
-
-            {/* Feature 6: Generously Sized */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <Grid className="w-6 h-6 text-foreground stroke-[1.5]" />
@@ -170,34 +130,30 @@ export function BabyHamperProductTemplate({
             </div>
           </div>
 
-          {/* Accordion Sections */}
           <div className="max-w-8xl mx-auto">
-            <Accordion type="single" collapsible className="w-full space-y-2">
-              {/* Description Accordion */}
-              <AccordionItem value="description" className="border-2 border-[#EED9C4]  px-4">
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              <AccordionItem value="description" className="border-2 border-[#EED9C4] px-4">
                 <AccordionTrigger className="text-lg font-medium text-foreground hover:no-underline">
                   Description
                 </AccordionTrigger>
                 <AccordionContent className="text-foreground/80 leading-relaxed">
                   <p className="mb-4">
-                    Our premium baby hamper collection is designed with your little one's comfort and safety in mind. 
-                    Each product is crafted using 100% organic cotton, ensuring the softest touch against delicate skin.
+                    {product.description}
                   </p>
                   <p className="mb-4">
-                    The hamper includes a carefully selected combination of essential items: a premium mattress, 
-                    comfortable topper, cozy lounger, supportive head pillow, and protective pillow bumpers. 
-                    All items are designed to work together, creating the perfect sleep environment for your baby.
+                    Our premium head pillow is designed with your baby's comfort and health in mind. 
+                    Each pillow is crafted using the finest organic materials and innovative technology 
+                    to ensure the perfect support for your little one's head and neck.
                   </p>
                   <p>
-                    With maximum absorbency and anti-pill technology, these products are built to last while 
-                    maintaining their plush, 700 GSM quality. Generously sized to accommodate your growing baby, 
-                    ensuring comfort from day one.
+                    With maximum comfort and support, this head pillow is built to last while 
+                    maintaining its premium quality. Available in standard and custom dimensions to fit 
+                    your specific needs.
                   </p>
                 </AccordionContent>
               </AccordionItem>
 
-              {/* Shipping Information Accordion */}
-              <AccordionItem value="shipping" className="border-2 border-[#EED9C4] !border-b-2 px-4">
+              <AccordionItem value="shipping" className="border-2 border-[#EED9C4] px-4 last:!border-b-2">
                 <AccordionTrigger className="text-lg font-medium text-foreground hover:no-underline">
                   Shipping information
                 </AccordionTrigger>
@@ -236,54 +192,6 @@ export function BabyHamperProductTemplate({
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-          </div>
-        </div>
-      </section>
-
-      {/* Complimentary Bed Sheet Section */}
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl md:text-3xl text-center font-medium text-foreground mb-4 font-cormorant">
-            Bed Sheet <span className="text-lg font-normal text-foreground">(Complimentary)</span>
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center mt-8">
-            <div className="relative aspect-[4/3] overflow-hidden w-full">
-              <Image
-                src="/bedsheet.jpg"
-                alt="Bed Sheet"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="space-y-6 w-full p-6 bg-white border-2 border-[#EED9C4]">
-              <div>
-                <label className="text-lg font-medium text-foreground mb-2 block">Color</label>
-                <Select value={hamperState.bedSpreadColor} onValueChange={hamperState.setBedSpreadColor}>
-                  <SelectTrigger className="w-full text-foreground">
-                    <SelectValue placeholder="Select color" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {bedsheetColors.map((color) => (
-                      <SelectItem key={color.value} value={color.value} className="text-foreground">
-                        {color.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="bg-[#EED9C4]/30 p-3 rounded border border-[#EED9C4]/50">
-                <p className="text-foreground/70 text-sm flex items-center gap-2">
-                  <span className="font-semibold">Dimensions:</span>
-                  <span>{getBedsheetDimensions()}</span>
-                  <span className="text-xs">(Based on mattress size)</span>
-                </p>
-              </div>
-              <div className="bg-[#EED9C4]/30 p-3 rounded border border-[#EED9C4]/50">
-                <p className="text-foreground/70 text-sm">
-                  This complimentary bed sheet will be automatically added to your cart. The dimensions will match your selected mattress size.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -373,10 +281,11 @@ export function BabyHamperProductTemplate({
         </div>
       </section>
 
-      {/* Customer Testimonials Video Carousel Section */}
+      {/* What Our Customers Also Bought Section */}
+      <CustomersAlsoBought currentProductId={productId} />
+
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
           <div className="text-center mb-12">
             <h2 className="text-4xl sm:text-4xl lg:text-4xl font-medium text-foreground mb-4 text-balance">
               What Our Divas Say
@@ -384,7 +293,6 @@ export function BabyHamperProductTemplate({
             <p className="text-xl sm:text-2xl text-foreground font-medium">Join thousands of happy sleepers</p>
           </div>
 
-          {/* Video Carousel */}
           <div className="relative">
             <Carousel
               opts={{
@@ -425,14 +333,12 @@ export function BabyHamperProductTemplate({
             </Carousel>
           </div>
 
-          {/* Rating Summary */}
           <div className="text-center mt-8">
             <p className="text-foreground text-lg font-semibold">Rated 4.9/5 from over 10,000 reviews</p>
           </div>
         </div>
       </section>
 
-      {/* About Us Section */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
@@ -449,10 +355,10 @@ export function BabyHamperProductTemplate({
                 About Us
               </h2>
               <p className="text-lg text-foreground leading-relaxed">
-                At Ananthala, we are committed to crafting premium products that take care of your baby's health. Our baby products are designed with safety and comfort in mind, using only the finest materials and innovative technology.
+                At Ananthala, we are committed to crafting premium products that take care of your baby's health. Our head pillows are designed with comfort and support in mind, using only the finest organic materials and innovative technology.
               </p>
               <p className="text-lg text-foreground leading-relaxed">
-                Every product is expertly crafted to ensure your little one gets the best care. We believe in quality, safety, and putting your baby's well-being first.
+                Every product is expertly crafted to ensure your little one gets the best sleep. We believe in quality, comfort, and putting your baby's well-being first.
               </p>
               <Link href="/about">
                 <Button 

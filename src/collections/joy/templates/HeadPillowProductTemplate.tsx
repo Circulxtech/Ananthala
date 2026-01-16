@@ -2,7 +2,7 @@
 
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
-import { PillowBumpersConfigurator } from "@/components/product/pillow-bumpers-configurator"
+import { HeadPillowConfigurator } from "@/collections/joy/components/head-pillow-configurator"
 import {
   Carousel,
   CarouselContent,
@@ -20,6 +20,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Sprout, Waves, SprayCan, XCircle, Layers, Grid } from "lucide-react"
+import { CustomersAlsoBought } from "@/collections/joy/components/customers-also-bought"
 
 interface TestimonialVideo {
   id: number
@@ -32,49 +33,49 @@ const testimonialVideos: TestimonialVideo[] = [
   {
     id: 1,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/pillow.jpg",
     name: "Sarah Johnson",
   },
   {
     id: 2,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/pillow.jpg",
     name: "Michael Chen",
   },
   {
     id: 3,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/pillow.jpg",
     name: "Emily Rodriguez",
   },
   {
     id: 4,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/pillow.jpg",
     name: "David Thompson",
   },
   {
     id: 5,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/pillow.jpg",
     name: "Priya Sharma",
   },
   {
     id: 6,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/pillow.jpg",
     name: "James Wilson",
   },
 ]
 
-interface PillowBumpersProductTemplateProps {
+interface HeadPillowProductTemplateProps {
   product: ProductDetail
   productId: number
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
 
-export function PillowBumpersProductTemplate({
+export function HeadPillowProductTemplate({
   product,
   productId,
   onAddToCart,
@@ -82,7 +83,7 @@ export function PillowBumpersProductTemplate({
 }: TopperProductTemplateProps) {
   return (
     <div className="space-y-12">
-      <PillowBumpersConfigurator
+      <HeadPillowConfigurator
         product={product}
         onAddToCart={onAddToCart}
         isAddingToCart={isAddingToCart}
@@ -140,13 +141,13 @@ export function PillowBumpersProductTemplate({
                     {product.description}
                   </p>
                   <p className="mb-4">
-                    Our premium pillow bumpers are designed with your baby's safety and comfort in mind. 
-                    Each bumper is crafted using the finest organic materials and breathable mesh design 
-                    to ensure proper air circulation while providing protection.
+                    Our premium head pillow is designed with your baby's comfort and health in mind. 
+                    Each pillow is crafted using the finest organic materials and innovative technology 
+                    to ensure the perfect support for your little one's head and neck.
                   </p>
                   <p>
-                    With maximum safety and comfort, these pillow bumpers are built to last while 
-                    maintaining their premium quality. Available in standard and custom dimensions to fit 
+                    With maximum comfort and support, this head pillow is built to last while 
+                    maintaining its premium quality. Available in standard and custom dimensions to fit 
                     your specific needs.
                   </p>
                 </AccordionContent>
@@ -280,6 +281,9 @@ export function PillowBumpersProductTemplate({
         </div>
       </section>
 
+      {/* What Our Customers Also Bought Section */}
+      <CustomersAlsoBought currentProductId={productId} />
+
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
@@ -351,7 +355,7 @@ export function PillowBumpersProductTemplate({
                 About Us
               </h2>
               <p className="text-lg text-foreground leading-relaxed">
-                At Ananthala, we are committed to crafting premium products that take care of your baby's health. Our pillow bumpers are designed with safety and comfort in mind, using only the finest organic materials and breathable mesh technology.
+                At Ananthala, we are committed to crafting premium products that take care of your baby's health. Our head pillows are designed with comfort and support in mind, using only the finest organic materials and innovative technology.
               </p>
               <p className="text-lg text-foreground leading-relaxed">
                 Every product is expertly crafted to ensure your little one gets the best sleep. We believe in quality, comfort, and putting your baby's well-being first.

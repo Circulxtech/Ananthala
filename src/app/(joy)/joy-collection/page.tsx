@@ -66,7 +66,7 @@ export default function JoyCollectionPage() {
                   <ChevronRight className="w-4 h-4 text-foreground/50" />
                 </li>
                 <li className="text-foreground font-medium">
-                  Joy Collection
+                  Joy 
                 </li>
               </ol>
             </nav>

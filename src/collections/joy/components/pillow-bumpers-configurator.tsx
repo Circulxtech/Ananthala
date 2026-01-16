@@ -6,24 +6,22 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Loader2 } from "lucide-react"
-import { useTopper } from "@/hooks/use-topper"
+import { usePillowBumpers } from "@/collections/joy/hooks/use-pillow-bumpers"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
 
-interface TopperConfiguratorProps {
+interface PillowBumpersConfiguratorProps {
   product: ProductDetail
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
 
-// Standard sizes in inches (L x B x H) with price multipliers
 const standardSizes = [
-  { label: "24\" x 30\" x 2\"", value: "24x30x2", dimensions: { length: "24\"", breadth: "30\"", height: "2\"" }, priceMultiplier: 1.0 },
-  { label: "28\" x 36\" x 2.5\"", value: "28x36x2.5", dimensions: { length: "28\"", breadth: "36\"", height: "2.5\"" }, priceMultiplier: 1.2 },
-  { label: "32\" x 40\" x 3\"", value: "32x40x3", dimensions: { length: "32\"", breadth: "40\"", height: "3\"" }, priceMultiplier: 1.4 },
+  { label: "10\" x 12\" x 1.5\"", value: "10x12x1.5", dimensions: { length: "10\"", breadth: "12\"", height: "1.5\"" }, priceMultiplier: 1.0 },
+  { label: "12\" x 14\" x 2\"", value: "12x14x2", dimensions: { length: "12\"", breadth: "14\"", height: "2\"" }, priceMultiplier: 1.15 },
+  { label: "14\" x 16\" x 2.5\"", value: "14x16x2.5", dimensions: { length: "14\"", breadth: "16\"", height: "2.5\"" }, priceMultiplier: 1.3 },
 ]
 
-// Fabric price multipliers
 const fabricMultipliers: Record<string, number> = {
   cotton: 1.0,
   "organic-cotton": 1.15,
@@ -36,17 +34,17 @@ const fabricOptions = [
   { value: "bamboo", label: "Bamboo" },
 ]
 
-export function TopperConfigurator({
+export function PillowBumpersConfigurator({
   product,
   onAddToCart,
   isAddingToCart,
-}: TopperConfiguratorProps) {
-  const topperState = useTopper()
+}: PillowBumpersConfiguratorProps) {
+  const bumpersState = usePillowBumpers()
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [useCustomDimensions, setUseCustomDimensions] = useState(false)
   
   const getProductImages = (): string[] => {
-    return product.images && product.images.length > 0 ? product.images : ["/topper.jpg"]
+    return product.images && product.images.length > 0 ? product.images : ["/bumpers.jpg"]
   }
   
   const toggleCustomDimensions = () => {
@@ -56,17 +54,17 @@ export function TopperConfigurator({
   const handleStandardSizeChange = (value: string) => {
     const size = standardSizes.find(s => s.value === value)
     if (size) {
-      topperState.setStandardTopperLength(size.dimensions.length)
-      topperState.setStandardTopperBreadth(size.dimensions.breadth)
-      topperState.setStandardTopperHeight(size.dimensions.height)
+      bumpersState.setStandardBumpersLength(size.dimensions.length)
+      bumpersState.setStandardBumpersBreadth(size.dimensions.breadth)
+      bumpersState.setStandardBumpersHeight(size.dimensions.height)
     }
   }
   
   const getCurrentStandardSize = (): string => {
     const size = standardSizes.find(s => 
-      s.dimensions.length === topperState.standardTopperLength &&
-      s.dimensions.breadth === topperState.standardTopperBreadth &&
-      s.dimensions.height === topperState.standardTopperHeight
+      s.dimensions.length === bumpersState.standardBumpersLength &&
+      s.dimensions.breadth === bumpersState.standardBumpersBreadth &&
+      s.dimensions.height === bumpersState.standardBumpersHeight
     )
     return size?.value || ""
   }
@@ -76,14 +74,13 @@ export function TopperConfigurator({
     const isCustom = useCustomDimensions
     
     if (isCustom) {
-      dimensions = `${topperState.topperLength || ""} x ${topperState.topperBreadth || ""} x ${topperState.topperHeight || ""}`.trim()
+      dimensions = `${bumpersState.bumpersLength || ""} x ${bumpersState.bumpersBreadth || ""} x ${bumpersState.bumpersHeight || ""}`.trim()
     } else {
-      dimensions = `${topperState.standardTopperLength || ""} x ${topperState.standardTopperBreadth || ""} x ${topperState.standardTopperHeight || ""}`.trim()
+      dimensions = `${bumpersState.standardBumpersLength || ""} x ${bumpersState.standardBumpersBreadth || ""} x ${bumpersState.standardBumpersHeight || ""}`.trim()
     }
     
-    const sizeInfo = dimensions ? `${dimensions}${topperState.topperFabric ? ` - ${fabricOptions.find(f => f.value === topperState.topperFabric)?.label || topperState.topperFabric}` : ""}${isCustom ? " (Custom)" : ""}` : "Standard"
+    const sizeInfo = dimensions ? `${dimensions}${bumpersState.bumpersFabric ? ` - ${fabricOptions.find(f => f.value === bumpersState.bumpersFabric)?.label || bumpersState.bumpersFabric}` : ""}${isCustom ? " (Custom)" : ""}` : "Standard"
     
-    // Calculate price
     let basePrice = product.price
     let dimensionMultiplier = 1.0
     let fabricMultiplier = 1.0
@@ -97,19 +94,19 @@ export function TopperConfigurator({
         }
       }
     } else {
-      dimensionMultiplier = 1.2 // Custom dimensions multiplier
+      dimensionMultiplier = 1.2
     }
     
-    if (topperState.topperFabric) {
-      fabricMultiplier = fabricMultipliers[topperState.topperFabric] || 1.0
+    if (bumpersState.bumpersFabric) {
+      fabricMultiplier = fabricMultipliers[bumpersState.bumpersFabric] || 1.0
     }
     
     const finalPrice = Math.round(basePrice * dimensionMultiplier * fabricMultiplier)
     
     const items: CartItem[] = [{
-      id: `topper-${product.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      id: `pillow-bumpers-${product.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       name: product.name,
-      image: product.images[0] || "/topper.jpg",
+      image: product.images[0] || "/bumpers.jpg",
       size: sizeInfo,
       quantity: 1,
       price: finalPrice,
@@ -118,7 +115,6 @@ export function TopperConfigurator({
     onAddToCart(items)
   }
   
-  // Calculate total price
   let basePrice = product.price
   let dimensionMultiplier = 1.0
   let fabricMultiplier = 1.0
@@ -132,27 +128,25 @@ export function TopperConfigurator({
       }
     }
   } else {
-    dimensionMultiplier = 1.2 // Custom dimensions multiplier
+    dimensionMultiplier = 1.2
   }
   
-  if (topperState.topperFabric) {
-    fabricMultiplier = fabricMultipliers[topperState.topperFabric] || 1.0
+  if (bumpersState.bumpersFabric) {
+    fabricMultiplier = fabricMultipliers[bumpersState.bumpersFabric] || 1.0
   }
   
   const totalPrice = Math.round(basePrice * dimensionMultiplier * fabricMultiplier)
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      {/* Left Content - Product Customization */}
       <div className="lg:col-span-8">
         <div className="p-6 bg-white border-2 border-[#EED9C4]">
           <h3 className="text-xl font-medium text-foreground mb-6">{product.name}</h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Side - Images */}
             <div className="space-y-4">
               <div className="relative aspect-square overflow-hidden">
                 <Image
-                  src={getProductImages()[selectedImageIndex] || "/topper.jpg"}
+                  src={getProductImages()[selectedImageIndex] || "/bumpers.jpg"}
                   alt={product.name}
                   fill
                   className="object-cover"
@@ -184,7 +178,6 @@ export function TopperConfigurator({
               )}
             </div>
             
-            {/* Right Side - Dimensions and Fabric */}
             <div>
               <h4 className="text-2xl font-medium text-foreground mb-4">Dimensions & Fabric</h4>
               <div className="space-y-4">
@@ -232,14 +225,14 @@ export function TopperConfigurator({
                           ))}
                         </SelectContent>
                       </Select>
-                      {topperState.standardTopperLength && (
+                      {bumpersState.standardBumpersLength && (
                         <div className="mt-2">
                           <div className="flex items-center gap-2 text-foreground text-lg">
-                            <span>{topperState.standardTopperLength || "L"}</span>
+                            <span>{bumpersState.standardBumpersLength || "L"}</span>
                             <span>×</span>
-                            <span>{topperState.standardTopperBreadth || "B"}</span>
+                            <span>{bumpersState.standardBumpersBreadth || "B"}</span>
                             <span>×</span>
-                            <span>{topperState.standardTopperHeight || "H"}</span>
+                            <span>{bumpersState.standardBumpersHeight || "H"}</span>
                           </div>
                         </div>
                       )}
@@ -251,8 +244,8 @@ export function TopperConfigurator({
                       <label className="text-base font-medium text-foreground mb-2 block">Length (inches)</label>
                       <Input
                         type="text"
-                        value={topperState.topperLength}
-                        onChange={(e) => topperState.setTopperLength(e.target.value)}
+                        value={bumpersState.bumpersLength}
+                        onChange={(e) => bumpersState.setBumpersLength(e.target.value)}
                         placeholder="Enter length"
                         className="text-foreground"
                       />
@@ -261,8 +254,8 @@ export function TopperConfigurator({
                       <label className="text-base font-medium text-foreground mb-2 block">Breadth (inches)</label>
                       <Input
                         type="text"
-                        value={topperState.topperBreadth}
-                        onChange={(e) => topperState.setTopperBreadth(e.target.value)}
+                        value={bumpersState.bumpersBreadth}
+                        onChange={(e) => bumpersState.setBumpersBreadth(e.target.value)}
                         placeholder="Enter breadth"
                         className="text-foreground"
                       />
@@ -271,8 +264,8 @@ export function TopperConfigurator({
                       <label className="text-base font-medium text-foreground mb-2 block">Height (inches)</label>
                       <Input
                         type="text"
-                        value={topperState.topperHeight}
-                        onChange={(e) => topperState.setTopperHeight(e.target.value)}
+                        value={bumpersState.bumpersHeight}
+                        onChange={(e) => bumpersState.setBumpersHeight(e.target.value)}
                         placeholder="Enter height"
                         className="text-foreground"
                       />
@@ -282,7 +275,7 @@ export function TopperConfigurator({
                 
                 <div>
                   <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                  <Select value={topperState.topperFabric || ""} onValueChange={topperState.setTopperFabric}>
+                  <Select value={bumpersState.bumpersFabric || ""} onValueChange={bumpersState.setBumpersFabric}>
                     <SelectTrigger className="w-full text-foreground">
                       <SelectValue placeholder="Select fabric" />
                     </SelectTrigger>
@@ -301,7 +294,6 @@ export function TopperConfigurator({
         </div>
       </div>
 
-      {/* Right Sidebar - Price and Add to Cart */}
       <div className="lg:col-span-4">
         <div className="sticky top-24 p-6 bg-white border-2 border-[#EED9C4]">
           <div className="mb-6">

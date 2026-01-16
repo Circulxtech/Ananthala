@@ -6,22 +6,24 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Loader2 } from "lucide-react"
-import { useHeadPillow } from "@/hooks/use-head-pillow"
+import { useTopper } from "@/collections/joy/hooks/use-topper"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
 
-interface HeadPillowConfiguratorProps {
+interface TopperConfiguratorProps {
   product: ProductDetail
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
 
+// Standard sizes in inches (L x B x H) with price multipliers
 const standardSizes = [
-  { label: "12\" x 16\" x 2\"", value: "12x16x2", dimensions: { length: "12\"", breadth: "16\"", height: "2\"" }, priceMultiplier: 1.0 },
-  { label: "14\" x 18\" x 2.5\"", value: "14x18x2.5", dimensions: { length: "14\"", breadth: "18\"", height: "2.5\"" }, priceMultiplier: 1.15 },
-  { label: "16\" x 20\" x 3\"", value: "16x20x3", dimensions: { length: "16\"", breadth: "20\"", height: "3\"" }, priceMultiplier: 1.3 },
+  { label: "24\" x 30\" x 2\"", value: "24x30x2", dimensions: { length: "24\"", breadth: "30\"", height: "2\"" }, priceMultiplier: 1.0 },
+  { label: "28\" x 36\" x 2.5\"", value: "28x36x2.5", dimensions: { length: "28\"", breadth: "36\"", height: "2.5\"" }, priceMultiplier: 1.2 },
+  { label: "32\" x 40\" x 3\"", value: "32x40x3", dimensions: { length: "32\"", breadth: "40\"", height: "3\"" }, priceMultiplier: 1.4 },
 ]
 
+// Fabric price multipliers
 const fabricMultipliers: Record<string, number> = {
   cotton: 1.0,
   "organic-cotton": 1.15,
@@ -34,17 +36,17 @@ const fabricOptions = [
   { value: "bamboo", label: "Bamboo" },
 ]
 
-export function HeadPillowConfigurator({
+export function TopperConfigurator({
   product,
   onAddToCart,
   isAddingToCart,
-}: HeadPillowConfiguratorProps) {
-  const pillowState = useHeadPillow()
+}: TopperConfiguratorProps) {
+  const topperState = useTopper()
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [useCustomDimensions, setUseCustomDimensions] = useState(false)
   
   const getProductImages = (): string[] => {
-    return product.images && product.images.length > 0 ? product.images : ["/pillow.jpg"]
+    return product.images && product.images.length > 0 ? product.images : ["/topper.jpg"]
   }
   
   const toggleCustomDimensions = () => {
@@ -54,17 +56,17 @@ export function HeadPillowConfigurator({
   const handleStandardSizeChange = (value: string) => {
     const size = standardSizes.find(s => s.value === value)
     if (size) {
-      pillowState.setStandardPillowLength(size.dimensions.length)
-      pillowState.setStandardPillowBreadth(size.dimensions.breadth)
-      pillowState.setStandardPillowHeight(size.dimensions.height)
+      topperState.setStandardTopperLength(size.dimensions.length)
+      topperState.setStandardTopperBreadth(size.dimensions.breadth)
+      topperState.setStandardTopperHeight(size.dimensions.height)
     }
   }
   
   const getCurrentStandardSize = (): string => {
     const size = standardSizes.find(s => 
-      s.dimensions.length === pillowState.standardPillowLength &&
-      s.dimensions.breadth === pillowState.standardPillowBreadth &&
-      s.dimensions.height === pillowState.standardPillowHeight
+      s.dimensions.length === topperState.standardTopperLength &&
+      s.dimensions.breadth === topperState.standardTopperBreadth &&
+      s.dimensions.height === topperState.standardTopperHeight
     )
     return size?.value || ""
   }
@@ -74,13 +76,14 @@ export function HeadPillowConfigurator({
     const isCustom = useCustomDimensions
     
     if (isCustom) {
-      dimensions = `${pillowState.pillowLength || ""} x ${pillowState.pillowBreadth || ""} x ${pillowState.pillowHeight || ""}`.trim()
+      dimensions = `${topperState.topperLength || ""} x ${topperState.topperBreadth || ""} x ${topperState.topperHeight || ""}`.trim()
     } else {
-      dimensions = `${pillowState.standardPillowLength || ""} x ${pillowState.standardPillowBreadth || ""} x ${pillowState.standardPillowHeight || ""}`.trim()
+      dimensions = `${topperState.standardTopperLength || ""} x ${topperState.standardTopperBreadth || ""} x ${topperState.standardTopperHeight || ""}`.trim()
     }
     
-    const sizeInfo = dimensions ? `${dimensions}${pillowState.pillowFabric ? ` - ${fabricOptions.find(f => f.value === pillowState.pillowFabric)?.label || pillowState.pillowFabric}` : ""}${isCustom ? " (Custom)" : ""}` : "Standard"
+    const sizeInfo = dimensions ? `${dimensions}${topperState.topperFabric ? ` - ${fabricOptions.find(f => f.value === topperState.topperFabric)?.label || topperState.topperFabric}` : ""}${isCustom ? " (Custom)" : ""}` : "Standard"
     
+    // Calculate price
     let basePrice = product.price
     let dimensionMultiplier = 1.0
     let fabricMultiplier = 1.0
@@ -94,19 +97,19 @@ export function HeadPillowConfigurator({
         }
       }
     } else {
-      dimensionMultiplier = 1.2
+      dimensionMultiplier = 1.2 // Custom dimensions multiplier
     }
     
-    if (pillowState.pillowFabric) {
-      fabricMultiplier = fabricMultipliers[pillowState.pillowFabric] || 1.0
+    if (topperState.topperFabric) {
+      fabricMultiplier = fabricMultipliers[topperState.topperFabric] || 1.0
     }
     
     const finalPrice = Math.round(basePrice * dimensionMultiplier * fabricMultiplier)
     
     const items: CartItem[] = [{
-      id: `head-pillow-${product.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      id: `topper-${product.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       name: product.name,
-      image: product.images[0] || "/pillow.jpg",
+      image: product.images[0] || "/topper.jpg",
       size: sizeInfo,
       quantity: 1,
       price: finalPrice,
@@ -115,6 +118,7 @@ export function HeadPillowConfigurator({
     onAddToCart(items)
   }
   
+  // Calculate total price
   let basePrice = product.price
   let dimensionMultiplier = 1.0
   let fabricMultiplier = 1.0
@@ -128,25 +132,27 @@ export function HeadPillowConfigurator({
       }
     }
   } else {
-    dimensionMultiplier = 1.2
+    dimensionMultiplier = 1.2 // Custom dimensions multiplier
   }
   
-  if (pillowState.pillowFabric) {
-    fabricMultiplier = fabricMultipliers[pillowState.pillowFabric] || 1.0
+  if (topperState.topperFabric) {
+    fabricMultiplier = fabricMultipliers[topperState.topperFabric] || 1.0
   }
   
   const totalPrice = Math.round(basePrice * dimensionMultiplier * fabricMultiplier)
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      {/* Left Content - Product Customization */}
       <div className="lg:col-span-8">
         <div className="p-6 bg-white border-2 border-[#EED9C4]">
           <h3 className="text-xl font-medium text-foreground mb-6">{product.name}</h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Side - Images */}
             <div className="space-y-4">
               <div className="relative aspect-square overflow-hidden">
                 <Image
-                  src={getProductImages()[selectedImageIndex] || "/pillow.jpg"}
+                  src={getProductImages()[selectedImageIndex] || "/topper.jpg"}
                   alt={product.name}
                   fill
                   className="object-cover"
@@ -178,6 +184,7 @@ export function HeadPillowConfigurator({
               )}
             </div>
             
+            {/* Right Side - Dimensions and Fabric */}
             <div>
               <h4 className="text-2xl font-medium text-foreground mb-4">Dimensions & Fabric</h4>
               <div className="space-y-4">
@@ -225,14 +232,14 @@ export function HeadPillowConfigurator({
                           ))}
                         </SelectContent>
                       </Select>
-                      {pillowState.standardPillowLength && (
+                      {topperState.standardTopperLength && (
                         <div className="mt-2">
                           <div className="flex items-center gap-2 text-foreground text-lg">
-                            <span>{pillowState.standardPillowLength || "L"}</span>
+                            <span>{topperState.standardTopperLength || "L"}</span>
                             <span>×</span>
-                            <span>{pillowState.standardPillowBreadth || "B"}</span>
+                            <span>{topperState.standardTopperBreadth || "B"}</span>
                             <span>×</span>
-                            <span>{pillowState.standardPillowHeight || "H"}</span>
+                            <span>{topperState.standardTopperHeight || "H"}</span>
                           </div>
                         </div>
                       )}
@@ -244,8 +251,8 @@ export function HeadPillowConfigurator({
                       <label className="text-base font-medium text-foreground mb-2 block">Length (inches)</label>
                       <Input
                         type="text"
-                        value={pillowState.pillowLength}
-                        onChange={(e) => pillowState.setPillowLength(e.target.value)}
+                        value={topperState.topperLength}
+                        onChange={(e) => topperState.setTopperLength(e.target.value)}
                         placeholder="Enter length"
                         className="text-foreground"
                       />
@@ -254,8 +261,8 @@ export function HeadPillowConfigurator({
                       <label className="text-base font-medium text-foreground mb-2 block">Breadth (inches)</label>
                       <Input
                         type="text"
-                        value={pillowState.pillowBreadth}
-                        onChange={(e) => pillowState.setPillowBreadth(e.target.value)}
+                        value={topperState.topperBreadth}
+                        onChange={(e) => topperState.setTopperBreadth(e.target.value)}
                         placeholder="Enter breadth"
                         className="text-foreground"
                       />
@@ -264,8 +271,8 @@ export function HeadPillowConfigurator({
                       <label className="text-base font-medium text-foreground mb-2 block">Height (inches)</label>
                       <Input
                         type="text"
-                        value={pillowState.pillowHeight}
-                        onChange={(e) => pillowState.setPillowHeight(e.target.value)}
+                        value={topperState.topperHeight}
+                        onChange={(e) => topperState.setTopperHeight(e.target.value)}
                         placeholder="Enter height"
                         className="text-foreground"
                       />
@@ -275,7 +282,7 @@ export function HeadPillowConfigurator({
                 
                 <div>
                   <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                  <Select value={pillowState.pillowFabric || ""} onValueChange={pillowState.setPillowFabric}>
+                  <Select value={topperState.topperFabric || ""} onValueChange={topperState.setTopperFabric}>
                     <SelectTrigger className="w-full text-foreground">
                       <SelectValue placeholder="Select fabric" />
                     </SelectTrigger>
@@ -294,6 +301,7 @@ export function HeadPillowConfigurator({
         </div>
       </div>
 
+      {/* Right Sidebar - Price and Add to Cart */}
       <div className="lg:col-span-4">
         <div className="sticky top-24 p-6 bg-white border-2 border-[#EED9C4]">
           <div className="mb-6">

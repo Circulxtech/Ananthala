@@ -9,15 +9,23 @@ import { useState } from "react"
 import { getProductDetailById } from "@/data/product-details"
 import { CartDrawer, type CartItem } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
-import { getProductType, isJoyProduct } from "@/utils/product-type"
-import { BabyHamperProductTemplate } from "./templates/BabyHamperProductTemplate"
-import { KidsHamperProductTemplate } from "./templates/KidsHamperProductTemplate"
+import { getProductType, isBlissProduct, isGraceProduct, isJoyProduct } from "@/utils/product-type"
+import { BabyHamperProductTemplate } from "@/collections/joy/templates/BabyHamperProductTemplate"
+import { KidsHamperProductTemplate } from "@/collections/joy/templates/KidsHamperProductTemplate"
 import { IndividualProductTemplate } from "./templates/IndividualProductTemplate"
-import { MattressProductTemplate } from "./templates/MattressProductTemplate"
-import { TopperProductTemplate } from "./templates/TopperProductTemplate"
-import { LoungerProductTemplate } from "./templates/LoungerProductTemplate"
-import { HeadPillowProductTemplate } from "./templates/HeadPillowProductTemplate"
-import { PillowBumpersProductTemplate } from "./templates/PillowBumpersProductTemplate"
+import { MattressProductTemplate } from "@/collections/joy/templates/MattressProductTemplate"
+import { TopperProductTemplate } from "@/collections/joy/templates/TopperProductTemplate"
+import { LoungerProductTemplate } from "@/collections/joy/templates/LoungerProductTemplate"
+import { HeadPillowProductTemplate } from "@/collections/joy/templates/HeadPillowProductTemplate"
+import { PillowBumpersProductTemplate } from "@/collections/joy/templates/PillowBumpersProductTemplate"
+import { BlissMattressProductTemplate } from "@/collections/bliss/templates/BlissMattressProductTemplate"
+import { BlissTopperProductTemplate } from "@/collections/bliss/templates/BlissTopperProductTemplate"
+import { BlissLoungerProductTemplate } from "@/collections/bliss/templates/BlissLoungerProductTemplate"
+import { BlissHeadPillowProductTemplate } from "@/collections/bliss/templates/BlissHeadPillowProductTemplate"
+import { GraceMattressProductTemplate } from "@/collections/grace/templates/GraceMattressProductTemplate"
+import { GraceTopperProductTemplate } from "@/collections/grace/templates/GraceTopperProductTemplate"
+import { GraceLoungerProductTemplate } from "@/collections/grace/templates/GraceLoungerProductTemplate"
+import { GraceHeadPillowProductTemplate } from "@/collections/grace/templates/GraceHeadPillowProductTemplate"
 import { SimpleProductConfigurator } from "@/components/product/simple-product-configurator"
 
 export default function ProductDetailPage() {
@@ -52,6 +60,8 @@ export default function ProductDetailPage() {
   const productType = getProductType(productId)
   const isBabyProduct = product.category === "baby"
   const isJoy = isJoyProduct(productId)
+  const isBliss = isBlissProduct(productId)
+  const isGrace = isGraceProduct(productId)
   
   // Shared state
   const [activeTab, setActiveTab] = useState<"features" | "specs">("features")
@@ -99,7 +109,7 @@ export default function ProductDetailPage() {
       <Header />
       <main>
         {/* Breadcrumb */}
-        {isJoy ? (
+        {isJoy && !isBliss && !isGrace ? (
           <>
             <div className="fixed top-20 left-0 right-0 z-40 bg-white border-b" style={{ borderColor: "#D9CFC7" }}>
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,7 +125,7 @@ export default function ProductDetailPage() {
                     </li>
                     <li>
                       <Link href="/joy-collection" className="text-foreground hover:text-[#6D4530] transition-colors">
-                        Joy Collection
+                        Joy
                       </Link>
                     </li>
                     <li>
@@ -131,24 +141,46 @@ export default function ProductDetailPage() {
             <div className="h-[49px]"></div>
           </>
         ) : (
-          <div
-            className="py-4 px-4 border-b"
-            style={{ backgroundColor: "white", borderColor: colors.border }}
-          >
-            <div className="max-w-7xl mx-auto">
-              <button
-                onClick={() => router.back()}
-                className="flex text-lg font-medium items-center gap-2 hover:opacity-70 transition-opacity"
-                style={{ color: "#000000" }}
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Back to Products
-              </button>
+          <div className="py-3 border-b" style={{ backgroundColor: "white", borderColor: colors.border }}>
+            <div className="w-full px-4">
+              <nav aria-label="Breadcrumb">
+                <ol className="flex items-center gap-2 text-base">
+                  <li>
+                    <Link href="/" className="text-foreground hover:text-[#6D4530] transition-colors">
+                      Home
+                    </Link>
+                  </li>
+                  <li>
+                    <ChevronRight className="w-4 h-4 text-foreground/50" />
+                  </li>
+                  <li>
+                    {isBliss ? (
+                      <Link href="/category/bliss" className="text-foreground hover:text-[#6D4530] transition-colors">
+                        Bliss
+                      </Link>
+                    ) : isGrace ? (
+                      <Link href="/category/grace" className="text-foreground hover:text-[#6D4530] transition-colors">
+                        Grace
+                      </Link>
+                    ) : (
+                      <Link href="/bestsellers" className="text-foreground hover:text-[#6D4530] transition-colors">
+                        Products
+                      </Link>
+                    )}
+                  </li>
+                  <li>
+                    <ChevronRight className="w-4 h-4 text-foreground/50" />
+                  </li>
+                  <li className="text-foreground font-medium">
+                    {product.name}
+                  </li>
+                </ol>
+              </nav>
             </div>
           </div>
         )}
 
-        <div className={`max-w-7xl mx-auto px-4 ${isJoy ? "pb-12 mt-8" : "py-12"}`}>
+        <div className={`max-w-7xl mx-auto px-4 ${isJoy || isBliss || isGrace ? "pb-12 mt-8" : "py-12"}`}>
           {/* Product Templates - Complete page structure for each product type */}
           {productType === "baby-hamper" && (
             <BabyHamperProductTemplate
@@ -178,39 +210,103 @@ export default function ProductDetailPage() {
           )}
           
           {productType === "mattress" && (
-            <MattressProductTemplate
-              product={product}
-              productId={productId}
-              onAddToCart={handleAddToCart}
-              isAddingToCart={isAddingToCart}
-            />
+            isBliss ? (
+              <BlissMattressProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : isGrace ? (
+              <GraceMattressProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : (
+              <MattressProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            )
           )}
           
           {productType === "topper" && (
-            <TopperProductTemplate
-              product={product}
-              productId={productId}
-              onAddToCart={handleAddToCart}
-              isAddingToCart={isAddingToCart}
-            />
+            isBliss ? (
+              <BlissTopperProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : isGrace ? (
+              <GraceTopperProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : (
+              <TopperProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            )
           )}
           
           {productType === "lounger" && (
-            <LoungerProductTemplate
-              product={product}
-              productId={productId}
-              onAddToCart={handleAddToCart}
-              isAddingToCart={isAddingToCart}
-            />
+            isBliss ? (
+              <BlissLoungerProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : isGrace ? (
+              <GraceLoungerProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : (
+              <LoungerProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            )
           )}
           
           {productType === "head-pillow" && (
-            <HeadPillowProductTemplate
-              product={product}
-              productId={productId}
-              onAddToCart={handleAddToCart}
-              isAddingToCart={isAddingToCart}
-            />
+            isBliss ? (
+              <BlissHeadPillowProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : isGrace ? (
+              <GraceHeadPillowProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : (
+              <HeadPillowProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            )
           )}
           
           {productType === "pillow-bumpers" && (

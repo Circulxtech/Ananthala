@@ -2,7 +2,7 @@
 
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
-import { HeadPillowConfigurator } from "@/components/product/head-pillow-configurator"
+import { LoungerConfigurator } from "@/collections/joy/components/lounger-configurator"
 import {
   Carousel,
   CarouselContent,
@@ -20,6 +20,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Sprout, Waves, SprayCan, XCircle, Layers, Grid } from "lucide-react"
+import { CustomersAlsoBought } from "@/collections/bliss/components/customers-also-bought"
 
 interface TestimonialVideo {
   id: number
@@ -32,57 +33,57 @@ const testimonialVideos: TestimonialVideo[] = [
   {
     id: 1,
     video: "/ananthala hero section video.mp4",
-    poster: "/pillow.jpg",
+    poster: "/lounger.jpg",
     name: "Sarah Johnson",
   },
   {
     id: 2,
     video: "/ananthala hero section video.mp4",
-    poster: "/pillow.jpg",
+    poster: "/lounger.jpg",
     name: "Michael Chen",
   },
   {
     id: 3,
     video: "/ananthala hero section video.mp4",
-    poster: "/pillow.jpg",
+    poster: "/lounger.jpg",
     name: "Emily Rodriguez",
   },
   {
     id: 4,
     video: "/ananthala hero section video.mp4",
-    poster: "/pillow.jpg",
+    poster: "/lounger.jpg",
     name: "David Thompson",
   },
   {
     id: 5,
     video: "/ananthala hero section video.mp4",
-    poster: "/pillow.jpg",
+    poster: "/lounger.jpg",
     name: "Priya Sharma",
   },
   {
     id: 6,
     video: "/ananthala hero section video.mp4",
-    poster: "/pillow.jpg",
+    poster: "/lounger.jpg",
     name: "James Wilson",
   },
 ]
 
-interface HeadPillowProductTemplateProps {
+interface BlissLoungerProductTemplateProps {
   product: ProductDetail
   productId: number
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
 
-export function HeadPillowProductTemplate({
+export function BlissLoungerProductTemplate({
   product,
   productId,
   onAddToCart,
   isAddingToCart,
-}: TopperProductTemplateProps) {
+}: BlissLoungerProductTemplateProps) {
   return (
     <div className="space-y-12">
-      <HeadPillowConfigurator
+      <LoungerConfigurator
         product={product}
         onAddToCart={onAddToCart}
         isAddingToCart={isAddingToCart}
@@ -140,12 +141,12 @@ export function HeadPillowProductTemplate({
                     {product.description}
                   </p>
                   <p className="mb-4">
-                    Our premium head pillow is designed with your baby's comfort and health in mind. 
-                    Each pillow is crafted using the finest organic materials and innovative technology 
-                    to ensure the perfect support for your little one's head and neck.
+                    Our premium lounger is designed with your baby's comfort and health in mind. 
+                    Each lounger is crafted using the finest organic materials and innovative technology 
+                    to ensure the perfect comfort surface.
                   </p>
                   <p>
-                    With maximum comfort and support, this head pillow is built to last while 
+                    With maximum comfort and support, this lounger is built to last while 
                     maintaining its premium quality. Available in standard and custom dimensions to fit 
                     your specific needs.
                   </p>
@@ -280,6 +281,9 @@ export function HeadPillowProductTemplate({
         </div>
       </section>
 
+      {/* What Our Customers Also Bought Section */}
+      <CustomersAlsoBought currentProductId={productId} />
+
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
@@ -351,7 +355,7 @@ export function HeadPillowProductTemplate({
                 About Us
               </h2>
               <p className="text-lg text-foreground leading-relaxed">
-                At Ananthala, we are committed to crafting premium products that take care of your baby's health. Our head pillows are designed with comfort and support in mind, using only the finest organic materials and innovative technology.
+                At Ananthala, we are committed to crafting premium products that take care of your baby's health. Our loungers are designed with comfort and support in mind, using only the finest organic materials and innovative technology.
               </p>
               <p className="text-lg text-foreground leading-relaxed">
                 Every product is expertly crafted to ensure your little one gets the best sleep. We believe in quality, comfort, and putting your baby's well-being first.
