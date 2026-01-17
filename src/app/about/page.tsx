@@ -51,7 +51,7 @@ export default function AboutPage() {
             <div className="text-center text-black max-w-3xl">
               <h1 className="mb-6 text-5xl font-semibold text-black">About Ananthala</h1>
               <p className="text-black/90 font-semibold text-lg">
-                Crafting premium mattresses with care, precision, and a commitment to your best sleep.
+                Crafting premium mattresses with care, precision, and acommitment to your best sleep.
               </p>
             </div>
           </div>
