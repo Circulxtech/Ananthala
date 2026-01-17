@@ -8,13 +8,7 @@ import { ArrowRight, Volume2, VolumeX, ChevronLeft, ChevronRight } from "lucide-
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
+import { CustomerReviewVideos } from "@/components/customer-review-videos"
 
 // Categories data
 const categories = [
@@ -165,7 +159,6 @@ export default function Home() {
     router.push(path)
   }
 
-
   return (
     <div className="min-h-screen">
       <Header />
@@ -174,14 +167,7 @@ export default function Home() {
         <section className="relative min-h-[680px] flex items-end">
           {/* Background Video */}
           <div className="absolute inset-0 z-0">
-            <video
-              ref={videoRef}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover"
-            >
+            <video ref={videoRef} autoPlay loop muted playsInline className="w-full h-full object-cover">
               <source src="/ananthala hero section video.mp4" type="video/mp4" />
             </video>
             <div className="absolute inset-0 bg-black/20" />
@@ -193,18 +179,14 @@ export default function Home() {
             className="absolute bottom-8 right-8 z-20 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110"
             aria-label={isMuted ? "Unmute video" : "Mute video"}
           >
-            {isMuted ? (
-              <VolumeX className="h-5 w-5 text-[#8B5A3C]" />
-            ) : (
-              <Volume2 className="h-5 w-5 text-[#8B5A3C]" />
-            )}
+            {isMuted ? <VolumeX className="h-5 w-5 text-[#8B5A3C]" /> : <Volume2 className="h-5 w-5 text-[#8B5A3C]" />}
           </button>
 
           {/* Action Buttons - Lower Left Corner */}
           <div className="relative z-10 flex flex-col sm:flex-row gap-4 pb-8 lg:pb-12 pl-4 sm:pl-6 lg:pl-8">
-            <Button 
-              asChild 
-              className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md shadow-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto min-w-[160px]" 
+            <Button
+              asChild
+              className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md shadow-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto min-w-[160px]"
               style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
             >
               <Link href="/category/bliss" className="flex items-center justify-center">
@@ -239,8 +221,7 @@ export default function Home() {
               className="max-w-2xl mx-auto text-xl font-semibold text-foreground"
               style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
             >
-              See how our mattresses are crafted with precision
-              and care to deliver unmatched comfort.
+              See how our mattresses are crafted with precision and care to deliver unmatched comfort.
             </p>
           </div>
         </div>
@@ -258,7 +239,7 @@ export default function Home() {
                 }}
               >
                 <img
-                  src={category.image}
+                  src={category.image || "/placeholder.svg"}
                   alt={category.title}
                   className="w-full h-full object-cover"
                 />
@@ -316,8 +297,7 @@ export default function Home() {
                 onClick={() => goToSlide(index)}
                 className="w-2 h-2 rounded-full transition-all"
                 style={{
-                  backgroundColor:
-                    currentSlide === index ? "#F9F8F6" : "rgba(249, 248, 246, 0.5)",
+                  backgroundColor: currentSlide === index ? "#F9F8F6" : "rgba(249, 248, 246, 0.5)",
                   width: currentSlide === index ? "24px" : "8px",
                 }}
                 aria-label={`Go to slide ${index + 1}`}
@@ -330,17 +310,10 @@ export default function Home() {
         <section className="py-24 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2
-                className="mb-4 text-4xl font-medium text-foreground"
-              >
-                Find Your Perfect Mattress
-              </h2>
-              <p
-                className="max-w-2xl mx-auto text-xl font-medium text-foreground"
-              >
-                Each mattress is expertly crafted with premium
-                materials to ensure the perfect night's sleep,
-                every night.
+              <h2 className="mb-4 text-4xl font-medium text-foreground">Find Your Perfect Mattress</h2>
+              <p className="max-w-2xl mx-auto text-xl font-medium text-foreground">
+                Each mattress is expertly crafted with premium materials to ensure the perfect night's sleep, every
+                night.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -356,7 +329,7 @@ export default function Home() {
                     key={product.id}
                     onClick={() => onNavigate(product.name)}
                     className="relative group overflow-hidden aspect-3/4 cursor-pointer bg-gray-100"
-                    style={{ overflow: 'hidden' }}
+                    style={{ overflow: "hidden" }}
                   >
                     {/* Image placeholder - replace with actual Image component when images are ready */}
                     <div className="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -364,13 +337,15 @@ export default function Home() {
                     </div>
                     {/* Uncomment when images are ready:
                     <Image
-                      src={product.image}
+                      src={product.image || "/placeholder.svg"}
                       alt={product.name}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     */}
-                    <div className={`absolute ${positionClasses[product.position as keyof typeof positionClasses]} z-10`}>
+                    <div
+                      className={`absolute ${positionClasses[product.position as keyof typeof positionClasses]} z-10`}
+                    >
                       <div className="bg-[#EED9C4] px-8 py-4 text-center relative min-w-[200px]">
                         <span
                           className="tracking-wider  text-base md:text-lg font-semibold uppercase text-foreground relative z-10"
@@ -392,24 +367,18 @@ export default function Home() {
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="order-2 lg:order-1">
-                <p
-                  className="text-3xl font-medium mb-2 text-foreground"
-                >
-                  Our Crafted Heritage
-                </p>
-                
+                <p className="text-3xl font-medium mb-2 text-foreground">Our Crafted Heritage</p>
+
                 <p className="mb-6 text-lg text-foreground/90 font-medium">
-                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to
-                  provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
-                  help you wake up refreshed.
+                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to provide the
+                  perfect balance of comfort and support. Every layer is thoughtfully designed to help you wake up
+                  refreshed.
                 </p>
                 <div className="space-y-4 mb-8">
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
                     <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">
-                        Pressure Relief Technology
-                      </p>
+                      <p className="mb-1 font-medium text-lg text-foreground">Pressure Relief Technology</p>
                       <p className="font-medium text-lg text-foreground">
                         Conforms to your body for optimal spinal alignment
                       </p>
@@ -418,9 +387,7 @@ export default function Home() {
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
                     <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">
-                        Temperature Regulation
-                      </p>
+                      <p className="mb-1 font-medium text-lg text-foreground">Temperature Regulation</p>
                       <p className="font-medium text-lg text-foreground">
                         Advanced cooling system keeps you comfortable all night
                       </p>
@@ -429,9 +396,7 @@ export default function Home() {
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
                     <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">
-                        Motion Isolation
-                      </p>
+                      <p className="mb-1 font-medium text-lg text-foreground">Motion Isolation</p>
                       <p className="font-medium text-lg text-foreground">
                         Undisturbed sleep even with a restless partner
                       </p>
@@ -447,76 +412,15 @@ export default function Home() {
               </div>
               <div className="order-1 lg:order-2">
                 <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src="/mattress.jpg"
-                    alt="Comfort"
-                    fill
-                    className="w-full h-full object-cover"
-                  />
+                  <Image src="/mattress.jpg" alt="Comfort" fill className="w-full h-full object-cover" />
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Customer Testimonials Video Carousel Section */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
-          <div className="max-w-7xl mx-auto">
-            {/* Section Header */}
-            <div className="text-center mb-12">
-              <h2 className="text-4xl sm:text-4xl lg:text-4xl font-medium text-foreground mb-4 text-balance">
-                What Our Divas Say
-              </h2>
-              <p className="text-xl sm:text-2xl text-foreground font-medium">Join thousands of happy sleepers</p>
-            </div>
-
-            {/* Video Carousel */}
-            <div className="relative">
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: true,
-                }}
-                className="w-full"
-              >
-                <CarouselContent className="-ml-2 md:-ml-4">
-                  {testimonialVideos.map((testimonial) => (
-                    <CarouselItem
-                      key={testimonial.id}
-                      className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
-                    >
-                      <div className="space-y-2">
-                        <div className="relative aspect-video overflow-hidden border border-[#EED9C4]">
-                          <video
-                            className="w-full h-full object-cover"
-                            controls
-                            controlsList="nodownload nofullscreen noremoteplayback"
-                            disablePictureInPicture
-                            onContextMenu={(e) => e.preventDefault()}
-                            poster={testimonial.poster}
-                          >
-                            <source src={testimonial.video} type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
-                        </div>
-                        <p className="text-left text-foreground font-semibold text-lg">
-                          {testimonial.name}
-                        </p>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-                <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-              </Carousel>
-            </div>
-
-            {/* Rating Summary */}
-            <div className="text-center mt-8">
-              <p className="text-foreground text-lg font-semibold">Rated 4.9/5 from over 10,000 reviews</p>
-            </div>
-          </div>
-        </section>
+        {/* Customer Review Videos Section - UPDATED */}
+        <CustomerReviewVideos />
       </main>
       <Footer />
     </div>
