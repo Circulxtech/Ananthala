@@ -1,24 +1,32 @@
 "use client"
 
 import { useParams, useRouter } from "next/navigation"
+import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import Image from "next/image"
-import {
-  ChevronLeft,
-  Check,
-  Truck,
-  Shield,
-  Moon,
-  IndianRupee,
-  ShoppingCart,
-  Loader2,
-} from "lucide-react"
-import { useState, useEffect } from "react"
+import { ChevronLeft, ChevronRight, Check } from "lucide-react"
+import { useState } from "react"
 import { getProductDetailById } from "@/data/product-details"
 import { CartDrawer, type CartItem } from "@/components/cart/cart-drawer"
-import { PopularProductsCarousel } from "@/components/sections/popular-products-carousel"
 import { useCart } from "@/contexts/cart-context"
+import { getProductType, isBlissProduct, isGraceProduct, isJoyProduct } from "@/utils/product-type"
+import { BabyHamperProductTemplate } from "@/collections/joy/templates/BabyHamperProductTemplate"
+import { KidsHamperProductTemplate } from "@/collections/joy/templates/KidsHamperProductTemplate"
+import { IndividualProductTemplate } from "./templates/IndividualProductTemplate"
+import { MattressProductTemplate } from "@/collections/joy/templates/MattressProductTemplate"
+import { TopperProductTemplate } from "@/collections/joy/templates/TopperProductTemplate"
+import { LoungerProductTemplate } from "@/collections/joy/templates/LoungerProductTemplate"
+import { HeadPillowProductTemplate } from "@/collections/joy/templates/HeadPillowProductTemplate"
+import { PillowBumpersProductTemplate } from "@/collections/joy/templates/PillowBumpersProductTemplate"
+import { BlissMattressProductTemplate } from "@/collections/bliss/templates/BlissMattressProductTemplate"
+import { BlissTopperProductTemplate } from "@/collections/bliss/templates/BlissTopperProductTemplate"
+import { BlissLoungerProductTemplate } from "@/collections/bliss/templates/BlissLoungerProductTemplate"
+import { BlissHeadPillowProductTemplate } from "@/collections/bliss/templates/BlissHeadPillowProductTemplate"
+import { GraceMattressProductTemplate } from "@/collections/grace/templates/GraceMattressProductTemplate"
+import { GraceTopperProductTemplate } from "@/collections/grace/templates/GraceTopperProductTemplate"
+import { GraceLoungerProductTemplate } from "@/collections/grace/templates/GraceLoungerProductTemplate"
+import { GraceHeadPillowProductTemplate } from "@/collections/grace/templates/GraceHeadPillowProductTemplate"
+import { SimpleProductConfigurator } from "@/components/product/simple-product-configurator"
 
 export default function ProductDetailPage() {
   const params = useParams()
@@ -33,7 +41,7 @@ export default function ProductDetailPage() {
         <main className="pt-16 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-black mb-4">
-              Product Not Found
+              Product Not Found in database
             </h1>
             <button
               onClick={() => router.push("/")}
@@ -49,19 +57,19 @@ export default function ProductDetailPage() {
     )
   }
 
+  const productType = getProductType(productId)
   const isBabyProduct = product.category === "baby"
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0].name)
-  const [quantity, setQuantity] = useState(1)
+  const isJoy = isJoyProduct(productId)
+  const isBliss = isBlissProduct(productId)
+  const isGrace = isGraceProduct(productId)
+  
+  // Shared state
   const [activeTab, setActiveTab] = useState<"features" | "specs">("features")
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   
   const { cartItems, addToCart, isCartOpen, setIsCartOpen } = useCart()
 
-  const selectedSizeData = product.sizes.find((s) => s.name === selectedSize)
-  const currentPrice = selectedSizeData?.price || product.price
-
-  
+  // Color scheme
   const colors = isBabyProduct
     ? {
         bg50: "#FAF7F3",
@@ -84,22 +92,14 @@ export default function ProductDetailPage() {
         textLight: "#B09A7D",
       }
 
-  const handleAddToCart = async () => {
+  // Handle add to cart - delegates to appropriate configurator
+  const handleAddToCart = async (items: CartItem | CartItem[]) => {
     setIsAddingToCart(true)
-    
-    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000))
     
-    const newCartItem: CartItem = {
-      id: `${product.id}-${selectedSize}`,
-      name: product.name,
-      image: product.images[0],
-      size: selectedSize,
-      quantity: quantity,
-      price: currentPrice,
-    }
+    const itemsArray = Array.isArray(items) ? items : [items]
+    itemsArray.forEach(item => addToCart(item))
     
-    addToCart(newCartItem)
     setIsAddingToCart(false)
     setIsCartOpen(true)
   }
@@ -107,338 +107,308 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <main className="pt-16">
+      <main>
         {/* Breadcrumb */}
-        <div
-          className="py-4 px-4 border-b"
-          style={{ backgroundColor: "white", borderColor: colors.border }}
-        >
-          <div className="max-w-7xl mx-auto">
-            <button
-              onClick={() => router.back()}
-              className="flex text-lg font-medium items-center gap-2 hover:opacity-70 transition-opacity"
-              style={{ color: "#000000" }}
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Back to Products
-            </button>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Image Gallery */}
-            <div>
-              {/* Main Image */}
-              <div className="mb-4" style={{ backgroundColor: colors.bg50 }}>
-                <div className="relative w-full aspect-square">
-                  <Image
-                    src={product.images[selectedImage]}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
+        {isJoy && !isBliss && !isGrace ? (
+          <>
+            <div className="fixed top-20 left-0 right-0 z-40 bg-white border-b" style={{ borderColor: "#D9CFC7" }}>
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <nav className="py-2">
+                  <ol className="flex items-center gap-2 text-base">
+                    <li>
+                      <Link href="/" className="text-foreground hover:text-[#6D4530] transition-colors">
+                        Home
+                      </Link>
+                    </li>
+                    <li>
+                      <ChevronRight className="w-4 h-4 text-foreground/50" />
+                    </li>
+                    <li>
+                      <Link href="/joy-collection" className="text-foreground hover:text-[#6D4530] transition-colors">
+                        Joy
+                      </Link>
+                    </li>
+                    <li>
+                      <ChevronRight className="w-4 h-4 text-foreground/50" />
+                    </li>
+                    <li className="text-foreground font-medium">
+                      {product.name}
+                    </li>
+                  </ol>
+                </nav>
               </div>
-              
-              {/* Thumbnail Gallery */}
-              {product.images.length > 1 && (
-                <div className="grid grid-cols-4 gap-4">
-                  {product.images.map((image: string, index: number) => (
-                    <button
-                      key={index}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setSelectedImage(index)
-                      }}
-                      type="button"
-                      className="relative w-full aspect-square border-2 transition-colors cursor-pointer hover:opacity-80"
-                      style={{
-                        borderColor:
-                          selectedImage === index ? colors.accent : colors.border,
-                      }}
-                    >
-                      <Image
-                        src={image}
-                        alt={`${product.name} thumbnail ${index + 1}`}
-                        fill
-                        className="object-cover pointer-events-none"
-                        unoptimized
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
+            <div className="h-[49px]"></div>
+          </>
+        ) : (
+          <div className="py-3 border-b" style={{ backgroundColor: "white", borderColor: colors.border }}>
+            <div className="w-full px-4">
+              <nav aria-label="Breadcrumb">
+                <ol className="flex items-center gap-2 text-base">
+                  <li>
+                    <Link href="/" className="text-foreground hover:text-[#6D4530] transition-colors">
+                      Home
+                    </Link>
+                  </li>
+                  <li>
+                    <ChevronRight className="w-4 h-4 text-foreground/50" />
+                  </li>
+                  <li>
+                    {isBliss ? (
+                      <Link href="/category/bliss" className="text-foreground hover:text-[#6D4530] transition-colors">
+                        Bliss
+                      </Link>
+                    ) : isGrace ? (
+                      <Link href="/category/grace" className="text-foreground hover:text-[#6D4530] transition-colors">
+                        Grace
+                      </Link>
+                    ) : (
+                      <Link href="/bestsellers" className="text-foreground hover:text-[#6D4530] transition-colors">
+                        Products
+                      </Link>
+                    )}
+                  </li>
+                  <li>
+                    <ChevronRight className="w-4 h-4 text-foreground/50" />
+                  </li>
+                  <li className="text-foreground font-medium">
+                    {product.name}
+                  </li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+        )}
 
-            {/* Product Info */}
-            <div>
-              <p className="text-2xl font-normal text-black mb-4 tracking-wider uppercase">
-                {product.name}
-              </p>
+        <div className={`max-w-7xl mx-auto px-4 ${isJoy || isBliss || isGrace ? "pb-12 mt-8" : "py-12"}`}>
+          {/* Product Templates - Complete page structure for each product type */}
+          {productType === "baby-hamper" && (
+            <BabyHamperProductTemplate
+              product={product}
+              productId={productId}
+              onAddToCart={handleAddToCart}
+              isAddingToCart={isAddingToCart}
+            />
+          )}
+          
+          {productType === "kids-hamper" && (
+            <KidsHamperProductTemplate
+              product={product}
+              productId={productId}
+              onAddToCart={handleAddToCart}
+              isAddingToCart={isAddingToCart}
+            />
+          )}
+          
+          {productType === "individual-baby" && (
+            <IndividualProductTemplate
+              product={product}
+              productId={productId}
+              onAddToCart={handleAddToCart}
+              isAddingToCart={isAddingToCart}
+            />
+          )}
+          
+          {productType === "mattress" && (
+            isBliss ? (
+              <BlissMattressProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : isGrace ? (
+              <GraceMattressProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : (
+              <MattressProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            )
+          )}
+          
+          {productType === "topper" && (
+            isBliss ? (
+              <BlissTopperProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : isGrace ? (
+              <GraceTopperProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : (
+              <TopperProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            )
+          )}
+          
+          {productType === "lounger" && (
+            isBliss ? (
+              <BlissLoungerProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : isGrace ? (
+              <GraceLoungerProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : (
+              <LoungerProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            )
+          )}
+          
+          {productType === "head-pillow" && (
+            isBliss ? (
+              <BlissHeadPillowProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : isGrace ? (
+              <GraceHeadPillowProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            ) : (
+              <HeadPillowProductTemplate
+                product={product}
+                productId={productId}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+              />
+            )
+          )}
+          
+          {productType === "pillow-bumpers" && (
+            <PillowBumpersProductTemplate
+              product={product}
+              productId={productId}
+              onAddToCart={handleAddToCart}
+              isAddingToCart={isAddingToCart}
+            />
+          )}
+          
+          {productType === "simple" && (
+            <>
+              <SimpleProductConfigurator
+                product={product}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+                colors={colors}
+              />
 
-              <p className="mb-6 text-lg  text-black">
-                {product.description}
-              </p>
-
+              {/* Product Details Tabs - Only for simple products */}
               <div
-                className="mb-8 pb-8 border-b"
+                className="mt-16 border-t pt-12"
                 style={{ borderColor: colors.border }}
               >
-                <div className="mb-4">
-                  <div className="flex items-center gap-1 text-black">
-                    <IndianRupee className="w-5 h-5 text-black" />
-                    <span className="text-2xl font-normal">
-                      {currentPrice.toLocaleString("en-IN", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Size Selection */}
-                <div className="mb-6">
-                  <label
-                    className="block mb-3 text-black text-lg"
-                  >
-                    Select Size
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {product.sizes.map((size) => (
-                      <button
-                        key={size.name}
-                        onClick={() => setSelectedSize(size.name)}
-                        className="py-3 px-4 border-2 transition-colors"
-                        style={{
-                          borderColor:
-                          selectedSize === size.name
-                            ? "#EED9C4"
-                            : colors.border,
-                        
-                        backgroundColor:
-                          selectedSize === size.name
-                            ? "rgba(238, 217, 196, 0.35)" // soft tint
-                            : "transparent",
-                        
-                        color: "black",
-                        
-                        }}
-                      >
-                        {size.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Quantity */}
-                <div className="mb-6">
-                  <label
-                    className="block mb-3 text-lg text-black"
-                  >
-                    Quantity
-                  </label>
-                  <div className="flex items-center text-lg gap-4">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-10 h-10 border hover:opacity-70 transition-opacity text-black"
-                      style={{
-                        borderColor: colors.border,
-                      }}
-                    >
-                      -
-                    </button>
-                    <span className="text-black">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="w-10 h-10 border hover:opacity-70 transition-opacity text-black"
-                      style={{
-                        borderColor: colors.border,
-                      }}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                {/* Add to Cart */}
-                <button
-                  onClick={handleAddToCart}
-                  disabled={isAddingToCart}
-                  className="w-full py-4 text-black text-lg font-medium hover:opacity-90 transition-opacity mb-3 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                  style={{ backgroundColor: "#EED9C4" }}
+                <div
+                  className="flex gap-8 mb-8 border-b"
+                  style={{ borderColor: colors.border }}
                 >
-                  {isAddingToCart ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Adding to Cart...
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingCart className="w-5 h-5" />
-                      Add to Cart -{" "}
-                      <div className="flex items-center gap-1">
-                        <IndianRupee className="w-4 h-4" />
-                        <span>
-                          {(currentPrice * quantity).toLocaleString("en-IN", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </button>
-                <p className="text-center text-base text-black">
-                  Free shipping on all orders
-                </p>
-              </div>
-
-              {/* Key Benefits */}
-              <div className="space-y-4 mb-8">
-                <div className="flex items-start gap-3">
-                  <Moon
-                    className="w-5 h-5 mt-1 shrink-0 text-black"
-                  />
-                  <div>
-                    <p className="mb-1 font-medium text-black">
-                      {isBabyProduct ? "100 Night Trial" : "100 Night Trial"}
-                    </p>
-                    <p className="font-medium text-black">
-                      Risk-free sleep trial period
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Shield
-                    className="w-5 h-5 mt-1 shrink-0 text-black"
-                  />
-                  <div>
-                    <p className="mb-1 font-medium text-black">
-                      {isBabyProduct
-                        ? "Safety Certified"
-                        : "15 Year Warranty"}
-                    </p>
-                    <p className="font-medium text-black">
-                      {isBabyProduct
-                        ? "GREENGUARD Gold & CertiPUR-US"
-                        : "Comprehensive coverage included"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Truck
-                    className="w-5 h-5 mt-1 shrink-0 text-black"
-                  />
-                  <div>
-                    <p className="mb-1 text-black font-medium">
-                      Free Delivery
-                    </p>
-                    <p className="font-medium text-black">
-                      {isBabyProduct
-                        ? "Safe & secure packaging"
-                        : "White glove delivery available"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Product Details Tabs */}
-          <div
-            className="mt-16 border-t pt-12"
-            style={{ borderColor: colors.border }}
-          >
-            <div
-              className="flex gap-8 mb-8 border-b"
-              style={{ borderColor: colors.border }}
-            >
-              <button
-                onClick={() => setActiveTab("features")}
-                className="pb-4 transition-colors relative text-black text-lg font-medium"
-              >
-                Features & Materials
-                {activeTab === "features" && (
-                  <div
-                    className="absolute bottom-0 left-0 right-0 h-0.5"
-                    style={{ backgroundColor: colors.accent }}
-                  ></div>
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab("specs")}
-                className="pb-4 transition-colors relative text-black text-lg font-medium"
-              >
-                Specifications
-                {activeTab === "specs" && (
-                  <div
-                    className="absolute bottom-0 left-0 right-0 h-0.5"
-                    style={{ backgroundColor: colors.accent }}
-                  ></div>
-                )}
-              </button>
-            </div>
-
-            {activeTab === "features" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="mb-4 text-black">
-                    Key Features
-                  </h3>
-                  <ul className="space-y-3">
-                    {product.features.map((feature: string, index: number) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <Check
-                          className="w-5 h-5 mt-0.5 shrink-0 text-black text-lg"
-                        />
-                        <span className="text-black">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h3 className="mb-4 text-black">
-                    Materials
-                  </h3>
-                  <ul className="space-y-3">
-                    {product.materials.map(
-                      (material: string, index: number) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <div
-                            className="w-2 h-2 rounded-full mt-2 shrink-0 bg-black text-lg"
-                          ></div>
-                          <span className="text-black">{material}</span>
-                        </li>
-                      )
+                  <button
+                    onClick={() => setActiveTab("features")}
+                    className="pb-4 transition-colors relative text-black text-lg font-medium"
+                  >
+                    Features & Materials
+                    {activeTab === "features" && (
+                      <div
+                        className="absolute bottom-0 left-0 right-0 h-0.5"
+                        style={{ backgroundColor: colors.accent }}
+                      ></div>
                     )}
-                  </ul>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("specs")}
+                    className="pb-4 transition-colors relative text-black text-lg font-medium"
+                  >
+                    Specifications
+                    {activeTab === "specs" && (
+                      <div
+                        className="absolute bottom-0 left-0 right-0 h-0.5"
+                        style={{ backgroundColor: colors.accent }}
+                      ></div>
+                    )}
+                  </button>
                 </div>
-              </div>
-            )}
 
-            {activeTab === "specs" && (
-              <div className="max-w-3xl">
-                <div className="grid grid-cols-1 gap-4">
-                  {Object.entries(product.specifications).map(([key, value]) => (
-                    <div
-                      key={key}
-                      className="grid grid-cols-2 gap-4 py-4 border-b last:border-0"
-                      style={{ borderColor: colors.border }}
-                    >
-                      <span className="text-black">{key}</span>
-                      <span className="text-black">{value as string}</span>
+                {activeTab === "features" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                      <h3 className="mb-4 text-black">Key Features</h3>
+                      <ul className="space-y-3">
+                        {product.features.map((feature: string, index: number) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <Check className="w-5 h-5 mt-0.5 shrink-0 text-black text-lg" />
+                            <span className="text-black">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                  ))}
-                </div>
+                    <div>
+                      <h3 className="mb-4 text-black">Materials</h3>
+                      <ul className="space-y-3">
+                        {product.materials.map((material: string, index: number) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <div className="w-2 h-2 rounded-full mt-2 shrink-0 bg-black text-lg"></div>
+                            <span className="text-black">{material}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "specs" && (
+                  <div className="max-w-3xl">
+                    <div className="grid grid-cols-1 gap-4">
+                      {Object.entries(product.specifications).map(([key, value]) => (
+                        <div
+                          key={key}
+                          className="grid grid-cols-2 gap-4 py-4 border-b last:border-0"
+                          style={{ borderColor: colors.border }}
+                        >
+                          <span className="text-black">{key}</span>
+                          <span className="text-black">{value as string}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          )}
         </div>
-        
-        {/* Popular Products Carousel */}
-        <PopularProductsCarousel excludeProductId={productId} />
       </main>
       <Footer />
       

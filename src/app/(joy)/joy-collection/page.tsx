@@ -10,12 +10,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import { ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRef, useState } from "react"
 
-export default function GracePage() {
+import { useRef } from "react"
+import { ChevronRight } from "lucide-react"
+
+export default function JoyCollectionPage() {
   const shopSectionRef = useRef<HTMLElement>(null)
   const aboutUsSectionRef = useRef<HTMLElement>(null)
 
@@ -27,6 +28,25 @@ export default function GracePage() {
     aboutUsSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
+  // Color to images mapping for display
+  const colorImages: Record<string, string[]> = {
+    "royal-blue": ["/productmattress.jpg", "/topper.jpg", "/lounger.jpg", "/pillow.jpg", "/bumpers.jpg"],
+    gray: ["/topper.jpg", "/productmattress.jpg", "/lounger.jpg", "/pillow.jpg", "/bumpers.jpg"],
+    black: ["/lounger.jpg", "/productmattress.jpg", "/topper.jpg", "/pillow.jpg", "/bumpers.jpg"],
+    "dark-brown": ["/bumpers.jpg", "/productmattress.jpg", "/topper.jpg", "/lounger.jpg", "/pillow.jpg"],
+  }
+
+  const currentImages = colorImages["royal-blue"]
+
+  const babyProducts = [
+    { id: "mattress", name: "Mattress", price: 299, image: "/productmattress.jpg", productDetailId: 7 },
+    { id: "topper", name: "Topper", price: 149, image: "/topper.jpg", productDetailId: 8 },
+    { id: "lounger", name: "Lounger", price: 199, image: "/lounger.jpg", productDetailId: 9 },
+    { id: "head-pillow", name: "Head Pillow", price: 79, image: "/pillow.jpg", productDetailId: 10 },
+    { id: "pillow-bumpers", name: "Pillow Bumpers", price: 89, image: "/bumpers.jpg", productDetailId: 11 },
+  ]
+
+  const totalHamperPrice = babyProducts.reduce((sum, product) => sum + product.price, 0)
 
   return (
     <div className="min-h-screen">
@@ -46,7 +66,7 @@ export default function GracePage() {
                   <ChevronRight className="w-4 h-4 text-foreground/50" />
                 </li>
                 <li className="text-foreground font-medium">
-                  Grace
+                  Joy 
                 </li>
               </ol>
             </nav>
@@ -54,12 +74,12 @@ export default function GracePage() {
         </div>
         {/* Spacer to prevent content from going under fixed breadcrumb */}
         <div className="h-[49px]"></div>
-        {/* 1. Hero Section - Mattress Image */}
+        {/* 1. Hero Section - Baby Products Image */}
         <section className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
           <div className="relative w-full h-full">
             <Image
-              src="/mattress.jpg"
-              alt="Premium Mattress"
+              src="/baby.jpg"
+              alt="Baby Products"
               fill
               className="object-cover"
               priority
@@ -70,10 +90,11 @@ export default function GracePage() {
                 <div className="max-w-md space-y-6">
                   <div className="bg-[#EED9C4] p-4 md:p-8 rounded-lg shadow-lg">
                     <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-foreground font-cormorant">
-                      Grace Collection
+                      Joy Collection
                     </h1>
+                  
                     <p className="text-foreground text-base md:text-lg mt-4 leading-relaxed font-medium">
-                      Discover elegant sleep solutions in our Grace collection, crafted with premium materials and thoughtful design for everyday comfort.
+                      Experience the purest comfort for your little one with our premium organic baby products, designed with love and care for your baby's health and happiness.
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4">
@@ -98,8 +119,9 @@ export default function GracePage() {
             </div>
           </div>
         </section>
-      {/* Ananthala Difference Section - Carousel */}
-      <section className="py-16 px-4 bg-white">
+
+        {/* Ananthala Difference Section - Carousel */}
+        <section className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="relative">
               <Carousel
@@ -113,21 +135,21 @@ export default function GracePage() {
                   {[
                     {
                       id: 1,
-                      image: "/mattress.jpg",
-                      title: "Premium Comfort",
-                      description: "Our GRACE collection is designed for those in their prime years, offering the perfect balance of luxury and support. Each mattress is crafted with premium memory foam and natural latex layers that contour to your body, providing exceptional pressure relief and spinal alignment for the best sleep of your life.",
+                      image: "/productmattress.jpg",
+                      title: "Organic Materials",
+                      description: "Every product in our JOY collection is crafted from 100% organic, chemical-free materials. We understand that your baby's delicate skin requires the purest, most natural fabrics. Our mattresses, toppers, and accessories are made without harmful toxins, ensuring a safe sleeping environment for your little one.",
                     },
                     {
                       id: 2,
-                      image: "/hybrid-mattress-with-blue-accent-pillows-bedroom.jpg",
-                      title: "Temperature Regulation",
-                      description: "Experience cool, comfortable sleep all night long with our advanced cooling technology. Our mattresses feature gel-infused memory foam and breathable cover materials that wick away moisture and regulate temperature, ensuring you stay comfortable regardless of the season.",
+                      image: "/cotton.jpg",
+                      title: "Breathable Design",
+                      description: "Our innovative breathable design ensures optimal air circulation, preventing overheating and maintaining a comfortable temperature throughout the night. This feature is especially crucial for newborns and infants who are still developing their temperature regulation systems.",
                     },
                     {
                       id: 3,
                       image: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      title: "Complete Sleep System",
-                      description: "Enhance your sleep experience with our complimentary pillows and bedspreads. Every mattress purchase includes premium accessories that complement your mattress perfectly, creating a complete sleep environment designed for optimal rest and recovery.",
+                      title: "Pediatrician Approved",
+                      description: "All our baby products are designed in consultation with pediatricians and child development experts. We prioritize spinal alignment, proper support, and safe sleep practices. Our products meet and exceed international safety standards for infant bedding and accessories.",
                     },
                   ].map((slide) => (
                     <CarouselItem
@@ -152,10 +174,10 @@ export default function GracePage() {
                             Ananthala Difference
                           </h1>
                           <div className="text-sm uppercase tracking-wider font-medium text-foreground">
-                            GRACE COLLECTION
+                            JOY COLLECTION
                           </div>
                           <p className="text-lg leading-relaxed text-foreground">
-                            At Ananthala we specifically make products to take care of your sleep health. Every product in our GRACE collection is crafted with premium materials and innovative technology. We understand that quality sleep is essential for your well-being, and our mattresses are designed to provide the perfect balance of comfort and support.
+                            At Ananthala we specifically make products to take care of your babies health. Every product in our JOY collection is crafted from 100% organic, chemical-free materials. We understand that your baby's delicate skin requires the purest, most natural fabrics.
                           </p>
                           
                          
@@ -171,44 +193,133 @@ export default function GracePage() {
           </div>
         </section>
 
-
-        {/* Shop Section */}
+        {/* Products Section */}
         <section ref={shopSectionRef} className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-8 text-center font-cormorant">
               Shop
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 gap-y-8">
-              <Link href="/product/19" className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white block">
-                <div className="relative aspect-square overflow-hidden mb-3">
-                  <Image
-                    src="/mattress.jpg"
-                    alt="Grace Mattress"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <h3 className="text-base font-semibold text-foreground mb-2 text-center">Mattress</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-8">
+              {/* Baby Hamper */}
+              <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white">
+                <Link href="/product/12" className="block">
+                  <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                    <Image
+                      src={currentImages[0]}
+                      alt="JOY Baby Hamper"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                </Link>
+                <h3 className="text-base font-semibold text-foreground mb-2 text-center">JOY Baby Hamper</h3>
                 <div className="text-sm font-medium text-foreground mb-3 text-center">
-                  Starting at ₹29,999
+                  Starting from ₹{totalHamperPrice.toLocaleString()}
                 </div>
-                <Button className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm">
-                  Customize
-                </Button>
-              </Link>
+                <Link href="/product/12">
+                  <Button 
+                    className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
+                  >
+                    Customize
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Kids Hamper */}
+              <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white">
+                <Link href="/product/13" className="block">
+                  <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                    <Image
+                      src={currentImages[0]}
+                      alt="JOY Kids Hamper"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                </Link>
+                <h3 className="text-base font-semibold text-foreground mb-2 text-center">JOY Kids Hamper</h3>
+                <div className="text-sm font-medium text-foreground mb-3 text-center">
+                  Starting from ₹{totalHamperPrice.toLocaleString()}
+                </div>
+                <Link href="/product/13">
+                  <Button 
+                    className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
+                  >
+                    Customize
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Individual Products */}
+              {babyProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white"
+                >
+                  <Link href={`/product/${product.productDetailId}`} className="block">
+                    <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  </Link>
+                  <h3 className="text-base font-semibold text-foreground mb-2 text-center">{product.name}</h3>
+                  <div className="text-sm font-medium text-foreground mb-3 text-center">
+                    Starting at ₹{product.price.toLocaleString()}
+                  </div>
+                  <Link href={`/product/${product.productDetailId}`}>
+                    <Button 
+                      className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
+                    >
+                      Customize
+                    </Button>
+                  </Link>
+                </div>
+              ))}
+
+              {/* Swaddles Card */}
+              <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white">
+                <Link href="/product/swaddles" className="block">
+                  <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                    <Image
+                      src="/swaddle.jpg"
+                      alt="Swaddles"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                </Link>
+                <h3 className="text-base font-semibold text-foreground mb-2 text-center">Swaddles</h3>
+                <div className="text-sm font-medium text-foreground mb-3 text-center">
+                  Starting at ₹49
+                </div>
+                <Link href="/product/swaddles">
+                  <Button 
+                    className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
+                  >
+                    Customize
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
 
-        
         {/* Customer Testimonials */}
         <section className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center font-cormorant">
-              What our Divas Say
+              Customer Testimonials
             </h2>
             <p className="text-center text-foreground mb-8 max-w-2xl mx-auto">
-           Join thousands of happy sleepers
+              Hear from our satisfied customers about their experience with Ananthala products
             </p>
             <div className="relative">
               <Carousel
@@ -223,37 +334,37 @@ export default function GracePage() {
                     {
                       id: 1,
                       video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
+                      poster: "/productmattress.jpg",
                       name: "Sarah Johnson",
                     },
                     {
                       id: 2,
                       video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
+                      poster: "/productmattress.jpg",
                       name: "Michael Chen",
                     },
                     {
                       id: 3,
                       video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
+                      poster: "/productmattress.jpg",
                       name: "Emily Rodriguez",
                     },
                     {
                       id: 4,
                       video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
+                      poster: "/productmattress.jpg",
                       name: "David Thompson",
                     },
                     {
                       id: 5,
                       video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
+                      poster: "/productmattress.jpg",
                       name: "Priya Sharma",
                     },
                     {
                       id: 6,
                       video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
+                      poster: "/productmattress.jpg",
                       name: "James Wilson",
                     },
                   ].map((testimonial) => (
@@ -295,7 +406,7 @@ export default function GracePage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
               <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
                 <Image
-                  src="/mattress.jpg"
+                  src="/productmattress.jpg"
                   alt="About Ananthala"
                   fill
                   className="object-cover"
@@ -306,10 +417,10 @@ export default function GracePage() {
                   About Us
                 </h2>
                 <p className="text-lg text-foreground leading-relaxed">
-                  At Ananthala, we are committed to crafting premium products that take care of your sleep health. Our mattresses are designed with comfort and support in mind, using only the finest materials and innovative technology.
+                  At Ananthala, we are committed to crafting premium products that take care of your baby's health. Our baby products are designed with safety and comfort in mind, using only the finest materials and innovative technology.
                 </p>
                 <p className="text-lg text-foreground leading-relaxed">
-                  Every product is expertly crafted to ensure you get the best sleep. We believe in quality, comfort, and putting your well-being first.
+                  Every product is expertly crafted to ensure your little one gets the best care. We believe in quality, safety, and putting your baby's well-being first.
                 </p>
                 <Link href="/about">
                   <Button 

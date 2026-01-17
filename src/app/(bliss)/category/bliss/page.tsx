@@ -13,9 +13,9 @@ import {
 import { ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRef, useState } from "react"
+import { useRef } from "react"
 
-export default function GracePage() {
+export default function BlissPage() {
   const shopSectionRef = useRef<HTMLElement>(null)
   const aboutUsSectionRef = useRef<HTMLElement>(null)
 
@@ -27,6 +27,12 @@ export default function GracePage() {
     aboutUsSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
+  const shopItems = [
+    { name: "Mattress", price: "29,999", image: "/mattress.jpg", href: "/product/15" },
+    { name: "Pillow", price: "4,999", image: "/pillow.jpg", href: "/product/18" },
+    { name: "Lounger", price: "7,999", image: "/lounger.jpg", href: "/product/17" },
+    { name: "Topper", price: "14,999", image: "/topper.jpg", href: "/product/16" },
+  ]
 
   return (
     <div className="min-h-screen">
@@ -46,7 +52,7 @@ export default function GracePage() {
                   <ChevronRight className="w-4 h-4 text-foreground/50" />
                 </li>
                 <li className="text-foreground font-medium">
-                  Grace
+                  Bliss
                 </li>
               </ol>
             </nav>
@@ -70,10 +76,11 @@ export default function GracePage() {
                 <div className="max-w-md space-y-6">
                   <div className="bg-[#EED9C4] p-4 md:p-8 rounded-lg shadow-lg">
                     <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-foreground font-cormorant">
-                      Grace Collection
+                      Bliss Collection
                     </h1>
                     <p className="text-foreground text-base md:text-lg mt-4 leading-relaxed font-medium">
-                      Discover elegant sleep solutions in our Grace collection, crafted with premium materials and thoughtful design for everyday comfort.
+                      Discover restorative sleep with our Bliss collection, crafted with premium materials
+                      and balanced support for every stage of your day.
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4">
@@ -98,8 +105,9 @@ export default function GracePage() {
             </div>
           </div>
         </section>
-      {/* Ananthala Difference Section - Carousel */}
-      <section className="py-16 px-4 bg-white">
+
+        {/* Ananthala Difference Section - Carousel */}
+        <section ref={shopSectionRef} className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="relative">
               <Carousel
@@ -115,7 +123,7 @@ export default function GracePage() {
                       id: 1,
                       image: "/mattress.jpg",
                       title: "Premium Comfort",
-                      description: "Our GRACE collection is designed for those in their prime years, offering the perfect balance of luxury and support. Each mattress is crafted with premium memory foam and natural latex layers that contour to your body, providing exceptional pressure relief and spinal alignment for the best sleep of your life.",
+                      description: "Our BLISS collection is designed for those in their prime years, offering the perfect balance of luxury and support. Each mattress is crafted with premium memory foam and natural latex layers that contour to your body, providing exceptional pressure relief and spinal alignment for the best sleep of your life.",
                     },
                     {
                       id: 2,
@@ -152,10 +160,10 @@ export default function GracePage() {
                             Ananthala Difference
                           </h1>
                           <div className="text-sm uppercase tracking-wider font-medium text-foreground">
-                            GRACE COLLECTION
+                            BLISS COLLECTION
                           </div>
                           <p className="text-lg leading-relaxed text-foreground">
-                            At Ananthala we specifically make products to take care of your sleep health. Every product in our GRACE collection is crafted with premium materials and innovative technology. We understand that quality sleep is essential for your well-being, and our mattresses are designed to provide the perfect balance of comfort and support.
+                            At Ananthala we specifically make products to take care of your sleep health. Every product in our BLISS collection is crafted with premium materials and innovative technology. We understand that quality sleep is essential for your well-being, and our mattresses are designed to provide the perfect balance of comfort and support.
                           </p>
                           
                          
@@ -171,44 +179,54 @@ export default function GracePage() {
           </div>
         </section>
 
-
         {/* Shop Section */}
-        <section ref={shopSectionRef} className="py-16 px-4 bg-stone-50">
+        <section className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-8 text-center font-cormorant">
               Shop
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 gap-y-8">
-              <Link href="/product/19" className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white block">
-                <div className="relative aspect-square overflow-hidden mb-3">
-                  <Image
-                    src="/mattress.jpg"
-                    alt="Grace Mattress"
-                    fill
-                    className="object-cover"
-                  />
+              {shopItems.map((item) => (
+                <div
+                  key={item.name}
+                  className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white"
+                >
+                  <Link href={item.href} className="block">
+                    <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  </Link>
+                  <h3 className="text-base font-semibold text-foreground mb-2 text-center">{item.name}</h3>
+                  <div className="text-sm font-medium text-foreground mb-3 text-center">
+                    Starting at ₹{item.price}
+                  </div>
+                  <Link href={item.href}>
+                    <Button
+                      className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
+                    >
+                      Customize
+                    </Button>
+                  </Link>
                 </div>
-                <h3 className="text-base font-semibold text-foreground mb-2 text-center">Mattress</h3>
-                <div className="text-sm font-medium text-foreground mb-3 text-center">
-                  Starting at ₹29,999
-                </div>
-                <Button className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm">
-                  Customize
-                </Button>
-              </Link>
+              ))}
             </div>
           </div>
         </section>
 
-        
         {/* Customer Testimonials */}
         <section className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center font-cormorant">
-              What our Divas Say
+              Customer Testimonials
             </h2>
             <p className="text-center text-foreground mb-8 max-w-2xl mx-auto">
-           Join thousands of happy sleepers
+              Hear from our satisfied customers about their experience with Ananthala products
             </p>
             <div className="relative">
               <Carousel

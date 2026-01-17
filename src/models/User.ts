@@ -7,6 +7,9 @@ export interface IUser {
   role: "customer" | "admin" | "agent"
   phone?: string
   address?: string
+  otpCode?: string
+  otpExpiry?: Date
+  otpMethod?: "phone" | "email" // Type of OTP sent
   createdAt: Date
 }
 
@@ -48,6 +51,19 @@ const UserSchema = new Schema<IUser>(
       type: String,
       trim: true,
       default: "",
+    },
+    otpCode: {
+      type: String,
+      default: "",
+    },
+    otpExpiry: {
+      type: Date,
+      default: null,
+    },
+    otpMethod: {
+      type: String,
+      enum: ["phone", "email"],
+      default: null,
     },
   },
   {
