@@ -8,13 +8,13 @@ const values = [
     icon: Heart,
     title: "Customer_first",
     description:
-      "Your comfort,satisfaction are at the heart of everything we do. We listen, adapt and continuously improve to serve you better.",
+      "Your comfort,satisfaction are at the heartof everything we do. We listen, adapt and continuously improve to serve you better.",
   },
   {
     icon: Leaf,
     title: "Sustainability",
     description:
-      "We source eco-friendly materials and use sustainable manufacturing processes to minimize our environmental footprint.",
+      "We source eco-friendly  materials and use sustainable manufacturing processes to minimize our environmental footprint.",
   },
   {
     icon: Award,
@@ -26,7 +26,7 @@ const values = [
     icon: Eye,
     title: "Transparency",
     description:
-      "We believe in being honest about our materials, processes, and pricing. No hidden costs & no compromises.",
+      "We believe in being honest about our materials, processes, and pricing.No hidden costs & no compromises.",
   },
 ]
 
@@ -51,7 +51,7 @@ export default function AboutPage() {
             <div className="text-center text-black max-w-3xl">
               <h1 className="mb-6 text-5xl font-semibold text-black">About Ananthala</h1>
               <p className="text-black/90 font-semibold text-lg">
-                Crafting premium mattresses with care, precision, and a commitment to your best sleep.
+                Crafting premium mattresses with care, precision, and acommitment to your best sleep.
               </p>
             </div>
           </div>

@@ -51,6 +51,11 @@ const menuItems = [
     icon: BookOpen,
   },
   {
+    label: "Review Videos",
+    href: "/admin/review-videos",
+    icon: MessageSquare,
+  },
+  {
     label: "User Management",
     href: "/admin/users",
     icon: Users,

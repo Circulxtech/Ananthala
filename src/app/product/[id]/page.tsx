@@ -41,7 +41,7 @@ export default function ProductDetailPage() {
         <main className="pt-16 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-black mb-4">
-              Product Not Found
+              Product Not Found in database
             </h1>
             <button
               onClick={() => router.push("/")}
