@@ -23,10 +23,7 @@ export function IndividualBabyProductConfigurator({
 }: IndividualBabyProductConfiguratorProps) {
   const productState = useIndividualBabyProduct(product)
   
-  // TODO: Extract the individual product JSX from the main page file
-  // This component will contain all the individual product customization UI
-  // that's currently in the main product page (lines ~1807-3128)
-  
+
   return (
     <div>
       {/* Individual Product Customization */}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -55,15 +55,15 @@ const standardSizes = {
 
 // Fabric price multipliers
 const fabricMultipliers: Record<string, number> = {
-  cotton: 1.0,
-  "organic-cotton": 1.15,
-  bamboo: 1.2,
+  "gingham-beige": 1.0,
+  "gingham-blue": 1.05,
+  "gingham-pink": 1.1,
 }
 
 const fabricOptions = [
-  { value: "cotton", label: "Cotton" },
-  { value: "organic-cotton", label: "Organic Cotton" },
-  { value: "bamboo", label: "Bamboo" },
+  { value: "gingham-beige", label: "Gingham Beige", image: "/gingham_small_beige.jpeg" },
+  { value: "gingham-blue", label: "Gingham Blue", image: "/gingham_small_blue.jpeg" },
+  { value: "gingham-pink", label: "Gingham Pink", image: "/gingham_small_pink.jpeg" },
 ]
 
 /**
@@ -83,6 +83,74 @@ export function BabyHamperConfigurator({
     "head-pillow": 0,
     "pillow-bumpers": 0,
   })
+
+  useEffect(() => {
+    const defaultMattress = standardSizes.mattress[0]?.dimensions
+    if (defaultMattress && !hamperState.standardLength && !hamperState.standardBreadth && !hamperState.standardHeight) {
+      hamperState.setStandardLength(defaultMattress.length)
+      hamperState.setStandardBreadth(defaultMattress.breadth)
+      hamperState.setStandardHeight(defaultMattress.height)
+    }
+
+    const defaultTopper = standardSizes.topper[0]?.dimensions
+    if (defaultTopper && !hamperState.standardTopperLength && !hamperState.standardTopperBreadth && !hamperState.standardTopperHeight) {
+      hamperState.setStandardTopperLength(defaultTopper.length)
+      hamperState.setStandardTopperBreadth(defaultTopper.breadth)
+      hamperState.setStandardTopperHeight(defaultTopper.height)
+    }
+
+    const defaultLounger = standardSizes.lounger[0]?.dimensions
+    if (defaultLounger && !hamperState.standardLoungerLength && !hamperState.standardLoungerBreadth && !hamperState.standardLoungerHeight) {
+      hamperState.setStandardLoungerLength(defaultLounger.length)
+      hamperState.setStandardLoungerBreadth(defaultLounger.breadth)
+      hamperState.setStandardLoungerHeight(defaultLounger.height)
+    }
+
+    const defaultPillow = standardSizes["head-pillow"][0]?.dimensions
+    if (defaultPillow && !hamperState.standardPillowLength && !hamperState.standardPillowBreadth && !hamperState.standardPillowHeight) {
+      hamperState.setStandardPillowLength(defaultPillow.length)
+      hamperState.setStandardPillowBreadth(defaultPillow.breadth)
+      hamperState.setStandardPillowHeight(defaultPillow.height)
+    }
+
+    const defaultBumper = standardSizes["pillow-bumpers"][0]?.dimensions
+    if (defaultBumper && !hamperState.standardBumperLength && !hamperState.standardBumperBreadth && !hamperState.standardBumperHeight) {
+      hamperState.setStandardBumperLength(defaultBumper.length)
+      hamperState.setStandardBumperBreadth(defaultBumper.breadth)
+      hamperState.setStandardBumperHeight(defaultBumper.height)
+    }
+  }, [
+    hamperState.standardLength,
+    hamperState.standardBreadth,
+    hamperState.standardHeight,
+    hamperState.standardTopperLength,
+    hamperState.standardTopperBreadth,
+    hamperState.standardTopperHeight,
+    hamperState.standardLoungerLength,
+    hamperState.standardLoungerBreadth,
+    hamperState.standardLoungerHeight,
+    hamperState.standardPillowLength,
+    hamperState.standardPillowBreadth,
+    hamperState.standardPillowHeight,
+    hamperState.standardBumperLength,
+    hamperState.standardBumperBreadth,
+    hamperState.standardBumperHeight,
+    hamperState.setStandardLength,
+    hamperState.setStandardBreadth,
+    hamperState.setStandardHeight,
+    hamperState.setStandardTopperLength,
+    hamperState.setStandardTopperBreadth,
+    hamperState.setStandardTopperHeight,
+    hamperState.setStandardLoungerLength,
+    hamperState.setStandardLoungerBreadth,
+    hamperState.setStandardLoungerHeight,
+    hamperState.setStandardPillowLength,
+    hamperState.setStandardPillowBreadth,
+    hamperState.setStandardPillowHeight,
+    hamperState.setStandardBumperLength,
+    hamperState.setStandardBumperBreadth,
+    hamperState.setStandardBumperHeight,
+  ])
   
   // Get images for each product based on selected color
   const getProductImages = (itemId: string): string[] => {
@@ -348,41 +416,13 @@ export function BabyHamperConfigurator({
                   {/* Standard Size Dropdown */}
                   <div>
                     <label className="text-base font-medium text-foreground mb-2 block">Dimensions(in inches)</label>
-                    <Select 
-                      value={getCurrentStandardSize("mattress")} 
-                      onValueChange={(value) => handleStandardSizeChange("mattress", value)}
-                    >
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select standard size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {standardSizes.mattress.map((size) => (
-                          <SelectItem key={size.value} value={size.value} className="text-foreground">
-                            {size.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="w-full rounded-md border border-[#EED9C4] px-3 py-2 text-foreground">
+                      {standardSizes.mattress[0]?.label}
+                    </div>
                     
                    
                   </div>
                   
-                  {/* Fabric Dropdown */}
-                  <div>
-                    <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                    <Select value={hamperState.mattressFabric || ""} onValueChange={hamperState.setMattressFabric}>
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select fabric" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fabricOptions.map((fabric) => (
-                          <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
-                            {fabric.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
             </div>
@@ -439,39 +479,11 @@ export function BabyHamperConfigurator({
                   {/* Standard Size Dropdown */}
                   <div>
                     <label className="text-base font-medium text-foreground mb-2 block">Dimensions(in inches)</label>
-                    <Select 
-                      value={getCurrentStandardSize("topper")} 
-                      onValueChange={(value) => handleStandardSizeChange("topper", value)}
-                    >
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select standard size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {standardSizes.topper.map((size) => (
-                          <SelectItem key={size.value} value={size.value} className="text-foreground">
-                            {size.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="w-full rounded-md border border-[#EED9C4] px-3 py-2 text-foreground">
+                      {standardSizes.topper[0]?.label}
+                    </div>
                   </div>
                   
-                  {/* Fabric Dropdown */}
-                  <div>
-                    <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                    <Select value={hamperState.topperFabric} onValueChange={hamperState.setTopperFabric}>
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select fabric" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fabricOptions.map((fabric) => (
-                          <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
-                            {fabric.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
             </div>
@@ -528,39 +540,11 @@ export function BabyHamperConfigurator({
                   {/* Standard Size Dropdown */}
                   <div>
                     <label className="text-base font-medium text-foreground mb-2 block">Dimensions(in inches)</label>
-                    <Select 
-                      value={getCurrentStandardSize("lounger")} 
-                      onValueChange={(value) => handleStandardSizeChange("lounger", value)}
-                    >
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select standard size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {standardSizes.lounger.map((size) => (
-                          <SelectItem key={size.value} value={size.value} className="text-foreground">
-                            {size.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="w-full rounded-md border border-[#EED9C4] px-3 py-2 text-foreground">
+                      {standardSizes.lounger[0]?.label}
+                    </div>
                   </div>
                   
-                  {/* Fabric Dropdown */}
-                  <div>
-                    <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                    <Select value={hamperState.loungerFabric} onValueChange={hamperState.setLoungerFabric}>
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select fabric" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fabricOptions.map((fabric) => (
-                          <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
-                            {fabric.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
             </div>
@@ -617,39 +601,11 @@ export function BabyHamperConfigurator({
                   {/* Standard Size Dropdown */}
                   <div>
                     <label className="text-base font-medium text-foreground mb-2 block">Dimensions(in inches)</label>
-                    <Select 
-                      value={getCurrentStandardSize("head-pillow")} 
-                      onValueChange={(value) => handleStandardSizeChange("head-pillow", value)}
-                    >
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select standard size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {standardSizes["head-pillow"].map((size) => (
-                          <SelectItem key={size.value} value={size.value} className="text-foreground">
-                            {size.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="w-full rounded-md border border-[#EED9C4] px-3 py-2 text-foreground">
+                      {standardSizes["head-pillow"][0]?.label}
+                    </div>
                   </div>
                   
-                  {/* Fabric Dropdown */}
-                  <div>
-                    <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                    <Select value={hamperState.pillowFabric} onValueChange={hamperState.setPillowFabric}>
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select fabric" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fabricOptions.map((fabric) => (
-                          <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
-                            {fabric.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
             </div>
@@ -706,39 +662,11 @@ export function BabyHamperConfigurator({
                   {/* Standard Size Dropdown */}
                   <div>
                     <label className="text-base font-medium text-foreground mb-2 block">Dimensions(in inches)</label>
-                    <Select 
-                      value={getCurrentStandardSize("pillow-bumpers")} 
-                      onValueChange={(value) => handleStandardSizeChange("pillow-bumpers", value)}
-                    >
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select standard size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {standardSizes["pillow-bumpers"].map((size) => (
-                          <SelectItem key={size.value} value={size.value} className="text-foreground">
-                            {size.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="w-full rounded-md border border-[#EED9C4] px-3 py-2 text-foreground">
+                      {standardSizes["pillow-bumpers"][0]?.label}
+                    </div>
                   </div>
                   
-                  {/* Fabric Dropdown */}
-                  <div>
-                    <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                    <Select value={hamperState.bumperFabric} onValueChange={hamperState.setBumperFabric}>
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select fabric" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fabricOptions.map((fabric) => (
-                          <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
-                            {fabric.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
             </div>
@@ -748,7 +676,7 @@ export function BabyHamperConfigurator({
 
       {/* Right Sidebar - Hamper Includes */}
       <div className="lg:col-span-3">
-        <div className="sticky top-24 p-6 bg-white border-2 border-[#EED9C4]">
+        <div className="sticky top-24 p-7 bg-white border-2 border-[#EED9C4]">
           <h3 className="text-xl font-semibold text-foreground mb-4">Hamper Includes:</h3>
           <div className="space-y-3">
             {babyProducts.map((product) => (
@@ -764,6 +692,48 @@ export function BabyHamperConfigurator({
             ))}
           </div>
           
+          {/* Fabric Selection */}
+          <div className="mt-6">
+            <label className="text-base font-medium text-foreground mb-3 block">Fabric</label>
+            <Select
+              value={
+                hamperState.mattressFabric ||
+                hamperState.topperFabric ||
+                hamperState.loungerFabric ||
+                hamperState.pillowFabric ||
+                hamperState.bumperFabric ||
+                ""
+              }
+              onValueChange={(value) => {
+                hamperState.setMattressFabric(value)
+                hamperState.setTopperFabric(value)
+                hamperState.setLoungerFabric(value)
+                hamperState.setPillowFabric(value)
+                hamperState.setBumperFabric(value)
+              }}
+            >
+              <SelectTrigger className="w-full text-foreground py-3">
+                <SelectValue placeholder="Select fabric" />
+              </SelectTrigger>
+              <SelectContent>
+                {fabricOptions.map((fabric) => (
+                  <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
+                    <span className="flex items-center gap-3">
+                      <Image
+                        src={fabric.image}
+                        alt={fabric.label}
+                        width={28}
+                        height={28}
+                        className="rounded-none"
+                      />
+                      <span className="text-base">{fabric.label}</span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Price Section */}
           <div className="mt-6 pt-6 border-t border-[#EED9C4]">
             <h3 className="text-lg font-medium text-foreground mb-2">Total Price</h3>
@@ -771,7 +741,7 @@ export function BabyHamperConfigurator({
               ₹{totalPrice.toLocaleString()} <span className="text-sm font-normal text-foreground/70">(inclusive of all taxes)</span>
             </div>
           </div>
-          
+
           {/* Add to Cart Button */}
           <Button 
             className="w-full mt-6 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"

@@ -522,7 +522,7 @@ export default function JoyPage() {
         <section className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center font-cormorant">
-              Customer Testimonials
+              What our Divas Say
             </h2>
             <p className="text-center text-foreground mb-8 max-w-2xl mx-auto">
               Hear from our satisfied customers about their experience with Ananthala products
@@ -620,14 +620,48 @@ export default function JoyPage() {
               </div>
               <div className="space-y-4">
                 <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
-                  About Us
+                  Our Crafted Heritage
                 </h2>
-                <p className="text-lg text-foreground leading-relaxed">
-                  At Ananthala, we are committed to crafting premium products that take care of your baby's health. Our baby products are designed with safety and comfort in mind, using only the finest materials and innovative technology.
+                <p className="text-lg text-foreground/90 font-medium">
+                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to
+                  provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
+                  help you wake up refreshed.
                 </p>
-                <p className="text-lg text-foreground leading-relaxed">
-                  Every product is expertly crafted to ensure your little one gets the best care. We believe in quality, safety, and putting your baby's well-being first.
-                </p>
+                <div className="space-y-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Pressure Relief Technology
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Conforms to your body for optimal spinal alignment
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Temperature Regulation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Advanced cooling system keeps you comfortable all night
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Motion Isolation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Undisturbed sleep even with a restless partner
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 <Link href="/about">
                   <Button 
                     className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"

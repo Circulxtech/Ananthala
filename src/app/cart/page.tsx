@@ -69,7 +69,7 @@ export default function CartPage() {
               Looks like you haven't added anything to your cart yet.
             </p>
             <button
-              onClick={() => router.push("/mattress")}
+              onClick={() => router.push("/category/grace")}
               className="px-8 py-3 text-white hover:opacity-90 transition-opacity"
               style={{ backgroundColor: "#6B563F" }}
             >
@@ -370,7 +370,7 @@ export default function CartPage() {
                 </button>
 
                 <button
-                  onClick={() => router.push("/mattress")}
+                  onClick={() => router.push("/category/grace")}
                   className="w-full py-3 border text-black hover:opacity-70 transition-opacity"
                   style={{ borderColor: "#D9CFC7" }}
                 >

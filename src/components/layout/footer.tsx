@@ -111,13 +111,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/mattress" className="hover:text-amber-950 transition-colors font-medium">
+                <Link href="/category/grace" className="hover:text-amber-950 transition-colors font-medium">
                   Mattress
-                </Link>
-              </li>
-              <li>
-                <Link href="/bedding" className="hover:text-amber-950 transition-colors font-medium">
-                  Bedding
                 </Link>
               </li>
               <li>

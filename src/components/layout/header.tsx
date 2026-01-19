@@ -10,12 +10,7 @@ import { CartDrawer } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
-const menuItems = [
-  { label: "PILLOWS", href: "/pillows" },
-  { label: "BEDDING", href: "/bedding" },
-  { label: "BESTSELLERS", href: "/bestsellers" },
-  { label: "NEW LAUNCHES", href: "/new-launches" },
-]
+const menuItems = []
 
 interface AuthenticatedUser {
   id: string

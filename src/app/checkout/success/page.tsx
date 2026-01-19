@@ -51,7 +51,7 @@ export default function CheckoutSuccessPage() {
               <span>Track Order</span>
             </Button>
             <Button
-              onClick={() => router.push("/mattress")}
+              onClick={() => router.push("/category/grace")}
               variant="outline"
               className="flex-1 h-12 border-2 border-[#D9CFC7] text-[#8B5A3C] hover:bg-[#F5F1ED] font-medium flex items-center justify-center gap-2"
             >

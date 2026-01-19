@@ -13,7 +13,7 @@ import {
 import { ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRef, useState } from "react"
+import { useRef } from "react"
 
 export default function GracePage() {
   const shopSectionRef = useRef<HTMLElement>(null)
@@ -26,6 +26,13 @@ export default function GracePage() {
   const scrollToAboutUs = () => {
     aboutUsSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
+
+  const shopItems = [
+    { name: "Mattress", price: "29,999", image: "/mattress.jpg", href: "/product/19" },
+    { name: "Topper", price: "14,999", image: "/topper.jpg", href: "/product/20" },
+    { name: "Lounger", price: "7,999", image: "/lounger.jpg", href: "/product/21" },
+    { name: "Pillow", price: "4,999", image: "/pillow.jpg", href: "/product/22" },
+  ]
 
 
   return (
@@ -136,7 +143,7 @@ export default function GracePage() {
                     >
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-[#EED9C4]">
                         {/* Left Side - Image */}
-                        <div className="relative aspect-[4/3] overflow-hidden ">
+                        <div className="relative aspect-4/3 overflow-hidden ">
                           <Image
                             src={slide.image}
                             alt={slide.title}
@@ -179,23 +186,33 @@ export default function GracePage() {
               Shop
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 gap-y-8">
-              <Link href="/product/19" className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white block">
-                <div className="relative aspect-square overflow-hidden mb-3">
-                  <Image
-                    src="/mattress.jpg"
-                    alt="Grace Mattress"
-                    fill
-                    className="object-cover"
-                  />
+              {shopItems.map((item) => (
+                <div
+                  key={item.name}
+                  className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white"
+                >
+                  <Link href={item.href} className="block">
+                    <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  </Link>
+                  <h3 className="text-base font-semibold text-foreground mb-2 text-center">{item.name}</h3>
+                  <div className="text-sm font-medium text-foreground mb-3 text-center">
+                    Starting at ₹{item.price}
+                  </div>
+                  <Link href={item.href}>
+                    <Button className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm">
+                      Customize
+                    </Button>
+                  </Link>
                 </div>
-                <h3 className="text-base font-semibold text-foreground mb-2 text-center">Mattress</h3>
-                <div className="text-sm font-medium text-foreground mb-3 text-center">
-                  Starting at ₹29,999
-                </div>
-                <Button className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm">
-                  Customize
-                </Button>
-              </Link>
+              ))}
             </div>
           </div>
         </section>
@@ -293,7 +310,7 @@ export default function GracePage() {
         <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-              <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
+              <div className="relative aspect-4/3 overflow-hidden max-w-lg mx-auto lg:mx-0">
                 <Image
                   src="/mattress.jpg"
                   alt="About Ananthala"
@@ -303,14 +320,48 @@ export default function GracePage() {
               </div>
               <div className="space-y-4">
                 <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
-                  About Us
+                  Our Crafted Heritage
                 </h2>
-                <p className="text-lg text-foreground leading-relaxed">
-                  At Ananthala, we are committed to crafting premium products that take care of your sleep health. Our mattresses are designed with comfort and support in mind, using only the finest materials and innovative technology.
+                <p className="text-lg text-foreground/90 font-medium">
+                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to
+                  provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
+                  help you wake up refreshed.
                 </p>
-                <p className="text-lg text-foreground leading-relaxed">
-                  Every product is expertly crafted to ensure you get the best sleep. We believe in quality, comfort, and putting your well-being first.
-                </p>
+                <div className="space-y-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Pressure Relief Technology
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Conforms to your body for optimal spinal alignment
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Temperature Regulation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Advanced cooling system keeps you comfortable all night
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Motion Isolation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Undisturbed sleep even with a restless partner
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 <Link href="/about">
                   <Button 
                     className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"

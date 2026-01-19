@@ -104,7 +104,7 @@ export default function CheckoutPage() {
               Please add items to your cart before checkout.
             </p>
             <button
-              onClick={() => router.push("/mattress")}
+              onClick={() => router.push("/category/grace")}
               className="px-8 py-3 text-white hover:opacity-90 transition-opacity"
               style={{ backgroundColor: "#6B563F" }}
             >

@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef } from "react"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
 import { TopperConfigurator } from "@/collections/joy/components/topper-configurator"
@@ -81,6 +82,7 @@ export function TopperProductTemplate({
   onAddToCart,
   isAddingToCart,
 }: TopperProductTemplateProps) {
+  const aboutUsSectionRef = useRef<HTMLElement>(null)
   return (
     <div className="space-y-12">
       <TopperConfigurator
@@ -341,38 +343,73 @@ export function TopperProductTemplate({
         </div>
       </section>
 
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-            <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
-              <Image
-                src="/productmattress.jpg"
-                alt="About Ananthala"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
-                About Us
-              </h2>
-              <p className="text-lg text-foreground leading-relaxed">
-                At Ananthala, we are committed to crafting premium products that take care of your baby's health. Our toppers are designed with comfort and support in mind, using only the finest organic materials and innovative technology.
-              </p>
-              <p className="text-lg text-foreground leading-relaxed">
-                Every product is expertly crafted to ensure your little one gets the best sleep. We believe in quality, comfort, and putting your baby's well-being first.
-              </p>
-              <Link href="/about">
-                <Button 
-                  className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
-                >
-                  More
-                </Button>
-              </Link>
+       {/* About Us Section */}
+     <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+              <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
+                <Image
+                  src="/mattress.jpg"
+                  alt="About Ananthala"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="space-y-4">
+                <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
+                  Our Crafted Heritage
+                </h2>
+                <p className="text-lg text-foreground/90 font-medium">
+                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to
+                  provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
+                  help you wake up refreshed.
+                </p>
+                <div className="space-y-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Pressure Relief Technology
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Conforms to your body for optimal spinal alignment
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Temperature Regulation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Advanced cooling system keeps you comfortable all night
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Motion Isolation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Undisturbed sleep even with a restless partner
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <Link href="/about">
+                  <Button 
+                    className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
+                  >
+                    More
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
     </div>
   )
 }
