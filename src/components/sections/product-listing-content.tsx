@@ -16,6 +16,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 import { useCart } from "@/contexts/cart-context"
+import { toast } from "@/hooks/use-toast"
 import { type CartItem } from "@/components/cart/cart-drawer"
 
 interface ProductListingContentProps {
@@ -24,7 +25,7 @@ interface ProductListingContentProps {
 
 export function ProductListingContent({ category }: ProductListingContentProps) {
   const router = useRouter()
-  const { addToCart, setIsCartOpen } = useCart()
+  const { addToCart } = useCart()
   const [selectedSize, setSelectedSize] = useState<string>("")
   const [isAddingToCart, setIsAddingToCart] = useState(false)
 
@@ -59,7 +60,10 @@ export function ProductListingContent({ category }: ProductListingContentProps) 
     
     addToCart(cartItem)
     setIsAddingToCart(false)
-    setIsCartOpen(true)
+    toast({
+      title: "Added to cart",
+      description: `${featuredProductDetail.name} added.`,
+    })
   }
 
   // Handle buy now for products carousel - redirect to product detail page

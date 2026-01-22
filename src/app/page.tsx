@@ -4,11 +4,11 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { ArrowRight, Volume2, VolumeX, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { CustomerReviewVideos } from "@/components/customer-review-videos"
 
 // Categories data
 const categories = [
@@ -147,9 +147,9 @@ export default function Home() {
   const getCategoryPath = (productName: string) => {
     const name = productName.toLowerCase()
     // Map product names to category pages (matching second section redirects)
-    if (name === "joy") return "/category/joy"
-    if (name === "bliss") return "/category/bliss"
-    if (name === "grace") return "/category/grace"
+    if (name === "joy") return "/category/joy#shop"
+    if (name === "bliss") return "/category/bliss#shop"
+    if (name === "grace") return "/category/grace#shop"
     if (name.includes("pillow") || name.includes("bedsheet")) return "/category/bliss"
     return "/category/bliss"
   }
@@ -189,7 +189,7 @@ export default function Home() {
               className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md shadow-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto min-w-[160px]"
               style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
             >
-              <Link href="/category/bliss" className="flex items-center justify-center">
+              <Link href="/#find-your-perfect-mattress" className="flex items-center justify-center">
                 Shop
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
@@ -307,7 +307,7 @@ export default function Home() {
         </section>
 
         {/* Products Section */}
-        <section className="py-24 px-4 bg-white">
+        <section id="find-your-perfect-mattress" className="py-24 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="mb-4 text-4xl font-medium text-foreground">Find Your Perfect Mattress</h2>
@@ -419,8 +419,60 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Customer Review Videos Section - UPDATED */}
-        <CustomerReviewVideos />
+        {/* Customer Testimonials */}
+        <section className="py-16 px-4 bg-stone-50">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center font-cormorant">
+              What our Divas Say
+            </h2>
+            <p className="text-center text-foreground mb-8 max-w-2xl mx-auto">
+              Hear from our satisfied customers about their experience with Ananthala products
+            </p>
+            <div className="relative">
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-2 md:-ml-4">
+                  {testimonialVideos.map((testimonial) => (
+                    <CarouselItem
+                      key={testimonial.id}
+                      className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
+                    >
+                      <div className="space-y-2">
+                        <div className="relative aspect-video overflow-hidden border border-[#EED9C4]">
+                          <video
+                            className="w-full h-full object-cover"
+                            controls
+                            controlsList="nodownload nofullscreen noremoteplayback"
+                            disablePictureInPicture
+                            onContextMenu={(e) => e.preventDefault()}
+                            poster={testimonial.poster}
+                          >
+                            <source src={testimonial.video} type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                        </div>
+                        <p className="text-left text-foreground font-medium">{testimonial.name}</p>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious
+                  className="left-0 bg-white border-2 shadow-md hover:bg-gray-50"
+                  style={{ borderColor: "#EED9C4" }}
+                />
+                <CarouselNext
+                  className="right-0 bg-white border-2 shadow-md hover:bg-gray-50"
+                  style={{ borderColor: "#EED9C4" }}
+                />
+              </Carousel>
+            </div>
+          </div>
+        </section>
       </main>
       <Footer />
     </div>

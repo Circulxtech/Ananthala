@@ -7,8 +7,9 @@ import { Footer } from "@/components/layout/footer"
 import { ChevronLeft, ChevronRight, Check } from "lucide-react"
 import { useState } from "react"
 import { getProductDetailById } from "@/data/product-details"
-import { CartDrawer, type CartItem } from "@/components/cart/cart-drawer"
+import { type CartItem } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
+import { toast } from "@/hooks/use-toast"
 import { getProductType, isBlissProduct, isGraceProduct, isJoyProduct } from "@/utils/product-type"
 import { BabyHamperProductTemplate } from "@/collections/joy/templates/BabyHamperProductTemplate"
 import { KidsHamperProductTemplate } from "@/collections/joy/templates/KidsHamperProductTemplate"
@@ -67,7 +68,7 @@ export default function ProductDetailPage() {
   const [activeTab, setActiveTab] = useState<"features" | "specs">("features")
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   
-  const { cartItems, addToCart, isCartOpen, setIsCartOpen } = useCart()
+  const { addToCart } = useCart()
 
   // Color scheme
   const colors = isBabyProduct
@@ -101,7 +102,10 @@ export default function ProductDetailPage() {
     itemsArray.forEach(item => addToCart(item))
     
     setIsAddingToCart(false)
-    setIsCartOpen(true)
+    toast({
+      title: "Added to cart",
+      description: `${itemsArray.length} item${itemsArray.length === 1 ? "" : "s"} added.`,
+    })
   }
 
   return (
@@ -415,12 +419,6 @@ export default function ProductDetailPage() {
       </main>
       <Footer />
       
-      {/* Cart Drawer */}
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cartItems}
-      />
     </div>
   )
 }

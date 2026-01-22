@@ -19,6 +19,7 @@ import { Loader2, ChevronRight } from "lucide-react"
 
 
 import { useCart } from "@/contexts/cart-context"
+import { toast } from "@/hooks/use-toast"
 import { type CartItem } from "@/components/cart/cart-drawer"
 
 export default function JoyPage() {
@@ -90,7 +91,7 @@ export default function JoyPage() {
     aboutUsSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  const { addToCart, setIsCartOpen } = useCart()
+  const { addToCart } = useCart()
 
   const toggleItem = (itemId: string) => {
     setSelectedItems((prev) =>
@@ -155,7 +156,10 @@ export default function JoyPage() {
     
     setHamperSelected(true)
     setIsAddingHamper(false)
-    setIsCartOpen(true)
+    toast({
+      title: "Added to cart",
+      description: "JOY Baby Hamper added.",
+    })
   }
 
   const handleAddProductToCart = async (productId: string) => {
@@ -183,7 +187,10 @@ export default function JoyPage() {
     setHamperSelected(false)
     toggleItem(productId)
     setAddingProductId(null)
-    setIsCartOpen(true)
+    toast({
+      title: "Added to cart",
+      description: `JOY ${product?.name ?? "item"} added.`,
+    })
   }
 
   const handleAddSwaddleToCart = async (swaddleType: string) => {
@@ -203,7 +210,10 @@ export default function JoyPage() {
     
     setSwaddleSelected(true)
     setAddingSwaddleType(null)
-    setIsCartOpen(true)
+    toast({
+      title: "Added to cart",
+      description: "JOY Swaddle added.",
+    })
   }
 
   const handleAddMattressToCart = async () => {
@@ -250,7 +260,10 @@ export default function JoyPage() {
     }
     
     setIsAddingMattress(false)
-    setIsCartOpen(true)
+    toast({
+      title: "Added to cart",
+      description: "JOY Swaddle added.",
+    })
   }
 
   return (
@@ -400,7 +413,7 @@ export default function JoyPage() {
 
        
         {/* Products Section */}
-        <section ref={shopSectionRef} className="py-16 px-4 bg-stone-50">
+        <section id="shop" ref={shopSectionRef} className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-8 text-center font-cormorant">
               Shop

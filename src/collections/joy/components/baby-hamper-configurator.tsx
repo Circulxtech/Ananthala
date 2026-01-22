@@ -176,82 +176,42 @@ export function BabyHamperConfigurator({
   }
   
   const handleAddToCart = async () => {
-    // Build cart items for all selected hamper items with standard dimensions
-    const items: CartItem[] = []
-    
-    hamperState.hamperItems.forEach((itemId) => {
-      const productData = babyProducts.find(p => p.id === itemId)
-      if (productData) {
-        // Get dimensions based on item type
-        let dimensions = ""
-        let fabric = ""
-        
-        if (itemId === "mattress") {
-          dimensions = `${hamperState.standardLength || ""} x ${hamperState.standardBreadth || ""} x ${hamperState.standardHeight || ""}`.trim()
-        } else if (itemId === "topper") {
-          dimensions = `${hamperState.standardTopperLength || ""} x ${hamperState.standardTopperBreadth || ""} x ${hamperState.standardTopperHeight || ""}`.trim()
-          fabric = hamperState.topperFabric || ""
-        } else if (itemId === "lounger") {
-          dimensions = `${hamperState.standardLoungerLength || ""} x ${hamperState.standardLoungerBreadth || ""} x ${hamperState.standardLoungerHeight || ""}`.trim()
-          fabric = hamperState.loungerFabric || ""
-        } else if (itemId === "head-pillow") {
-          dimensions = `${hamperState.standardPillowLength || ""} x ${hamperState.standardPillowBreadth || ""} x ${hamperState.standardPillowHeight || ""}`.trim()
-          fabric = hamperState.pillowFabric || ""
-        } else if (itemId === "pillow-bumpers") {
-          dimensions = `${hamperState.standardBumperLength || ""} x ${hamperState.standardBumperBreadth || ""} x ${hamperState.standardBumperHeight || ""}`.trim()
-          fabric = hamperState.bumperFabric || ""
-        }
-        
-        const sizeInfo = dimensions ? `${dimensions}${fabric ? ` - ${fabricOptions.find(f => f.value === fabric)?.label || fabric}` : ""}` : "Standard"
-        
-        // Calculate price based on dimensions and fabric
-        let basePrice = productData.price
-        let dimensionMultiplier = 1.0
-        let fabricMultiplier = 1.0
-        
-        // Get dimension multiplier
-        const currentSizeValue = getCurrentStandardSize(itemId)
-        if (currentSizeValue) {
-          const size = standardSizes[itemId as keyof typeof standardSizes]?.find(s => s.value === currentSizeValue)
-          if (size && size.priceMultiplier) {
-            dimensionMultiplier = size.priceMultiplier
-          }
-        }
-        
-        // Get fabric multiplier
-        if (fabric) {
-          fabricMultiplier = fabricMultipliers[fabric] || 1.0
-        }
-        
-        const finalPrice = Math.round(basePrice * dimensionMultiplier * fabricMultiplier)
-        
-        items.push({
-          id: `joy-${itemId}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
-          name: `JOY ${productData.name}`,
-          image: productData.image,
-          size: sizeInfo,
-          quantity: 1,
-          price: finalPrice,
-        })
-      }
-    })
-    
-    // Add complimentary bed sheet if color is selected
-    if (hamperState.bedSpreadColor) {
-      const colorLabel = hamperState.bedSpreadColor.charAt(0).toUpperCase() + hamperState.bedSpreadColor.slice(1)
-      const bedsheetDimensions = hamperState.standardLength && hamperState.standardBreadth
-        ? `${hamperState.standardLength} x ${hamperState.standardBreadth}`
-        : "Standard Size"
-      
-      items.push({
-        id: `joy-bedsheet-${hamperState.bedSpreadColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
-        name: "JOY Bed Sheet (Complimentary)",
-        image: "/bedsheet.jpg",
-        size: `${bedsheetDimensions} - ${colorLabel}`,
-        quantity: 1,
-        price: 0,
-      })
+    const includedItems = babyProducts
+      .filter((productData) => hamperState.hamperItems.includes(productData.id))
+      .map((productData) => productData.name)
+
+    const selectedColorLabel =
+      hamperState.colorOptions.find((option) => option.name === hamperState.selectedColor)?.label ||
+      hamperState.selectedColor
+
+    const bedSpreadLabel = hamperState.bedSpreadColor
+      ? hamperState.bedSpreadColor.charAt(0).toUpperCase() + hamperState.bedSpreadColor.slice(1)
+      : ""
+
+    const summaryParts = []
+    if (includedItems.length > 0) {
+      summaryParts.push(`Includes: ${includedItems.join(", ")}`)
     }
+    if (selectedColorLabel) {
+      summaryParts.push(`Color: ${selectedColorLabel}`)
+    }
+    if (bedSpreadLabel) {
+      summaryParts.push(`Bed Sheet: ${bedSpreadLabel}`)
+        }
+        
+    const sizeInfo = summaryParts.join(" | ") || "Standard"
+    const hamperImage = hamperState.currentImages[0] || product.images[0] || "/productmattress.jpg"
+
+    const items: CartItem[] = [
+      {
+        id: `joy-baby-hamper-${product.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        name: product.name,
+        image: hamperImage,
+          size: sizeInfo,
+        quantity: 1,
+        price: totalPrice,
+      },
+    ]
     
     onAddToCart(items)
   }

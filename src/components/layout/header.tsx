@@ -6,7 +6,6 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ShoppingCart, User, Menu, X, Search, LogOut, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { CartDrawer } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
@@ -23,7 +22,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const { cartItems, isCartOpen, setIsCartOpen } = useCart()
+  const { cartItems } = useCart()
   const [user, setUser] = useState<AuthenticatedUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -179,7 +178,7 @@ export function Header() {
                 variant="ghost"
                 size="icon"
                 className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors relative"
-                onClick={() => setIsCartOpen(true)}
+                onClick={() => router.push("/cart")}
               >
                 <ShoppingCart className="h-5 w-5" />
                 {cartItems.length > 0 && (
@@ -267,7 +266,6 @@ export function Header() {
         />
       )}
 
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cartItems={cartItems} />
     </>
   )
 }
