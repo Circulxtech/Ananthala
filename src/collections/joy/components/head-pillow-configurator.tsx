@@ -16,10 +16,12 @@ interface HeadPillowConfiguratorProps {
   isAddingToCart: boolean
 }
 
-const standardSizes = [
-  { label: "12\" x 16\" x 2\"", value: "12x16x2", dimensions: { length: "12\"", breadth: "16\"", height: "2\"" }, priceMultiplier: 1.0 },
-  { label: "14\" x 18\" x 2.5\"", value: "14x18x2.5", dimensions: { length: "14\"", breadth: "18\"", height: "2.5\"" }, priceMultiplier: 1.15 },
-  { label: "16\" x 20\" x 3\"", value: "16x20x3", dimensions: { length: "16\"", breadth: "20\"", height: "3\"" }, priceMultiplier: 1.3 },
+const babyStandardSizes = [
+  { label: "9\" x 13\" x 1\"", value: "9x13x1", dimensions: { length: "9\"", breadth: "13\"", height: "1\"" }, priceMultiplier: 1.0 },
+]
+
+const adultStandardSizes = [
+  { label: "18\" x 28\" x 2.5\"", value: "18x28x2.5", dimensions: { length: "18\"", breadth: "28\"", height: "2.5\"" }, priceMultiplier: 1.0 },
 ]
 
 const fabricMultipliers: Record<string, number> = {
@@ -42,6 +44,7 @@ export function HeadPillowConfigurator({
   const pillowState = useHeadPillow()
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [useCustomDimensions, setUseCustomDimensions] = useState(false)
+  const standardSizes = product.category === "baby" ? babyStandardSizes : adultStandardSizes
   
   const getProductImages = (): string[] => {
     return product.images && product.images.length > 0 ? product.images : ["/pillow.jpg"]

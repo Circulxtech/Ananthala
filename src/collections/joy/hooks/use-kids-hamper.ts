@@ -53,6 +53,10 @@ export interface KidsHamperState {
   setStandardKidsBedSheetsBreadth: (breadth: string) => void
   standardKidsBedSheetsHeight: string
   setStandardKidsBedSheetsHeight: (height: string) => void
+
+  // Bed spread selection
+  bedSpreadColor: string
+  setBedSpreadColor: (color: string) => void
   
   // Price
   price: number
@@ -91,6 +95,9 @@ export function useKidsHamper() {
   const [standardKidsBedSheetsLength, setStandardKidsBedSheetsLength] = useState("")
   const [standardKidsBedSheetsBreadth, setStandardKidsBedSheetsBreadth] = useState("")
   const [standardKidsBedSheetsHeight, setStandardKidsBedSheetsHeight] = useState("")
+
+  // Bed spread
+  const [bedSpreadColor, setBedSpreadColor] = useState("")
   
   const toggleKidsHamperItem = (itemId: string) => {
     setKidsHamperItems((prev) =>
@@ -145,6 +152,8 @@ export function useKidsHamper() {
     setStandardKidsBedSheetsBreadth,
     standardKidsBedSheetsHeight,
     setStandardKidsBedSheetsHeight,
+    bedSpreadColor,
+    setBedSpreadColor,
     price,
   }
 }

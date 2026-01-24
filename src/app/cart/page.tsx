@@ -2,10 +2,11 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import Image from "next/image"
-import { IndianRupee, Trash2, Plus, Minus, ShoppingCart, Tag, Star } from "lucide-react"
+import { IndianRupee, Trash2, Plus, Minus, ShoppingCart, ChevronRight } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
 
 export default function CartPage() {
@@ -64,14 +65,14 @@ export default function CartPage() {
         <main className="pt-16 min-h-[60vh] flex items-center justify-center">
           <div className="text-center max-w-md mx-auto px-4">
             <ShoppingCart className="w-24 h-24 text-gray-300 mx-auto mb-6" />
-            <h1 className="text-3xl font-serif text-black mb-4">Your Cart is Empty</h1>
-            <p className="text-gray-600 mb-8">
+            <h1 className="text-3xl font-serif text-foreground mb-4">Your Cart is Empty</h1>
+            <p className="text-foreground mb-8">
               Looks like you haven't added anything to your cart yet.
             </p>
             <button
-              onClick={() => router.push("/category/grace")}
-              className="px-8 py-3 text-white hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: "#6B563F" }}
+              onClick={() => router.push("/#find-your-perfect-mattress")}
+              className="px-8 py-3 text-foreground hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: "#EED9C4" }}
             >
               Continue Shopping
             </button>
@@ -83,286 +84,181 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F4F5F7]">
       <Header />
-      <main className="pt-16">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <h1 className="text-3xl font-serif text-black mb-8">Shopping Cart</h1>
+      <div
+        className="fixed top-20 left-0 right-0 z-40 bg-white border-b"
+        style={{ borderColor: "#D9CFC7" }}
+      >
+        <div className="max-w-7xl mx-auto px-4">
+          <nav className="py-2 ">
+            <ol className="flex items-center gap-2 text-base">
+              <li>
+                <Link href="/" className="text-foreground hover:opacity-80 transition-opacity">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <ChevronRight className="w-4 h-4 text-foreground/50" />
+              </li>
+              <li>
+                <Link href="/#find-your-perfect-mattress" className="text-foreground hover:opacity-80 transition-opacity">
+                  Products
+                </Link>
+              </li>
+              <li>
+                <ChevronRight className="w-4 h-4 text-foreground/50" />
+              </li>
+              <li className="text-foreground">Cart</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+      <div className="h-[49px]"></div>
+      <main className="pt-6">
+        <div className="max-w-7xl mx-auto px-4 pb-12">
+          <h1 className="text-3xl font-serif text-foreground mt-4 mb-8">Shopping Cart</h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2">
-              <div className="space-y-6">
-                {cartItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex gap-6 pb-6 border-b"
-                    style={{ borderColor: "#D9CFC7" }}
-                  >
-                    <div className="relative w-32 h-32 flex-shrink-0 bg-gray-100 overflow-hidden">
-                      <Image
-                        src={item.image || "/placeholder.svg"}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-serif text-black text-xl mb-2">
-                        {item.name}
-                      </h3>
-                      <p className="text-black text-sm mb-4">Size: {item.size}</p>
+              <div className="space-y-4">
+                {cartItems.map((item, index) => {
+                  const isComplimentaryBedsheet = item.name.toLowerCase().includes("bed sheet (complimentary)")
+                  const nextIsComplimentaryBedsheet = cartItems[index + 1]?.name
+                    ?.toLowerCase()
+                    .includes("bed sheet (complimentary)")
 
-                      {/* Quantity Controls */}
-                      <div className="flex items-center gap-4 mb-4">
-                        <label className="text-black text-sm">Quantity:</label>
-                        <div className="flex items-center gap-2">
+                  const containerClass = [
+                    "flex gap-5 p-6 bg-white shadow-sm",
+                    isComplimentaryBedsheet ? "-mt-6" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")
+
+                  return (
+                    <div
+                      key={item.id}
+                      className={containerClass}
+                    >
+                      <div className="relative w-28 h-28 shrink-0 bg-gray-100 overflow-hidden">
+                        <Image
+                          src={item.image || "/placeholder.svg"}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-xl font-semibold text-foreground mb-2">{item.name}</h3>
+                        <div className="inline-block  px-3 py-1 text-base text-foreground">
+                          {item.fabric ? `Fabric: ${item.fabric}` : `Size: ${item.size}`}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-end gap-3">
+                        
+                        <div className="flex items-center gap-2 border rounded-md px-2 py-1">
                           <button
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity - 1)
-                            }
-                            className="w-8 h-8 border flex items-center justify-center hover:opacity-70 transition-opacity text-black"
-                            style={{ borderColor: "#D9CFC7" }}
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            className="w-6 h-6 flex items-center justify-center text-foreground hover:opacity-70 transition-opacity"
                           >
                             <Minus className="w-4 h-4" />
                           </button>
-                          <span className="text-black w-8 text-center">
-                            {item.quantity}
-                          </span>
+                          <span className="text-foreground w-6 text-center text-sm">{item.quantity}</span>
                           <button
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
-                            }
-                            className="w-8 h-8 border flex items-center justify-center hover:opacity-70 transition-opacity text-black"
-                            style={{ borderColor: "#D9CFC7" }}
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            className="w-6 h-6 flex items-center justify-center text-foreground hover:opacity-70 transition-opacity"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
                         </div>
+                       
+                        <div className="text-right">
+                        
+                          <div className="text-lg font-semibold text-foreground">
+                            ₹{(item.price * item.quantity).toLocaleString("en-IN", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-foreground hover:opacity-80 transition-opacity"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
                       </div>
-
-                      {/* Price */}
-                      <div className="flex items-center gap-1 text-black">
-                        <IndianRupee className="w-5 h-5" />
-                        <span className="text-xl font-medium">
-                          {(item.price * item.quantity).toLocaleString("en-IN", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </span>
-                      </div>
                     </div>
-
-                    {/* Remove Button */}
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="text-gray-400 hover:text-black transition-colors self-start"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Coupon Code */}
-              <div
-                className="mt-6 p-6 border"
-                style={{ borderColor: "#D9CFC7" }}
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <Tag className="w-5 h-5 text-black" />
-                  <h3 className="text-black text-lg">Discount Coupon</h3>
-                </div>
-                {appliedCoupon ? (
-                  <div
-                    className="flex items-center justify-between p-4 border"
-                    style={{ borderColor: "#D9CFC7", backgroundColor: "#F9F8F6" }}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-black font-medium">{appliedCoupon}</span>
-                      <span className="text-gray-600">Applied!</span>
-                    </div>
-                    <button
-                      onClick={removeCoupon}
-                      className="text-black hover:opacity-70 transition-opacity"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="Enter coupon code"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        className="flex-1 px-4 py-2 border text-black focus:outline-none"
-                        style={{ borderColor: "#D9CFC7" }}
-                      />
-                      <button
-                        onClick={applyCoupon}
-                        className="px-6 py-2 text-white hover:opacity-90 transition-opacity"
-                        style={{ backgroundColor: "#6B563F" }}
-                      >
-                        Apply
-                      </button>
-                    </div>
-                    {couponError && (
-                      <p className="text-red-600 text-sm">{couponError}</p>
-                    )}
-                    <p className="text-gray-600 text-sm">
-                      Try: SAVE10, WELCOME15, or SLEEP20
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Customer Reviews Widget */}
-              <div
-                className="mt-6 p-6 border"
-                style={{ borderColor: "#D9CFC7" }}
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <Star className="w-5 h-5 text-black" />
-                  <h3 className="text-black text-lg">Customer Reviews</h3>
-                </div>
-                <div className="space-y-4">
-                  <div className="pb-4 border-b" style={{ borderColor: "#D9CFC7" }}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex text-yellow-500">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-current" />
-                        ))}
-                      </div>
-                      <span className="text-black">Sarah M.</span>
-                    </div>
-                    <p className="text-gray-700">
-                      "Best mattress I've ever owned! The quality is exceptional
-                      and I sleep so much better now."
-                    </p>
-                  </div>
-                  <div className="pb-4 border-b" style={{ borderColor: "#D9CFC7" }}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex text-yellow-500">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-current" />
-                        ))}
-                      </div>
-                      <span className="text-black">James T.</span>
-                    </div>
-                    <p className="text-gray-700">
-                      "Amazing comfort and support. Worth every penny!"
-                    </p>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex text-yellow-500">
-                        {[...Array(4)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-current" />
-                        ))}
-                      </div>
-                      <span className="text-black">Emily R.</span>
-                    </div>
-                    <p className="text-gray-700">
-                      "Great mattress, very comfortable. Delivery was super fast
-                      too!"
-                    </p>
-                  </div>
-                </div>
+                  )
+                })}
               </div>
             </div>
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div
-                className="border p-6 sticky top-24"
-                style={{ borderColor: "#D9CFC7" }}
-              >
-                <h2 className="text-2xl font-serif text-black mb-6">
-                  Order Summary
-                </h2>
+              <div className="bg-white shadow-md p-6 sticky top-24">
+                <h2 className="text-xl font-semibold text-foreground mb-6">Order Summary</h2>
 
                 <div className="space-y-4 mb-6">
-                  <div className="flex items-center justify-between text-lg">
-                    <span className="text-black">Subtotal</span>
-                    <span className="text-black font-semibold">
-                      <div className="flex items-center gap-1">
-                        <IndianRupee className="w-4 h-4" />
-                        <span>
-                          {subtotal.toLocaleString("en-IN", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </span>
-                      </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-base text-foreground">Items Total Price</span>
+                    <span className="text-foreground text-base font-semibold">
+                      ₹{subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                   {appliedCoupon && (
-                    <div className="flex items-center justify-between text-green-700">
+                    <div className="flex items-center justify-between text-foreground text-sm">
                       <span>Discount ({appliedCoupon})</span>
                       <span>
-                        <div className="flex items-center gap-1">
-                          <IndianRupee className="w-4 h-4" />
-                          <span>
-                            -{discount.toLocaleString("en-IN", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </span>
-                        </div>
+                        -₹{discount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                   )}
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-black">Shipping</span>
-                    <span className="text-black">
-                      {shipping === 0 ? (
-                        "FREE"
-                      ) : (
-                        <div className="flex items-center gap-1">
-                          <IndianRupee className="w-3 h-3" />
-                          <span>
-                            {shipping.toLocaleString("en-IN", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </span>
-                        </div>
-                      )}
-                    </span>
+                    <span className="text-base text-foreground">Delivery Charge</span>
+                    <span className="text-foreground">{shipping === 0 ? "FREE" : `₹${shipping.toLocaleString("en-IN")}`}</span>
                   </div>
-                  {shipping > 0 && (
-                    <p className="text-gray-600 text-sm">
-                      Free shipping on orders over ₹5,000
-                    </p>
-                  )}
                 </div>
 
-                <div
-                  className="border-t pt-4 mb-6"
-                  style={{ borderColor: "#D9CFC7" }}
-                >
-                  <div className="flex items-center justify-between text-xl">
-                    <span className="text-black font-semibold">Total</span>
-                    <span className="text-black font-bold">
-                      <div className="flex items-center gap-1">
-                        <IndianRupee className="w-5 h-5" />
-                        <span>
-                          {total.toLocaleString("en-IN", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </span>
-                      </div>
+                <div className="flex items-center gap-2 mb-4">
+                  <input
+                    type="text"
+                    placeholder="Enter Coupon Code"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    className="flex-1 px-3 py-2 border rounded-md text-sm text-foreground focus:outline-none"
+                    style={{ borderColor: "#D9CFC7" }}
+                  />
+                  <button
+                    onClick={appliedCoupon ? removeCoupon : applyCoupon}
+                    className="px-4 py-2 text-sm text-foreground bg-gray-100 hover:bg-gray-200 transition-colors"
+                  >
+                    {appliedCoupon ? "Remove" : "Apply Coupon"}
+                  </button>
+                </div>
+                {couponError && <p className="text-foreground text-sm mb-4">{couponError}</p>}
+
+                <div className="border-t pt-4 mb-6" style={{ borderColor: "#E5E7EB" }}>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-base text-foreground">Sub Total</span>
+                    <span className="text-foreground text-base font-semibold">
+                      ₹{subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xl mt-2">
+                    <span className="text-foreground font-semibold">Total</span>
+                    <span className="text-foreground font-bold">
+                      ₹{total.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>
 
                 <button
                   onClick={handleCheckout}
-                  className="w-full py-4 text-black hover:opacity-90 transition-opacity mb-3 flex items-center justify-center gap-2"
+                  className="w-full py-3 text-foreground hover:opacity-90 transition-opacity mb-3 flex items-center justify-center gap-2"
                   style={{ backgroundColor: "#EED9C4" }}
                 >
                   <ShoppingCart className="w-5 h-5" />
@@ -370,9 +266,8 @@ export default function CartPage() {
                 </button>
 
                 <button
-                  onClick={() => router.push("/category/grace")}
-                  className="w-full py-3 border text-black hover:opacity-70 transition-opacity"
-                  style={{ borderColor: "#D9CFC7" }}
+                  onClick={() => router.push("/#find-your-perfect-mattress")}
+                  className="w-full py-3 border text-foreground hover:opacity-70 transition-opacity bg-gray-100"
                 >
                   Continue Shopping
                 </button>

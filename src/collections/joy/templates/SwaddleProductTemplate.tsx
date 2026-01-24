@@ -1,9 +1,9 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useRef } from "react"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
-import { MattressConfigurator } from "@/collections/joy/components/mattress-configurator"
+import { IndividualBabyProductConfigurator } from "@/components/product/individual-baby-product-configurator"
 import {
   Carousel,
   CarouselContent,
@@ -17,15 +17,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Sprout, Waves, SprayCan, XCircle, Layers, Grid } from "lucide-react"
-import { CustomersAlsoBought } from "@/collections/grace/components/customers-also-bought"
+import { CustomersAlsoBought } from "@/collections/joy/components/customers-also-bought"
 
-// Testimonial videos data
 interface TestimonialVideo {
   id: number
   video: string
@@ -37,153 +34,97 @@ const testimonialVideos: TestimonialVideo[] = [
   {
     id: 1,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/swaddle.jpg",
     name: "Sarah Johnson",
   },
   {
     id: 2,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/swaddle.jpg",
     name: "Michael Chen",
   },
   {
     id: 3,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/swaddle.jpg",
     name: "Emily Rodriguez",
   },
   {
     id: 4,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/swaddle.jpg",
     name: "David Thompson",
   },
   {
     id: 5,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/swaddle.jpg",
     name: "Priya Sharma",
   },
   {
     id: 6,
     video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
+    poster: "/swaddle.jpg",
     name: "James Wilson",
   },
 ]
 
-interface GraceMattressProductTemplateProps {
+interface SwaddleProductTemplateProps {
   product: ProductDetail
   productId: number
-  onAddToCart: (items: CartItem[]) => void
+  onAddToCart: (item: CartItem) => void
   isAddingToCart: boolean
 }
 
-/**
- * Mattress Product Template
- * Complete page structure for mattress products with custom layout
- */
-export function GraceMattressProductTemplate({
+export function SwaddleProductTemplate({
   product,
   productId,
   onAddToCart,
   isAddingToCart,
-}: GraceMattressProductTemplateProps) {
+}: SwaddleProductTemplateProps) {
   const aboutUsSectionRef = useRef<HTMLElement>(null)
-  const bedsheetColors = [
-    { value: "cream", label: "Cream" },
-    { value: "beige", label: "Beige" },
-    { value: "white", label: "White" },
-    { value: "gray", label: "Gray" },
-  ]
-  const [bedSheetColor, setBedSheetColor] = useState(bedsheetColors[0]?.value ?? "")
-  const [isBedsheetOpen, setIsBedsheetOpen] = useState(false)
-  const [pendingItems, setPendingItems] = useState<CartItem[] | null>(null)
-
-  const getBedsheetDimensions = () => {
-    const size = pendingItems?.[0]?.size
-    if (!size) return "Standard Size"
-    return size.split(" - ")[0]
-  }
-
-  const handleAddToCartWithBedsheet = (items: CartItem[]) => {
-    setPendingItems(items)
-    setIsBedsheetOpen(true)
-  }
-
-  const handleConfirmAddToCart = () => {
-    if (!pendingItems) return
-    const colorLabel = bedsheetColors.find((color) => color.value === bedSheetColor)?.label || bedSheetColor
-    const bedsheetItem: CartItem = {
-      id: `grace-bedsheet-${bedSheetColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
-      name: "Grace Bed Sheet (Complimentary)",
-      image: "/bedsheet.jpg",
-      size: `${getBedsheetDimensions()} - ${colorLabel}`,
-      quantity: 1,
-      price: 0,
-    }
-    onAddToCart([...pendingItems, bedsheetItem])
-    setIsBedsheetOpen(false)
-    setPendingItems(null)
-  }
-
   return (
     <div className="space-y-12">
-      {/* Breadcrumb - Already handled in parent, but can be customized here if needed */}
-      
-      {/* Main Product Configuration Section */}
-      <MattressConfigurator
+      <IndividualBabyProductConfigurator
         product={product}
-        onAddToCart={handleAddToCartWithBedsheet}
+        productId={productId}
+        onAddToCart={onAddToCart}
         isAddingToCart={isAddingToCart}
       />
 
-      {/* Product Features & Information Section */}
       <section className="w-full bg-white py-16">
         <div className="w-full px-4 sm:px-6 lg:px-8">
-          {/* Features Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 mb-12 max-w-7xl mx-auto">
-            {/* Feature 1: 100% Organic Cotton */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <Sprout className="w-6 h-6 text-foreground stroke-[1.5]" />
               </div>
               <p className="text-base md:text-lg font-medium text-foreground">100% Organic Cotton</p>
             </div>
-
-            {/* Feature 2: Maximum Absorbency */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <Waves className="w-6 h-6 text-foreground stroke-[1.5]" />
               </div>
               <p className="text-base md:text-lg font-medium text-foreground">Maximum Absorbency</p>
             </div>
-
-            {/* Feature 3: No Artificial Softeners */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <SprayCan className="w-6 h-6 text-foreground stroke-[1.5]" />
               </div>
               <p className="text-base md:text-lg font-medium text-foreground">No Artificial Softeners</p>
             </div>
-
-            {/* Feature 4: Anti-Pill */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <XCircle className="w-6 h-6 text-foreground stroke-[1.5]" />
               </div>
               <p className="text-base md:text-lg font-medium text-foreground">Anti-Pill</p>
             </div>
-
-            {/* Feature 5: Plush, 700 GSM */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <Layers className="w-6 h-6 text-foreground stroke-[1.5]" />
               </div>
               <p className="text-base md:text-lg font-medium text-foreground">Plush, 700 GSM</p>
             </div>
-
-            {/* Feature 6: Generously Sized */}
             <div className="flex flex-col items-center text-center">
               <div className="mb-4">
                 <Grid className="w-6 h-6 text-foreground stroke-[1.5]" />
@@ -192,10 +133,8 @@ export function GraceMattressProductTemplate({
             </div>
           </div>
 
-          {/* Accordion Sections */}
           <div className="max-w-8xl mx-auto">
             <Accordion type="single" collapsible className="w-full space-y-4">
-              {/* Description Accordion */}
               <AccordionItem value="description" className="border-2 border-[#EED9C4] px-4">
                 <AccordionTrigger className="text-lg font-medium text-foreground hover:no-underline">
                   Description
@@ -205,20 +144,19 @@ export function GraceMattressProductTemplate({
                     {product.description}
                   </p>
                   <p className="mb-4">
-                    Our premium mattress is designed with your comfort and health in mind. 
-                    Each mattress is crafted using the finest materials and innovative technology 
-                    to ensure the perfect night's sleep.
+                    Our premium swaddles are designed with your baby's comfort and health in mind.
+                    Each swaddle is crafted using the finest organic materials and innovative weaving
+                    to ensure a soft, breathable sleep environment.
                   </p>
                   <p>
-                    With maximum support and comfort technology, this mattress is built to last while 
-                    maintaining its premium quality. Available in standard and custom dimensions to fit 
+                    With maximum comfort and support, these swaddles are built to last while
+                    maintaining their premium quality. Available in standard and custom dimensions to fit
                     your specific needs.
                   </p>
                 </AccordionContent>
               </AccordionItem>
 
-              {/* Shipping Information Accordion */}
-              <AccordionItem value="shipping" className="border-2 border-[#EED9C4] px-4 last:border-b-2!">
+              <AccordionItem value="shipping" className="border-2 border-[#EED9C4] px-4 last:!border-b-2">
                 <AccordionTrigger className="text-lg font-medium text-foreground hover:no-underline">
                   Shipping information
                 </AccordionTrigger>
@@ -242,14 +180,14 @@ export function GraceMattressProductTemplate({
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">Custom Orders</h4>
                       <p>
-                        Customized products (with selected dimensions and fabrics) may take 7-10 business days 
+                        Customized products (with selected dimensions and fabrics) may take 7-10 business days
                         for production before shipping. You will receive a tracking number once your order ships.
                       </p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">Returns & Exchanges</h4>
                       <p>
-                        We offer a 30-day return policy for unused items in original packaging. 
+                        We offer a 30-day return policy for unused items in original packaging.
                         Custom orders are non-returnable unless there is a manufacturing defect.
                       </p>
                     </div>
@@ -261,10 +199,8 @@ export function GraceMattressProductTemplate({
         </div>
       </section>
 
-      {/* Feature Sections */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto space-y-16">
-          {/* Feature 1: Softer, Smoother Slumber */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div className="relative aspect-square overflow-hidden max-w-md mx-auto lg:mx-0">
               <Image
@@ -279,19 +215,18 @@ export function GraceMattressProductTemplate({
                 SOFTER, SMOOTHER SLUMBER
               </h3>
               <p className="text-lg text-foreground/80 leading-relaxed">
-                Woven using a 4 under 1 sateen weave that imparts a silky-smooth finish and a subtle sheen, while maintaining its strength, the resultant sheets are both elegant and long-lasting.
+                Woven using a 4 under 1 sateen weave that imparts a silky-smooth finish and a subtle sheen, while maintaining its strength.
               </p>
             </div>
           </div>
 
-          {/* Feature 2: 100% Organic Cotton */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-3xl md:text-4xl font-medium text-foreground mb-4 font-cormorant">
                 100% ORGANIC COTTON
               </h3>
               <p className="text-lg text-foreground/80 leading-relaxed">
-                Crafted from the rarest 100% organic cotton, sourced directly from farms to ensure premium quality. The extra-long staple cotton enhances the smoothness and breathability, offering a luxurious feel and a healthier sleeping environment.
+                Crafted from the rarest 100% organic cotton, sourced directly from farms to ensure premium quality.
               </p>
             </div>
             <div className="relative aspect-square overflow-hidden max-w-md mx-auto lg:mx-0">
@@ -304,7 +239,6 @@ export function GraceMattressProductTemplate({
             </div>
           </div>
 
-          {/* Feature 3: Highly Breathable */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div className="relative aspect-square overflow-hidden max-w-md mx-auto lg:mx-0">
               <Image
@@ -319,19 +253,18 @@ export function GraceMattressProductTemplate({
                 HIGHLY BREATHABLE
               </h3>
               <p className="text-lg text-foreground/80 leading-relaxed">
-                Unlike synthetic options that can trap heat and block aeration, our organic bed sheets offer superior breathability. This natural airflow helps to regulate temperature and wick away moisture, ensuring a cooler, more comfortable sleep and reducing the need for restless tossing and turning.
+                Our organic swaddles offer superior breathability, helping regulate temperature and wick away moisture for a comfortable sleep.
               </p>
             </div>
           </div>
 
-          {/* Feature 4: Say Good-bye to Fuzz Balls */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-3xl md:text-4xl font-medium text-foreground mb-4 font-cormorant">
                 SAY GOOD-BYE TO FUZZ BALLS
               </h3>
               <p className="text-lg text-foreground/80 leading-relaxed">
-                Designed for durability, our bed sheets feature a single-ply yarn with a 300 thread count, which helps prevent pilling. This construction ensures that the sheets retain their pristine appearance and texture, even after frequent use and washing.
+                Designed for durability, our swaddles feature a single-ply yarn with a 300 thread count to help prevent pilling.
               </p>
             </div>
             <div className="relative aspect-square overflow-hidden max-w-md mx-auto lg:mx-0">
@@ -346,13 +279,10 @@ export function GraceMattressProductTemplate({
         </div>
       </section>
 
-      {/* What Our Customers Also Bought Section */}
       <CustomersAlsoBought currentProductId={productId} />
 
-      {/* Customer Testimonials Video Carousel Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
           <div className="text-center mb-12">
             <h2 className="text-4xl sm:text-4xl lg:text-4xl font-medium text-foreground mb-4 text-balance">
               What Our Divas Say
@@ -360,7 +290,6 @@ export function GraceMattressProductTemplate({
             <p className="text-xl sm:text-2xl text-foreground font-medium">Join thousands of happy sleepers</p>
           </div>
 
-          {/* Video Carousel */}
           <div className="relative">
             <Carousel
               opts={{
@@ -401,137 +330,77 @@ export function GraceMattressProductTemplate({
             </Carousel>
           </div>
 
-          {/* Rating Summary */}
           <div className="text-center mt-8">
             <p className="text-foreground text-lg font-semibold">Rated 4.9/5 from over 10,000 reviews</p>
           </div>
         </div>
       </section>
 
-     {/* About Us Section */}
-     <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-              <div className="relative aspect-4/3 overflow-hidden max-w-lg mx-auto lg:mx-0">
-                <Image
-                  src="/mattress.jpg"
-                  alt="About Ananthala"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="space-y-4">
-                <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
-                  Our Crafted Heritage
-                </h2>
-                <p className="text-lg text-foreground/90 font-medium">
-                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to
-                  provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
-                  help you wake up refreshed.
-                </p>
-                <div className="space-y-4 mb-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">
-                        Pressure Relief Technology
-                      </p>
-                      <p className="font-medium text-lg text-foreground">
-                        Conforms to your body for optimal spinal alignment
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">
-                        Temperature Regulation
-                      </p>
-                      <p className="font-medium text-lg text-foreground">
-                        Advanced cooling system keeps you comfortable all night
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">
-                        Motion Isolation
-                      </p>
-                      <p className="font-medium text-lg text-foreground">
-                        Undisturbed sleep even with a restless partner
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <Link href="/about">
-                  <Button 
-                    className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
-                  >
-                    More
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-      <Dialog
-        open={isBedsheetOpen}
-        onOpenChange={(open) => {
-          setIsBedsheetOpen(open)
-          if (!open) {
-            setPendingItems(null)
-          }
-        }}
-      >
-        <DialogContent className="sm:max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Complimentary Bed Sheet</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-            <div className="relative aspect-4/3 overflow-hidden w-full border border-[#EED9C4]">
-              <Image src="/bedsheet.jpg" alt="Bed Sheet" fill className="object-cover" />
+      <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+            <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
+              <Image
+                src="/productmattress.jpg"
+                alt="About Ananthala"
+                fill
+                className="object-cover"
+              />
             </div>
             <div className="space-y-4">
-              <div>
-                <label className="text-lg font-medium text-foreground mb-2 block">Color</label>
-                <Select value={bedSheetColor} onValueChange={setBedSheetColor}>
-                  <SelectTrigger className="w-full text-foreground">
-                    <SelectValue placeholder="Select color" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {bedsheetColors.map((color) => (
-                      <SelectItem key={color.value} value={color.value} className="text-foreground">
-                        {color.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
+                Our Crafted Heritage
+              </h2>
+              <p className="text-lg text-foreground/90 font-medium">
+                Our products are engineered with premium materials and thoughtful craftsmanship to
+                provide the perfect balance of comfort and support.
+              </p>
+              <div className="space-y-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                  <div>
+                    <p className="mb-1 font-medium text-lg text-foreground">
+                      Pressure Relief Technology
+                    </p>
+                    <p className="font-medium text-lg text-foreground">
+                      Conforms to your body for optimal comfort
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                  <div>
+                    <p className="mb-1 font-medium text-lg text-foreground">
+                      Temperature Regulation
+                    </p>
+                    <p className="font-medium text-lg text-foreground">
+                      Advanced cooling system keeps you comfortable all night
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                  <div>
+                    <p className="mb-1 font-medium text-lg text-foreground">
+                      Motion Isolation
+                    </p>
+                    <p className="font-medium text-lg text-foreground">
+                      Undisturbed sleep even with a restless partner
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="bg-[#EED9C4]/30 p-3 rounded border border-[#EED9C4]/50">
-                <p className="text-foreground/70 text-sm flex items-center gap-2">
-                  <span className="font-semibold">Dimensions:</span>
-                  <span>{getBedsheetDimensions()}</span>
-                </p>
-              </div>
-              <div className="bg-[#EED9C4]/30 p-3 rounded border border-[#EED9C4]/50">
-                <p className="text-foreground/70 text-sm">
-                  This complimentary bed sheet will be added to your cart with your selected mattress.
-                </p>
-              </div>
+              <Link href="/about">
+                <Button
+                  className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
+                >
+                  More
+                </Button>
+              </Link>
             </div>
           </div>
-          <DialogFooter>
-            <Button
-              className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-6 py-3"
-              onClick={handleConfirmAddToCart}
-            >
-              Add to Cart
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </section>
     </div>
   )
 }

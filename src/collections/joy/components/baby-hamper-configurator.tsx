@@ -27,29 +27,20 @@ const babyProducts = [
 // Standard sizes in inches (L x B x H) with price multipliers
 const standardSizes = {
   mattress: [
-    { label: "24\" x 30\" x 2\"", value: "24x30x2", dimensions: { length: "24\"", breadth: "30\"", height: "2\"" }, priceMultiplier: 1.0 },
-    { label: "28\" x 35\" x 2.5\"", value: "28x35x2.5", dimensions: { length: "28\"", breadth: "35\"", height: "2.5\"" }, priceMultiplier: 1.2 },
-    { label: "32\" x 40\" x 3\"", value: "32x40x3", dimensions: { length: "32\"", breadth: "40\"", height: "3\"" }, priceMultiplier: 1.5 },
+    { label: "Regular - 24\" x 48\" x 2\"", value: "regular-24x48x2", dimensions: { length: "24\"", breadth: "48\"", height: "2\"" }, priceMultiplier: 1.0 },
+    { label: "Premium - 24\" x 48\" x 4\"", value: "premium-24x48x4", dimensions: { length: "24\"", breadth: "48\"", height: "4\"" }, priceMultiplier: 1.2 },
   ],
   topper: [
-    { label: "24\" x 30\" x 1\"", value: "24x30x1", dimensions: { length: "24\"", breadth: "30\"", height: "1\"" }, priceMultiplier: 1.0 },
-    { label: "28\" x 35\" x 1.5\"", value: "28x35x1.5", dimensions: { length: "28\"", breadth: "35\"", height: "1.5\"" }, priceMultiplier: 1.2 },
-    { label: "32\" x 40\" x 2\"", value: "32x40x2", dimensions: { length: "32\"", breadth: "40\"", height: "2\"" }, priceMultiplier: 1.5 },
+    { label: "16\" x 26\" x 1.5\"", value: "16x26x1.5", dimensions: { length: "16\"", breadth: "26\"", height: "1.5\"" }, priceMultiplier: 1.0 },
   ],
   lounger: [
-    { label: "24\" x 30\" x 4\"", value: "24x30x4", dimensions: { length: "24\"", breadth: "30\"", height: "4\"" }, priceMultiplier: 1.0 },
-    { label: "28\" x 35\" x 5\"", value: "28x35x5", dimensions: { length: "28\"", breadth: "35\"", height: "5\"" }, priceMultiplier: 1.2 },
-    { label: "32\" x 40\" x 6\"", value: "32x40x6", dimensions: { length: "32\"", breadth: "40\"", height: "6\"" }, priceMultiplier: 1.5 },
+    { label: "18\" x 30\" x 2\"", value: "18x30x2", dimensions: { length: "18\"", breadth: "30\"", height: "2\"" }, priceMultiplier: 1.0 },
   ],
   "head-pillow": [
-    { label: "12\" x 8\" x 1\"", value: "12x8x1", dimensions: { length: "12\"", breadth: "8\"", height: "1\"" }, priceMultiplier: 1.0 },
-    { label: "14\" x 10\" x 1.5\"", value: "14x10x1.5", dimensions: { length: "14\"", breadth: "10\"", height: "1.5\"" }, priceMultiplier: 1.15 },
-    { label: "16\" x 12\" x 2\"", value: "16x12x2", dimensions: { length: "16\"", breadth: "12\"", height: "2\"" }, priceMultiplier: 1.3 },
+    { label: "9\" x 13\" x 1\"", value: "9x13x1", dimensions: { length: "9\"", breadth: "13\"", height: "1\"" }, priceMultiplier: 1.0 },
   ],
   "pillow-bumpers": [
-    { label: "48\" x 8\" x 6\"", value: "48x8x6", dimensions: { length: "48\"", breadth: "8\"", height: "6\"" }, priceMultiplier: 1.0 },
-    { label: "52\" x 10\" x 8\"", value: "52x10x8", dimensions: { length: "52\"", breadth: "10\"", height: "8\"" }, priceMultiplier: 1.2 },
-    { label: "56\" x 12\" x 10\"", value: "56x12x10", dimensions: { length: "56\"", breadth: "12\"", height: "10\"" }, priceMultiplier: 1.4 },
+    { label: "18\" x 4\" x 4\" (Set of 2)", value: "18x4x4", dimensions: { length: "18\"", breadth: "4\"", height: "4\"" }, priceMultiplier: 1.0 },
   ],
 }
 
@@ -176,6 +167,22 @@ export function BabyHamperConfigurator({
   }
   
   const handleAddToCart = async () => {
+    const getFabricLabel = (fabricValue: string) =>
+      fabricOptions.find((option) => option.value === fabricValue)?.label || fabricValue
+
+    const selectedFabrics = [
+      hamperState.mattressFabric,
+      hamperState.topperFabric,
+      hamperState.loungerFabric,
+      hamperState.pillowFabric,
+      hamperState.bumperFabric,
+    ]
+      .filter((fabric): fabric is string => Boolean(fabric))
+      .map(getFabricLabel)
+
+    const uniqueFabrics = Array.from(new Set(selectedFabrics))
+    const fabricSummary = uniqueFabrics.length > 0 ? uniqueFabrics.join(", ") : "Standard"
+
     const includedItems = babyProducts
       .filter((productData) => hamperState.hamperItems.includes(productData.id))
       .map((productData) => productData.name)
@@ -197,8 +204,8 @@ export function BabyHamperConfigurator({
     }
     if (bedSpreadLabel) {
       summaryParts.push(`Bed Sheet: ${bedSpreadLabel}`)
-        }
-        
+    }
+
     const sizeInfo = summaryParts.join(" | ") || "Standard"
     const hamperImage = hamperState.currentImages[0] || product.images[0] || "/productmattress.jpg"
 
@@ -207,7 +214,8 @@ export function BabyHamperConfigurator({
         id: `joy-baby-hamper-${product.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         name: product.name,
         image: hamperImage,
-          size: sizeInfo,
+        size: sizeInfo,
+        fabric: fabricSummary,
         quantity: 1,
         price: totalPrice,
       },

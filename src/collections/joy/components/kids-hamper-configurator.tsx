@@ -35,14 +35,11 @@ const kidsProducts = [
 // Standard sizes in inches (L x B x H) with price multipliers
 const standardSizes = {
   mattress: [
-    { label: "36\" x 48\" x 4\"", value: "36x48x4", dimensions: { length: "36\"", breadth: "48\"", height: "4\"" }, priceMultiplier: 1.0 },
-    { label: "42\" x 54\" x 5\"", value: "42x54x5", dimensions: { length: "42\"", breadth: "54\"", height: "5\"" }, priceMultiplier: 1.3 },
-    { label: "48\" x 60\" x 6\"", value: "48x60x6", dimensions: { length: "48\"", breadth: "60\"", height: "6\"" }, priceMultiplier: 1.6 },
+    { label: "24\" x 48\" x 2\"", value: "24x48x2", dimensions: { length: "24\"", breadth: "48\"", height: "2\"" }, priceMultiplier: 1.0 },
+    { label: "24\" x 48\" x 4\"", value: "24x48x4", dimensions: { length: "24\"", breadth: "48\"", height: "4\"" }, priceMultiplier: 1.2 },
   ],
   pillows: [
-    { label: "16\" x 20\" x 4\"", value: "16x20x4", dimensions: { length: "16\"", breadth: "20\"", height: "4\"" }, priceMultiplier: 1.0 },
-    { label: "18\" x 24\" x 5\"", value: "18x24x5", dimensions: { length: "18\"", breadth: "24\"", height: "5\"" }, priceMultiplier: 1.2 },
-    { label: "20\" x 28\" x 6\"", value: "20x28x6", dimensions: { length: "20\"", breadth: "28\"", height: "6\"" }, priceMultiplier: 1.4 },
+    { label: "18\" x 4\" x 4\"", value: "18x4x4", dimensions: { length: "18\"", breadth: "4\"", height: "4\"" }, priceMultiplier: 1.0 },
   ],
  
 }

@@ -9,7 +9,6 @@ import { useState } from "react"
 import { getProductDetailById } from "@/data/product-details"
 import { type CartItem } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
-import { toast } from "@/hooks/use-toast"
 import { getProductType, isBlissProduct, isGraceProduct, isJoyProduct } from "@/utils/product-type"
 import { BabyHamperProductTemplate } from "@/collections/joy/templates/BabyHamperProductTemplate"
 import { KidsHamperProductTemplate } from "@/collections/joy/templates/KidsHamperProductTemplate"
@@ -102,10 +101,6 @@ export default function ProductDetailPage() {
     itemsArray.forEach(item => addToCart(item))
     
     setIsAddingToCart(false)
-    toast({
-      title: "Added to cart",
-      description: `${itemsArray.length} item${itemsArray.length === 1 ? "" : "s"} added.`,
-    })
   }
 
   return (

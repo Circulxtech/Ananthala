@@ -11,6 +11,7 @@ export interface CartItem {
   name: string
   image: string
   size: string
+  fabric?: string
   quantity: number
   price: number
 }

@@ -16,7 +16,11 @@ interface LoungerConfiguratorProps {
   isAddingToCart: boolean
 }
 
-const standardSizes = [
+const babyStandardSizes = [
+  { label: "18\" x 30\" x 2\"", value: "18x30x2", dimensions: { length: "18\"", breadth: "30\"", height: "2\"" }, priceMultiplier: 1.0 },
+]
+
+const adultStandardSizes = [
   { label: "20\" x 30\" x 4\"", value: "20x30x4", dimensions: { length: "20\"", breadth: "30\"", height: "4\"" }, priceMultiplier: 1.0 },
   { label: "24\" x 36\" x 5\"", value: "24x36x5", dimensions: { length: "24\"", breadth: "36\"", height: "5\"" }, priceMultiplier: 1.25 },
   { label: "28\" x 40\" x 6\"", value: "28x40x6", dimensions: { length: "28\"", breadth: "40\"", height: "6\"" }, priceMultiplier: 1.5 },
@@ -42,6 +46,7 @@ export function LoungerConfigurator({
   const loungerState = useLounger()
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [useCustomDimensions, setUseCustomDimensions] = useState(false)
+  const standardSizes = product.category === "baby" ? babyStandardSizes : adultStandardSizes
   
   const getProductImages = (): string[] => {
     return product.images && product.images.length > 0 ? product.images : ["/lounger.jpg"]

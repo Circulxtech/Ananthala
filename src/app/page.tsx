@@ -51,7 +51,7 @@ const products = [
   },
   {
     id: 3,
-    name: "GRACE",
+    name: "Grace",
     image: "/firm-mattress-with-beige-bedding-modern-bedroom.jpg",
     position: "center",
   },

@@ -17,9 +17,7 @@ interface PillowBumpersConfiguratorProps {
 }
 
 const standardSizes = [
-  { label: "10\" x 12\" x 1.5\"", value: "10x12x1.5", dimensions: { length: "10\"", breadth: "12\"", height: "1.5\"" }, priceMultiplier: 1.0 },
-  { label: "12\" x 14\" x 2\"", value: "12x14x2", dimensions: { length: "12\"", breadth: "14\"", height: "2\"" }, priceMultiplier: 1.15 },
-  { label: "14\" x 16\" x 2.5\"", value: "14x16x2.5", dimensions: { length: "14\"", breadth: "16\"", height: "2.5\"" }, priceMultiplier: 1.3 },
+  { label: "18\" x 4\" x 4\" (Set of 2)", value: "18x4x4", dimensions: { length: "18\"", breadth: "4\"", height: "4\"" }, priceMultiplier: 1.0 },
 ]
 
 const fabricMultipliers: Record<string, number> = {

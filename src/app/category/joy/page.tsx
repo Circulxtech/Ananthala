@@ -19,7 +19,6 @@ import { Loader2, ChevronRight } from "lucide-react"
 
 
 import { useCart } from "@/contexts/cart-context"
-import { toast } from "@/hooks/use-toast"
 import { type CartItem } from "@/components/cart/cart-drawer"
 
 export default function JoyPage() {
@@ -156,10 +155,6 @@ export default function JoyPage() {
     
     setHamperSelected(true)
     setIsAddingHamper(false)
-    toast({
-      title: "Added to cart",
-      description: "JOY Baby Hamper added.",
-    })
   }
 
   const handleAddProductToCart = async (productId: string) => {
@@ -187,10 +182,6 @@ export default function JoyPage() {
     setHamperSelected(false)
     toggleItem(productId)
     setAddingProductId(null)
-    toast({
-      title: "Added to cart",
-      description: `JOY ${product?.name ?? "item"} added.`,
-    })
   }
 
   const handleAddSwaddleToCart = async (swaddleType: string) => {
@@ -210,10 +201,6 @@ export default function JoyPage() {
     
     setSwaddleSelected(true)
     setAddingSwaddleType(null)
-    toast({
-      title: "Added to cart",
-      description: "JOY Swaddle added.",
-    })
   }
 
   const handleAddMattressToCart = async () => {
@@ -260,10 +247,6 @@ export default function JoyPage() {
     }
     
     setIsAddingMattress(false)
-    toast({
-      title: "Added to cart",
-      description: "JOY Swaddle added.",
-    })
   }
 
   return (

@@ -17,11 +17,15 @@ interface MattressConfiguratorProps {
 }
 
 // Standard sizes in inches (L x B x H) with price multipliers
-const standardSizes = [
-  { label: "36\" x 48\" x 6\"", value: "36x48x6", dimensions: { length: "36\"", breadth: "48\"", height: "6\"" }, priceMultiplier: 1.0 },
-  { label: "42\" x 54\" x 8\"", value: "42x54x8", dimensions: { length: "42\"", breadth: "54\"", height: "8\"" }, priceMultiplier: 1.3 },
-  { label: "48\" x 60\" x 10\"", value: "48x60x10", dimensions: { length: "48\"", breadth: "60\"", height: "10\"" }, priceMultiplier: 1.6 },
-  { label: "54\" x 72\" x 12\"", value: "54x72x12", dimensions: { length: "54\"", breadth: "72\"", height: "12\"" }, priceMultiplier: 2.0 },
+const babyStandardSizes = [
+  { label: "Regular - 24\" x 48\" x 2\"", value: "regular-24x48x2", dimensions: { length: "24\"", breadth: "48\"", height: "2\"" }, priceMultiplier: 1.0 },
+  { label: "Premium - 24\" x 48\" x 4\"", value: "premium-24x48x4", dimensions: { length: "24\"", breadth: "48\"", height: "4\"" }, priceMultiplier: 1.2 },
+]
+
+const adultStandardSizes = [
+  { label: "Single - 36\" x 72\" x 6\"", value: "36x72x6", dimensions: { length: "36\"", breadth: "72\"", height: "6\"" }, priceMultiplier: 1.0 },
+  { label: "Queen - 60\" x 72\" x 6\"", value: "60x72x6", dimensions: { length: "60\"", breadth: "72\"", height: "6\"" }, priceMultiplier: 1.3 },
+  { label: "King - 72\" x 78\" x 6\"", value: "72x78x6", dimensions: { length: "72\"", breadth: "78\"", height: "6\"" }, priceMultiplier: 1.6 },
 ]
 
 // Fabric price multipliers
@@ -49,6 +53,7 @@ export function MattressConfigurator({
   const mattressState = useMattress()
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [useCustomDimensions, setUseCustomDimensions] = useState(false)
+  const standardSizes = product.category === "baby" ? babyStandardSizes : adultStandardSizes
   
   const getProductImages = (): string[] => {
     return product.images && product.images.length > 0 ? product.images : ["/productmattress.jpg"]
