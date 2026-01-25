@@ -14,7 +14,7 @@ const values = [
     icon: Leaf,
     title: "Sustainability",
     description:
-      "We source eco-friendly  materials and use sustainable manufacturing processes to minimize our environmental footprint.",
+      "We source eco-friendly materials and use sustainable manufacturing processes to minimize our environmental footprint.",
   },
   {
     icon: Award,
