@@ -20,6 +20,7 @@ import { Loader2, ChevronRight } from "lucide-react"
 
 import { useCart } from "@/contexts/cart-context"
 import { type CartItem } from "@/components/cart/cart-drawer"
+import { CustomerTestimonialVideos } from "@/components/sections/customer-testimonial-videos"
 
 export default function JoyPage() {
   const [hamperSelected, setHamperSelected] = useState(true)
@@ -361,7 +362,7 @@ export default function JoyPage() {
                         {/* Left Side - Image */}
                         <div className="relative aspect-[4/3] overflow-hidden ">
                           <Image
-                            src={slide.image}
+                            src={slide.image || "/placeholder.svg"}
                             alt={slide.title}
                             fill
                             className="object-cover"
@@ -407,7 +408,7 @@ export default function JoyPage() {
                 <Link href="/product/12" className="block">
                   <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
                     <Image
-                      src={currentImages[0]}
+                      src={currentImages[0] || "/placeholder.svg"}
                       alt="JOY Baby Hamper"
                       fill
                       className="object-cover"
@@ -433,7 +434,7 @@ export default function JoyPage() {
                 <Link href="/product/13" className="block">
                   <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
                     <Image
-                      src={currentImages[0]}
+                      src={currentImages[0] || "/placeholder.svg"}
                       alt="JOY Kids Hamper"
                       fill
                       className="object-cover"
@@ -463,7 +464,7 @@ export default function JoyPage() {
                   <Link href={`/product/${product.productDetailId}`} className="block">
                     <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
                       <Image
-                        src={product.image}
+                        src={product.image || "/placeholder.svg"}
                         alt={product.name}
                         fill
                         className="object-cover"
@@ -514,93 +515,8 @@ export default function JoyPage() {
           </div>
         </section>
 
-        {/* Customer Testimonials */}
-        <section className="py-16 px-4 bg-stone-50">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center font-cormorant">
-              What our Divas Say
-            </h2>
-            <p className="text-center text-foreground mb-8 max-w-2xl mx-auto">
-              Hear from our satisfied customers about their experience with Ananthala products
-            </p>
-            <div className="relative">
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: true,
-                }}
-                className="w-full"
-              >
-                <CarouselContent className="-ml-2 md:-ml-4">
-                  {[
-                    {
-                      id: 1,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "Sarah Johnson",
-                    },
-                    {
-                      id: 2,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "Michael Chen",
-                    },
-                    {
-                      id: 3,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "Emily Rodriguez",
-                    },
-                    {
-                      id: 4,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "David Thompson",
-                    },
-                    {
-                      id: 5,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "Priya Sharma",
-                    },
-                    {
-                      id: 6,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "James Wilson",
-                    },
-                  ].map((testimonial) => (
-                    <CarouselItem
-                      key={testimonial.id}
-                      className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
-                    >
-                      <div className="space-y-2">
-                        <div className="relative aspect-video overflow-hidden border border-[#EED9C4]">
-                          <video
-                            className="w-full h-full object-cover"
-                            controls
-                            controlsList="nodownload nofullscreen noremoteplayback"
-                            disablePictureInPicture
-                            onContextMenu={(e) => e.preventDefault()}
-                            poster={testimonial.poster}
-                          >
-                            <source src={testimonial.video} type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
-                        </div>
-                        <p className="text-left text-foreground font-medium">
-                          {testimonial.name}
-                        </p>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-                <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-              </Carousel>
-            </div>
-          </div>
-        </section>
+        {/* Customer Testimonial Videos - Real from Database */}
+        <CustomerTestimonialVideos />
 
         {/* About Us Section */}
         <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
@@ -674,4 +590,3 @@ export default function JoyPage() {
     </div>
   )
 }
-

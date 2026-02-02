@@ -21,6 +21,7 @@ export function CustomerTestimonialVideos() {
   const [selectedVideo, setSelectedVideo] = useState<ReviewVideo | null>(null)
   const [autoPlayInterval, setAutoPlayInterval] = useState<NodeJS.Timeout | null>(null)
   const [isPaused, setIsPaused] = useState(false)
+  const canShowThree = videos.length > 3; // Declare canShowThree variable
 
   // Fetch videos from database
   useEffect(() => {
@@ -44,9 +45,9 @@ export function CustomerTestimonialVideos() {
     fetchVideos()
   }, [])
 
-  // Auto-scroll carousel every 5 seconds if more than 4 videos
+  // Auto-scroll carousel every 5 seconds if more than 3 videos
   useEffect(() => {
-    if (videos.length > 4 && !isPaused) {
+    if (videos.length > 3 && !isPaused) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % videos.length)
       }, 5000)
@@ -69,13 +70,13 @@ export function CustomerTestimonialVideos() {
     setCurrentIndex((prev) => (prev + 1) % videos.length)
   }
 
-  // Always show 3 videos with infinite loop
+  // Show all videos if <= 3, otherwise show 3 in circular manner
   const getVisibleVideos = () => {
     if (videos.length === 0) return []
     if (videos.length <= 3) {
       return videos
     }
-    // Show 3 videos in a circular manner
+    // Show 3 videos in a circular manner for 4+ videos
     return [
       videos[currentIndex % videos.length],
       videos[(currentIndex + 1) % videos.length],
@@ -84,8 +85,7 @@ export function CustomerTestimonialVideos() {
   }
 
   const visibleVideos = getVisibleVideos()
-  const showNavigation = videos.length > 4
-  const canShowThree = videos.length >= 3
+  const showNavigation = videos.length > 3
 
   if (loading) {
     return (
@@ -114,10 +114,10 @@ export function CustomerTestimonialVideos() {
           </p>
         </div>
 
-        {/* Videos Grid - Always show 3 columns */}
+        {/* Videos Grid - Show all available videos */}
         <div className="relative">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {canShowThree && visibleVideos.map((video) => (
+          <div className={`grid ${visibleVideos.length === 1 ? 'md:grid-cols-1' : visibleVideos.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6 mb-8`}>
+            {visibleVideos.map((video) => (
               <div
                 key={video._id}
                 className="group relative bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-[#EED9C4]"

@@ -26,6 +26,8 @@ export default function ReviewVideosPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editData, setEditData] = useState<Partial<ReviewVideo>>({})
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   const fetchVideos = useCallback(async () => {
     try {
@@ -52,6 +54,7 @@ export default function ReviewVideosPage() {
 
     try {
       setDeleting(id)
+      setError(null)
       const response = await fetch(`/api/admin/review-videos/${id}`, {
         method: "DELETE",
       })
@@ -59,9 +62,14 @@ export default function ReviewVideosPage() {
 
       if (data.success) {
         setVideos(videos.filter((v) => v._id !== id))
+        setSuccess("Video deleted successfully")
+        setTimeout(() => setSuccess(null), 3000)
+      } else {
+        setError(data.message || "Failed to delete video")
       }
     } catch (error) {
       console.error("[v0] Error deleting video:", error)
+      setError("Failed to delete video. Please try again.")
     } finally {
       setDeleting(null)
     }
@@ -69,6 +77,7 @@ export default function ReviewVideosPage() {
 
   const handleUpdate = async (id: string) => {
     try {
+      setError(null)
       const response = await fetch(`/api/admin/review-videos/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -80,9 +89,14 @@ export default function ReviewVideosPage() {
         setVideos(videos.map((v) => (v._id === id ? data.data : v)))
         setEditingId(null)
         setEditData({})
+        setSuccess("Video updated successfully")
+        setTimeout(() => setSuccess(null), 3000)
+      } else {
+        setError(data.message || "Failed to update video")
       }
     } catch (error) {
       console.error("[v0] Error updating video:", error)
+      setError("Failed to update video. Please try again.")
     }
   }
 
@@ -123,6 +137,7 @@ export default function ReviewVideosPage() {
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
     try {
+      setError(null)
       const response = await fetch(`/api/admin/review-videos/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -132,9 +147,14 @@ export default function ReviewVideosPage() {
 
       if (data.success) {
         setVideos(videos.map((v) => (v._id === id ? data.data : v)))
+        setSuccess(`Video ${!currentStatus ? "activated" : "deactivated"} successfully`)
+        setTimeout(() => setSuccess(null), 3000)
+      } else {
+        setError(data.message || "Failed to update video status")
       }
     } catch (error) {
       console.error("[v0] Error toggling active status:", error)
+      setError("Failed to update video status. Please try again.")
     }
   }
 
@@ -151,6 +171,18 @@ export default function ReviewVideosPage() {
 
   return (
     <div className="space-y-6">
+      {/* Error/Success Messages */}
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+          {success}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
