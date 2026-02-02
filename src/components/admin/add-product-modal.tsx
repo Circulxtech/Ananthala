@@ -416,7 +416,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
 
                     <div className="space-y-2">
                       <Label htmlFor={`length-${variant.id}`} className="text-sm text-[#6D4530]">
-                        Length (cm)*
+                        Length (inch)*
                       </Label>
                       <Input
                         id={`length-${variant.id}`}
@@ -432,7 +432,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
 
                     <div className="space-y-2">
                       <Label htmlFor={`width-${variant.id}`} className="text-sm text-[#6D4530]">
-                        Width (cm)*
+                        Width (inch)*
                       </Label>
                       <Input
                         id={`width-${variant.id}`}
@@ -448,7 +448,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
 
                     <div className="space-y-2">
                       <Label htmlFor={`height-${variant.id}`} className="text-sm text-[#6D4530]">
-                        Height (cm)*
+                        Height (inch)*
                       </Label>
                       <Input
                         id={`height-${variant.id}`}
