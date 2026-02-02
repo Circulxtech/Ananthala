@@ -6,7 +6,7 @@ import { Heart, Eye, Award, Leaf } from "lucide-react"
 const values = [
   {
     icon: Heart,
-    title: "Customer_firstt",
+    title: "Customer_first",
     description:
       "Your comfort,satisfaction are at the heartof everything we do.We listen, adapt and continuously improve to serve you better.",
   },
