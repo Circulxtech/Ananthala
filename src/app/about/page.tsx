@@ -82,7 +82,7 @@ export default function AboutPage() {
               {/* RIGHT SIDE — TEXT */}
               <div className="space-y-6 text-black">
                 <p className="text-lg font-medium">
-                  Founded in 2015, Ananthala was born from a simple yet profound realization: quality sleep is the
+                  Founded in 2015, Ananthala wa born from a simple yet profound realization: quality sleep is the
                   foundation of a quality life. Our founder, after years of struggling with poor sleep and back pain,
                   discovered that the right mattress could transform not just nights, but entire days. This personal
                   journey sparked a mission to create mattresses that truly serve the needs of every sleeper.
