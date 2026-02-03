@@ -2,11 +2,12 @@ import { connectDB } from "@/lib/mongodb"
 import { ReviewVideo } from "@/models/reviewVideo"
 import { type NextRequest, NextResponse } from "next/server"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
 
-    const video = await ReviewVideo.findById(params.id)
+    const { id } = await params
+    const video = await ReviewVideo.findById(id)
 
     if (!video) {
       return NextResponse.json(
@@ -37,15 +38,16 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
 
+    const { id } = await params
     const body = await request.json()
     const { title, description, blobUrl, customerName, thumbnail, isActive, displayOrder } = body
 
     const video = await ReviewVideo.findByIdAndUpdate(
-      params.id,
+      id,
       {
         title,
         description,
@@ -89,11 +91,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
 
-    const video = await ReviewVideo.findByIdAndDelete(params.id)
+    const { id } = await params
+    const video = await ReviewVideo.findByIdAndDelete(id)
 
     if (!video) {
       return NextResponse.json(

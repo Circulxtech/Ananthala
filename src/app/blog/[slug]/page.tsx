@@ -198,7 +198,7 @@ export default function BlogDetailPage() {
               Explore our premium mattresses designed for your ultimate comfort.
             </p>
             <Button asChild size="lg" className="bg-[#8B5A3C] hover:bg-[#6D4530] px-8">
-              <Link href="/mattress">Shop Mattresses</Link>
+              <Link href="/category/grace">Shop Mattresses</Link>
             </Button>
           </div>
         </section>

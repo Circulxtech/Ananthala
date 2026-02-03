@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
 import { MattressConfigurator } from "@/collections/joy/components/mattress-configurator"
@@ -18,6 +18,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -88,13 +89,43 @@ export function GraceMattressProductTemplate({
   onAddToCart,
   isAddingToCart,
 }: GraceMattressProductTemplateProps) {
-  const [bedSheetColor, setBedSheetColor] = useState("")
+  const aboutUsSectionRef = useRef<HTMLElement>(null)
   const bedsheetColors = [
     { value: "cream", label: "Cream" },
     { value: "beige", label: "Beige" },
     { value: "white", label: "White" },
     { value: "gray", label: "Gray" },
   ]
+  const [bedSheetColor, setBedSheetColor] = useState(bedsheetColors[0]?.value ?? "")
+  const [isBedsheetOpen, setIsBedsheetOpen] = useState(false)
+  const [pendingItems, setPendingItems] = useState<CartItem[] | null>(null)
+
+  const getBedsheetDimensions = () => {
+    const size = pendingItems?.[0]?.size
+    if (!size) return "Standard Size"
+    return size.split(" - ")[0]
+  }
+
+  const handleAddToCartWithBedsheet = (items: CartItem[]) => {
+    setPendingItems(items)
+    setIsBedsheetOpen(true)
+  }
+
+  const handleConfirmAddToCart = () => {
+    if (!pendingItems) return
+    const colorLabel = bedsheetColors.find((color) => color.value === bedSheetColor)?.label || bedSheetColor
+    const bedsheetItem: CartItem = {
+      id: `grace-bedsheet-${bedSheetColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      name: "Grace Bed Sheet (Complimentary)",
+      image: "/bedsheet.jpg",
+      size: `${getBedsheetDimensions()} - ${colorLabel}`,
+      quantity: 1,
+      price: 0,
+    }
+    onAddToCart([...pendingItems, bedsheetItem])
+    setIsBedsheetOpen(false)
+    setPendingItems(null)
+  }
 
   return (
     <div className="space-y-12">
@@ -103,7 +134,7 @@ export function GraceMattressProductTemplate({
       {/* Main Product Configuration Section */}
       <MattressConfigurator
         product={product}
-        onAddToCart={onAddToCart}
+        onAddToCart={handleAddToCartWithBedsheet}
         isAddingToCart={isAddingToCart}
       />
 
@@ -187,7 +218,7 @@ export function GraceMattressProductTemplate({
               </AccordionItem>
 
               {/* Shipping Information Accordion */}
-              <AccordionItem value="shipping" className="border-2 border-[#EED9C4] px-4 last:!border-b-2">
+              <AccordionItem value="shipping" className="border-2 border-[#EED9C4] px-4 last:border-b-2!">
                 <AccordionTrigger className="text-lg font-medium text-foreground hover:no-underline">
                   Shipping information
                 </AccordionTrigger>
@@ -226,54 +257,6 @@ export function GraceMattressProductTemplate({
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-          </div>
-        </div>
-      </section>
-
-      {/* Complimentary Bed Sheet Section */}
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl md:text-3xl text-center font-medium text-foreground mb-4 font-cormorant">
-            Bed Sheet <span className="text-lg font-normal text-foreground">(Complimentary)</span>
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center mt-8">
-            <div className="relative aspect-[4/3] overflow-hidden w-full">
-              <Image
-                src="/bedsheet.jpg"
-                alt="Bed Sheet"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="space-y-6 w-full p-6 bg-white border-2 border-[#EED9C4]">
-              <div>
-                <label className="text-lg font-medium text-foreground mb-2 block">Color</label>
-                <Select value={bedSheetColor} onValueChange={setBedSheetColor}>
-                  <SelectTrigger className="w-full text-foreground">
-                    <SelectValue placeholder="Select color" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {bedsheetColors.map((color) => (
-                      <SelectItem key={color.value} value={color.value} className="text-foreground">
-                        {color.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="bg-[#EED9C4]/30 p-3 rounded border border-[#EED9C4]/50">
-                <p className="text-foreground/70 text-sm flex items-center gap-2">
-                  <span className="font-semibold">Dimensions:</span>
-                  <span>Based on selected mattress size</span>
-                  <span className="text-xs">(auto)</span>
-                </p>
-              </div>
-              <div className="bg-[#EED9C4]/30 p-3 rounded border border-[#EED9C4]/50">
-                <p className="text-foreground/70 text-sm">
-                  This complimentary bed sheet will be automatically added to your cart. The dimensions will match your selected mattress size.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -425,39 +408,130 @@ export function GraceMattressProductTemplate({
         </div>
       </section>
 
-      {/* About Us Section */}
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-            <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
-              <Image
-                src="/productmattress.jpg"
-                alt="About Ananthala"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
-                About Us
-              </h2>
-              <p className="text-lg text-foreground leading-relaxed">
-                At Ananthala, we are committed to crafting premium products that take care of your health. Our mattresses are designed with comfort and support in mind, using only the finest materials and innovative technology.
-              </p>
-              <p className="text-lg text-foreground leading-relaxed">
-                Every product is expertly crafted to ensure you get the best sleep. We believe in quality, comfort, and putting your well-being first.
-              </p>
-              <Link href="/about">
-                <Button 
-                  className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
-                >
-                  More
-                </Button>
-              </Link>
+     {/* About Us Section */}
+     <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+              <div className="relative aspect-4/3 overflow-hidden max-w-lg mx-auto lg:mx-0">
+                <Image
+                  src="/mattress.jpg"
+                  alt="About Ananthala"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="space-y-4">
+                <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
+                  Our Crafted Heritage
+                </h2>
+                <p className="text-lg text-foreground/90 font-medium">
+                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to
+                  provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
+                  help you wake up refreshed.
+                </p>
+                <div className="space-y-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Pressure Relief Technology
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Conforms to your body for optimal spinal alignment
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Temperature Regulation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Advanced cooling system keeps you comfortable all night
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Motion Isolation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Undisturbed sleep even with a restless partner
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <Link href="/about">
+                  <Button 
+                    className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
+                  >
+                    More
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+      <Dialog
+        open={isBedsheetOpen}
+        onOpenChange={(open) => {
+          setIsBedsheetOpen(open)
+          if (!open) {
+            setPendingItems(null)
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Complimentary Bed Sheet</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            <div className="relative aspect-4/3 overflow-hidden w-full border border-[#EED9C4]">
+              <Image src="/bedsheet.jpg" alt="Bed Sheet" fill className="object-cover" />
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-lg font-medium text-foreground mb-2 block">Color</label>
+                <Select value={bedSheetColor} onValueChange={setBedSheetColor}>
+                  <SelectTrigger className="w-full text-foreground">
+                    <SelectValue placeholder="Select color" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {bedsheetColors.map((color) => (
+                      <SelectItem key={color.value} value={color.value} className="text-foreground">
+                        {color.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="bg-[#EED9C4]/30 p-3 rounded border border-[#EED9C4]/50">
+                <p className="text-foreground/70 text-sm flex items-center gap-2">
+                  <span className="font-semibold">Dimensions:</span>
+                  <span>{getBedsheetDimensions()}</span>
+                </p>
+              </div>
+              <div className="bg-[#EED9C4]/30 p-3 rounded border border-[#EED9C4]/50">
+                <p className="text-foreground/70 text-sm">
+                  This complimentary bed sheet will be added to your cart with your selected mattress.
+                </p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-6 py-3"
+              onClick={handleConfirmAddToCart}
+            >
+              Add to Cart
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

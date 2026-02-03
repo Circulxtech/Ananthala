@@ -7,7 +7,7 @@ import { Footer } from "@/components/layout/footer"
 import { ChevronLeft, ChevronRight, Check } from "lucide-react"
 import { useState } from "react"
 import { getProductDetailById } from "@/data/product-details"
-import { CartDrawer, type CartItem } from "@/components/cart/cart-drawer"
+import { type CartItem } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
 import { getProductType, isBlissProduct, isGraceProduct, isJoyProduct } from "@/utils/product-type"
 import { BabyHamperProductTemplate } from "@/collections/joy/templates/BabyHamperProductTemplate"
@@ -67,7 +67,7 @@ export default function ProductDetailPage() {
   const [activeTab, setActiveTab] = useState<"features" | "specs">("features")
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   
-  const { cartItems, addToCart, isCartOpen, setIsCartOpen } = useCart()
+  const { addToCart } = useCart()
 
   // Color scheme
   const colors = isBabyProduct
@@ -101,7 +101,6 @@ export default function ProductDetailPage() {
     itemsArray.forEach(item => addToCart(item))
     
     setIsAddingToCart(false)
-    setIsCartOpen(true)
   }
 
   return (
@@ -109,7 +108,7 @@ export default function ProductDetailPage() {
       <Header />
       <main>
         {/* Breadcrumb */}
-        {isJoy && !isBliss && !isGrace ? (
+        {(isJoy || isGrace) && !isBliss ? (
           <>
             <div className="fixed top-20 left-0 right-0 z-40 bg-white border-b" style={{ borderColor: "#D9CFC7" }}>
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -124,8 +123,11 @@ export default function ProductDetailPage() {
                       <ChevronRight className="w-4 h-4 text-foreground/50" />
                     </li>
                     <li>
-                      <Link href="/joy-collection" className="text-foreground hover:text-[#6D4530] transition-colors">
-                        Joy
+                      <Link
+                        href={isGrace ? "/category/grace" : "/category/joy"}
+                        className="text-foreground hover:text-[#6D4530] transition-colors"
+                      >
+                        {isGrace ? "Grace" : "Joy"}
                       </Link>
                     </li>
                     <li>
@@ -163,7 +165,7 @@ export default function ProductDetailPage() {
                         Grace
                       </Link>
                     ) : (
-                      <Link href="/bestsellers" className="text-foreground hover:text-[#6D4530] transition-colors">
+                      <Link href="/category/grace" className="text-foreground hover:text-[#6D4530] transition-colors">
                         Products
                       </Link>
                     )}
@@ -412,12 +414,6 @@ export default function ProductDetailPage() {
       </main>
       <Footer />
       
-      {/* Cart Drawer */}
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cartItems}
-      />
     </div>
   )
 }

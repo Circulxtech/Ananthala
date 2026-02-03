@@ -3,7 +3,7 @@
 import { useRef } from "react"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
-import { PillowBumpersConfigurator } from "@/collections/joy/components/pillow-bumpers-configurator"
+import { IndividualBabyProductConfigurator } from "@/components/product/individual-baby-product-configurator"
 import {
   Carousel,
   CarouselContent,
@@ -34,59 +34,60 @@ const testimonialVideos: TestimonialVideo[] = [
   {
     id: 1,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/swaddle.jpg",
     name: "Sarah Johnson",
   },
   {
     id: 2,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/swaddle.jpg",
     name: "Michael Chen",
   },
   {
     id: 3,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/swaddle.jpg",
     name: "Emily Rodriguez",
   },
   {
     id: 4,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/swaddle.jpg",
     name: "David Thompson",
   },
   {
     id: 5,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/swaddle.jpg",
     name: "Priya Sharma",
   },
   {
     id: 6,
     video: "/ananthala hero section video.mp4",
-    poster: "/bumpers.jpg",
+    poster: "/swaddle.jpg",
     name: "James Wilson",
   },
 ]
 
-interface PillowBumpersProductTemplateProps {
+interface SwaddleProductTemplateProps {
   product: ProductDetail
   productId: number
-  onAddToCart: (items: CartItem[]) => void
+  onAddToCart: (item: CartItem) => void
   isAddingToCart: boolean
 }
 
-export function PillowBumpersProductTemplate({
+export function SwaddleProductTemplate({
   product,
   productId,
   onAddToCart,
   isAddingToCart,
-}: PillowBumpersProductTemplateProps) {
+}: SwaddleProductTemplateProps) {
   const aboutUsSectionRef = useRef<HTMLElement>(null)
   return (
     <div className="space-y-12">
-      <PillowBumpersConfigurator
+      <IndividualBabyProductConfigurator
         product={product}
+        productId={productId}
         onAddToCart={onAddToCart}
         isAddingToCart={isAddingToCart}
       />
@@ -143,13 +144,13 @@ export function PillowBumpersProductTemplate({
                     {product.description}
                   </p>
                   <p className="mb-4">
-                    Our premium pillow bumpers are designed with your baby's safety and comfort in mind. 
-                    Each bumper is crafted using the finest organic materials and breathable mesh design 
-                    to ensure proper air circulation while providing protection.
+                    Our premium swaddles are designed with your baby's comfort and health in mind.
+                    Each swaddle is crafted using the finest organic materials and innovative weaving
+                    to ensure a soft, breathable sleep environment.
                   </p>
                   <p>
-                    With maximum safety and comfort, these pillow bumpers are built to last while 
-                    maintaining their premium quality. Available in standard and custom dimensions to fit 
+                    With maximum comfort and support, these swaddles are built to last while
+                    maintaining their premium quality. Available in standard and custom dimensions to fit
                     your specific needs.
                   </p>
                 </AccordionContent>
@@ -179,14 +180,14 @@ export function PillowBumpersProductTemplate({
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">Custom Orders</h4>
                       <p>
-                        Customized products (with selected dimensions and fabrics) may take 7-10 business days 
+                        Customized products (with selected dimensions and fabrics) may take 7-10 business days
                         for production before shipping. You will receive a tracking number once your order ships.
                       </p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">Returns & Exchanges</h4>
                       <p>
-                        We offer a 30-day return policy for unused items in original packaging. 
+                        We offer a 30-day return policy for unused items in original packaging.
                         Custom orders are non-returnable unless there is a manufacturing defect.
                       </p>
                     </div>
@@ -198,10 +199,8 @@ export function PillowBumpersProductTemplate({
         </div>
       </section>
 
-      {/* Feature Sections */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto space-y-16">
-          {/* Feature 1: Softer, Smoother Slumber */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div className="relative aspect-square overflow-hidden max-w-md mx-auto lg:mx-0">
               <Image
@@ -216,19 +215,18 @@ export function PillowBumpersProductTemplate({
                 SOFTER, SMOOTHER SLUMBER
               </h3>
               <p className="text-lg text-foreground/80 leading-relaxed">
-                Woven using a 4 under 1 sateen weave that imparts a silky-smooth finish and a subtle sheen, while maintaining its strength, the resultant sheets are both elegant and long-lasting.
+                Woven using a 4 under 1 sateen weave that imparts a silky-smooth finish and a subtle sheen, while maintaining its strength.
               </p>
             </div>
           </div>
 
-          {/* Feature 2: 100% Organic Cotton */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-3xl md:text-4xl font-medium text-foreground mb-4 font-cormorant">
                 100% ORGANIC COTTON
               </h3>
               <p className="text-lg text-foreground/80 leading-relaxed">
-                Crafted from the rarest 100% organic cotton, sourced directly from farms to ensure premium quality. The extra-long staple cotton enhances the smoothness and breathability, offering a luxurious feel and a healthier sleeping environment.
+                Crafted from the rarest 100% organic cotton, sourced directly from farms to ensure premium quality.
               </p>
             </div>
             <div className="relative aspect-square overflow-hidden max-w-md mx-auto lg:mx-0">
@@ -241,7 +239,6 @@ export function PillowBumpersProductTemplate({
             </div>
           </div>
 
-          {/* Feature 3: Highly Breathable */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div className="relative aspect-square overflow-hidden max-w-md mx-auto lg:mx-0">
               <Image
@@ -256,19 +253,18 @@ export function PillowBumpersProductTemplate({
                 HIGHLY BREATHABLE
               </h3>
               <p className="text-lg text-foreground/80 leading-relaxed">
-                Unlike synthetic options that can trap heat and block aeration, our organic bed sheets offer superior breathability. This natural airflow helps to regulate temperature and wick away moisture, ensuring a cooler, more comfortable sleep and reducing the need for restless tossing and turning.
+                Our organic swaddles offer superior breathability, helping regulate temperature and wick away moisture for a comfortable sleep.
               </p>
             </div>
           </div>
 
-          {/* Feature 4: Say Good-bye to Fuzz Balls */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-3xl md:text-4xl font-medium text-foreground mb-4 font-cormorant">
                 SAY GOOD-BYE TO FUZZ BALLS
               </h3>
               <p className="text-lg text-foreground/80 leading-relaxed">
-                Designed for durability, our bed sheets feature a single-ply yarn with a 300 thread count, which helps prevent pilling. This construction ensures that the sheets retain their pristine appearance and texture, even after frequent use and washing.
+                Designed for durability, our swaddles feature a single-ply yarn with a 300 thread count to help prevent pilling.
               </p>
             </div>
             <div className="relative aspect-square overflow-hidden max-w-md mx-auto lg:mx-0">
@@ -283,7 +279,6 @@ export function PillowBumpersProductTemplate({
         </div>
       </section>
 
-      {/* What Our Customers Also Bought Section */}
       <CustomersAlsoBought currentProductId={productId} />
 
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
@@ -341,73 +336,71 @@ export function PillowBumpersProductTemplate({
         </div>
       </section>
 
-       {/* About Us Section */}
-     <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-              <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
-                <Image
-                  src="/mattress.jpg"
-                  alt="About Ananthala"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="space-y-4">
-                <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
-                  Our Crafted Heritage
-                </h2>
-                <p className="text-lg text-foreground/90 font-medium">
-                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to
-                  provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
-                  help you wake up refreshed.
-                </p>
-                <div className="space-y-4 mb-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">
-                        Pressure Relief Technology
-                      </p>
-                      <p className="font-medium text-lg text-foreground">
-                        Conforms to your body for optimal spinal alignment
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">
-                        Temperature Regulation
-                      </p>
-                      <p className="font-medium text-lg text-foreground">
-                        Advanced cooling system keeps you comfortable all night
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">
-                        Motion Isolation
-                      </p>
-                      <p className="font-medium text-lg text-foreground">
-                        Undisturbed sleep even with a restless partner
-                      </p>
-                    </div>
+      <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+            <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
+              <Image
+                src="/productmattress.jpg"
+                alt="About Ananthala"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="space-y-4">
+              <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
+                Our Crafted Heritage
+              </h2>
+              <p className="text-lg text-foreground/90 font-medium">
+                Our products are engineered with premium materials and thoughtful craftsmanship to
+                provide the perfect balance of comfort and support.
+              </p>
+              <div className="space-y-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                  <div>
+                    <p className="mb-1 font-medium text-lg text-foreground">
+                      Pressure Relief Technology
+                    </p>
+                    <p className="font-medium text-lg text-foreground">
+                      Conforms to your body for optimal comfort
+                    </p>
                   </div>
                 </div>
-                <Link href="/about">
-                  <Button 
-                    className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
-                  >
-                    More
-                  </Button>
-                </Link>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                  <div>
+                    <p className="mb-1 font-medium text-lg text-foreground">
+                      Temperature Regulation
+                    </p>
+                    <p className="font-medium text-lg text-foreground">
+                      Advanced cooling system keeps you comfortable all night
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                  <div>
+                    <p className="mb-1 font-medium text-lg text-foreground">
+                      Motion Isolation
+                    </p>
+                    <p className="font-medium text-lg text-foreground">
+                      Undisturbed sleep even with a restless partner
+                    </p>
+                  </div>
+                </div>
               </div>
+              <Link href="/about">
+                <Button
+                  className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
+                >
+                  More
+                </Button>
+              </Link>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
     </div>
   )
 }

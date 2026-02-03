@@ -24,7 +24,7 @@ interface ProductListingContentProps {
 
 export function ProductListingContent({ category }: ProductListingContentProps) {
   const router = useRouter()
-  const { addToCart, setIsCartOpen } = useCart()
+  const { addToCart } = useCart()
   const [selectedSize, setSelectedSize] = useState<string>("")
   const [isAddingToCart, setIsAddingToCart] = useState(false)
 
@@ -59,7 +59,6 @@ export function ProductListingContent({ category }: ProductListingContentProps) 
     
     addToCart(cartItem)
     setIsAddingToCart(false)
-    setIsCartOpen(true)
   }
 
   // Handle buy now for products carousel - redirect to product detail page

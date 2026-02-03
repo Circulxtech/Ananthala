@@ -13,7 +13,8 @@ import {
 import { ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRef, useState } from "react"
+import { useRef } from "react"
+import { CustomerTestimonialVideos } from "@/components/sections/customer-testimonial-videos"
 
 export default function GracePage() {
   const shopSectionRef = useRef<HTMLElement>(null)
@@ -26,6 +27,13 @@ export default function GracePage() {
   const scrollToAboutUs = () => {
     aboutUsSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
+
+  const shopItems = [
+    { name: "Mattress", price: "29,999", image: "/mattress.jpg", href: "/product/19" },
+    { name: "Topper", price: "14,999", image: "/topper.jpg", href: "/product/20" },
+    { name: "Lounger", price: "7,999", image: "/lounger.jpg", href: "/product/21" },
+    { name: "Pillow", price: "4,999", image: "/pillow.jpg", href: "/product/22" },
+  ]
 
 
   return (
@@ -115,7 +123,7 @@ export default function GracePage() {
                       id: 1,
                       image: "/mattress.jpg",
                       title: "Premium Comfort",
-                      description: "Our GRACE collection is designed for those in their prime years, offering the perfect balance of luxury and support. Each mattress is crafted with premium memory foam and natural latex layers that contour to your body, providing exceptional pressure relief and spinal alignment for the best sleep of your life.",
+                      description: "Our Grace collection is designed for those in their prime years, offering the perfect balance of luxury and support. Each mattress is crafted with premium memory foam and natural latex layers that contour to your body, providing exceptional pressure relief and spinal alignment for the best sleep of your life.",
                     },
                     {
                       id: 2,
@@ -136,9 +144,9 @@ export default function GracePage() {
                     >
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-[#EED9C4]">
                         {/* Left Side - Image */}
-                        <div className="relative aspect-[4/3] overflow-hidden ">
+                        <div className="relative aspect-4/3 overflow-hidden ">
                           <Image
-                            src={slide.image}
+                            src={slide.image || "/placeholder.svg"}
                             alt={slide.title}
                             fill
                             className="object-cover"
@@ -152,10 +160,10 @@ export default function GracePage() {
                             Ananthala Difference
                           </h1>
                           <div className="text-sm uppercase tracking-wider font-medium text-foreground">
-                            GRACE COLLECTION
+                            Grace Collection
                           </div>
                           <p className="text-lg leading-relaxed text-foreground">
-                            At Ananthala we specifically make products to take care of your sleep health. Every product in our GRACE collection is crafted with premium materials and innovative technology. We understand that quality sleep is essential for your well-being, and our mattresses are designed to provide the perfect balance of comfort and support.
+                            At Ananthala we specifically make products to take care of your sleep health. Every product in our Grace collection is crafted with premium materials and innovative technology. We understand that quality sleep is essential for your well-being, and our mattresses are designed to provide the perfect balance of comfort and support.
                           </p>
                           
                          
@@ -173,127 +181,52 @@ export default function GracePage() {
 
 
         {/* Shop Section */}
-        <section ref={shopSectionRef} className="py-16 px-4 bg-stone-50">
+        <section id="shop" ref={shopSectionRef} className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-8 text-center font-cormorant">
               Shop
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 gap-y-8">
-              <Link href="/product/19" className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white block">
-                <div className="relative aspect-square overflow-hidden mb-3">
-                  <Image
-                    src="/mattress.jpg"
-                    alt="Grace Mattress"
-                    fill
-                    className="object-cover"
-                  />
+              {shopItems.map((item) => (
+                <div
+                  key={item.name}
+                  className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white"
+                >
+                  <Link href={item.href} className="block">
+                    <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                      <Image
+                        src={item.image || "/placeholder.svg"}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  </Link>
+                  <h3 className="text-base font-semibold text-foreground mb-2 text-center">{item.name}</h3>
+                  <div className="text-sm font-medium text-foreground mb-3 text-center">
+                    Starting at ₹{item.price}
+                  </div>
+                  <Link href={item.href}>
+                    <Button className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm">
+                      Customize
+                    </Button>
+                  </Link>
                 </div>
-                <h3 className="text-base font-semibold text-foreground mb-2 text-center">Mattress</h3>
-                <div className="text-sm font-medium text-foreground mb-3 text-center">
-                  Starting at ₹29,999
-                </div>
-                <Button className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm">
-                  Customize
-                </Button>
-              </Link>
+              ))}
             </div>
           </div>
         </section>
 
         
-        {/* Customer Testimonials */}
-        <section className="py-16 px-4 bg-stone-50">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center font-cormorant">
-              What our Divas Say
-            </h2>
-            <p className="text-center text-foreground mb-8 max-w-2xl mx-auto">
-           Join thousands of happy sleepers
-            </p>
-            <div className="relative">
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: true,
-                }}
-                className="w-full"
-              >
-                <CarouselContent className="-ml-2 md:-ml-4">
-                  {[
-                    {
-                      id: 1,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "Sarah Johnson",
-                    },
-                    {
-                      id: 2,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "Michael Chen",
-                    },
-                    {
-                      id: 3,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "Emily Rodriguez",
-                    },
-                    {
-                      id: 4,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "David Thompson",
-                    },
-                    {
-                      id: 5,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "Priya Sharma",
-                    },
-                    {
-                      id: 6,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "James Wilson",
-                    },
-                  ].map((testimonial) => (
-                    <CarouselItem
-                      key={testimonial.id}
-                      className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
-                    >
-                      <div className="space-y-2">
-                        <div className="relative aspect-video overflow-hidden border border-[#EED9C4]">
-                          <video
-                            className="w-full h-full object-cover"
-                            controls
-                            controlsList="nodownload nofullscreen noremoteplayback"
-                            disablePictureInPicture
-                            onContextMenu={(e) => e.preventDefault()}
-                            poster={testimonial.poster}
-                          >
-                            <source src={testimonial.video} type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
-                        </div>
-                        <p className="text-left text-foreground font-medium">
-                          {testimonial.name}
-                        </p>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-                <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-              </Carousel>
-            </div>
-          </div>
-        </section>
+        {/* Customer Testimonial Videos - Real from Database */}
+        <CustomerTestimonialVideos />
 
         {/* About Us Section */}
         <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-              <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
+              <div className="relative aspect-4/3 overflow-hidden max-w-lg mx-auto lg:mx-0">
                 <Image
                   src="/mattress.jpg"
                   alt="About Ananthala"
@@ -303,14 +236,48 @@ export default function GracePage() {
               </div>
               <div className="space-y-4">
                 <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
-                  About Us
+                  Our Crafted Heritage
                 </h2>
-                <p className="text-lg text-foreground leading-relaxed">
-                  At Ananthala, we are committed to crafting premium products that take care of your sleep health. Our mattresses are designed with comfort and support in mind, using only the finest materials and innovative technology.
+                <p className="text-lg text-foreground/90 font-medium">
+                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to
+                  provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
+                  help you wake up refreshed.
                 </p>
-                <p className="text-lg text-foreground leading-relaxed">
-                  Every product is expertly crafted to ensure you get the best sleep. We believe in quality, comfort, and putting your well-being first.
-                </p>
+                <div className="space-y-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Pressure Relief Technology
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Conforms to your body for optimal spinal alignment
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Temperature Regulation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Advanced cooling system keeps you comfortable all night
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Motion Isolation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Undisturbed sleep even with a restless partner
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 <Link href="/about">
                   <Button 
                     className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"

@@ -9,8 +9,6 @@ interface CartContextType {
   removeFromCart: (itemId: string) => void
   updateQuantity: (itemId: string, quantity: number) => void
   clearCart: () => void
-  isCartOpen: boolean
-  setIsCartOpen: (open: boolean) => void
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -19,7 +17,8 @@ const CART_STORAGE_KEY = "ananthala_cart"
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
-  const [isCartOpen, setIsCartOpen] = useState(false)
+
+  const normalizeItemName = (name: string) => name.replace(/\bGRACE\b/g, "Grace")
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -29,7 +28,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         try {
           const parsed = JSON.parse(stored)
           if (Array.isArray(parsed)) {
-            setCartItems(parsed)
+            const normalizedItems = parsed.map((item) =>
+              item && typeof item === "object" ? { ...item, name: normalizeItemName(item.name ?? "") } : item
+            )
+            setCartItems(normalizedItems)
           }
         } catch (error) {
           console.error("Error loading cart from localStorage:", error)
@@ -47,6 +49,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = (newItem: CartItem) => {
     setCartItems((prevItems) => {
+      const normalizedItem = { ...newItem, name: normalizeItemName(newItem.name) }
       // Check if exact same product with same size exists
       const existingItemIndex = prevItems.findIndex(
         (item) => item.id === newItem.id
@@ -54,11 +57,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (existingItemIndex >= 0) {
         // Item exists, update quantity
         const updatedItems = [...prevItems]
-        updatedItems[existingItemIndex].quantity += newItem.quantity
+        updatedItems[existingItemIndex].quantity += normalizedItem.quantity
         return updatedItems
       }
       // New item, add to cart
-      return [...prevItems, newItem]
+      return [...prevItems, normalizedItem]
     })
   }
 
@@ -90,8 +93,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         removeFromCart,
         updateQuantity,
         clearCart,
-        isCartOpen,
-        setIsCartOpen,
       }}
     >
       {children}

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import Image from "next/image"
-import { IndianRupee, ShoppingCart, ArrowLeft } from "lucide-react"
+import { IndianRupee, ShoppingCart, ChevronRight } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
 import { getAllStates, getCitiesForState } from "@/lib/indian-states-cities"
 
@@ -97,16 +98,16 @@ export default function CheckoutPage() {
         <Header />
         <main className="pt-16 min-h-[60vh] flex items-center justify-center">
           <div className="text-center max-w-md mx-auto px-4">
-            <h1 className="text-3xl font-serif text-black mb-4">
+            <h1 className="text-3xl font-serif text-foreground mb-4">
               Your Cart is Empty
             </h1>
-            <p className="text-gray-600 mb-8">
+            <p className="text-foreground mb-8">
               Please add items to your cart before checkout.
             </p>
             <button
-              onClick={() => router.push("/mattress")}
-              className="px-8 py-3 text-white hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: "#6B563F" }}
+              onClick={() => router.push("/#find-your-perfect-mattress")}
+              className="px-8 py-3 text-foreground hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: "#EED9C4" }}
             >
               Continue Shopping
             </button>
@@ -120,18 +121,46 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <main className="pt-16">
+      <div
+        className="fixed top-20 left-0 right-0 z-40 bg-white border-b"
+        style={{ borderColor: "#D9CFC7" }}
+      >
+        <div className="max-w-7xl mx-auto px-4">
+          <nav className="py-2">
+            <ol className="flex items-center gap-2 text-base">
+              <li>
+                <Link href="/" className="text-foreground hover:opacity-80 transition-opacity">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <ChevronRight className="w-4 h-4 text-foreground/50" />
+              </li>
+              <li>
+                <Link href="/#find-your-perfect-mattress" className="text-foreground hover:opacity-80 transition-opacity">
+                  Products
+                </Link>
+              </li>
+              <li>
+                <ChevronRight className="w-4 h-4 text-foreground/50" />
+              </li>
+              <li>
+                <Link href="/cart" className="text-foreground hover:opacity-80 transition-opacity">
+                  Cart
+                </Link>
+              </li>
+              <li>
+                <ChevronRight className="w-4 h-4 text-foreground/50" />
+              </li>
+              <li className="text-foreground">Checkout</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+      <div className="h-[49px]"></div>
+      <main className="pt-6">
         <div className="max-w-7xl mx-auto px-4 py-12">
-          {/* Back Button */}
-          <button
-            onClick={() => router.push("/cart")}
-            className="flex items-center gap-2 mb-6 text-black hover:opacity-70 transition-opacity text-lg"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back to Cart
-          </button>
-
-          <h1 className="text-xl md:text-2xl font-serif text-black mb-8">Checkout</h1>
+          
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Checkout Form */}
@@ -306,17 +335,7 @@ export default function CheckoutPage() {
                       />
                       <span className="text-black text-lg">UPI</span>
                     </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="cod"
-                        checked={formData.paymentMethod === "cod"}
-                        onChange={handleInputChange}
-                        className="w-5 h-5"
-                      />
-                      <span className="text-black text-lg">Cash on Delivery</span>
-                    </label>
+                   
                   </div>
                 </div>
 
@@ -352,7 +371,7 @@ export default function CheckoutPage() {
                 <div className="space-y-4 mb-6">
                   {cartItems.map((item) => (
                     <div key={item.id} className="flex gap-3">
-                      <div className="relative w-16 h-16 flex-shrink-0 bg-gray-100 overflow-hidden">
+                      <div className="relative w-16 h-16 shrink-0 bg-gray-100 overflow-hidden">
                         <Image
                           src={item.image || "/placeholder.svg"}
                           alt={item.name}

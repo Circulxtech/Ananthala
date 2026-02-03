@@ -17,23 +17,27 @@ interface TopperConfiguratorProps {
 }
 
 // Standard sizes in inches (L x B x H) with price multipliers
-const standardSizes = [
-  { label: "24\" x 30\" x 2\"", value: "24x30x2", dimensions: { length: "24\"", breadth: "30\"", height: "2\"" }, priceMultiplier: 1.0 },
-  { label: "28\" x 36\" x 2.5\"", value: "28x36x2.5", dimensions: { length: "28\"", breadth: "36\"", height: "2.5\"" }, priceMultiplier: 1.2 },
-  { label: "32\" x 40\" x 3\"", value: "32x40x3", dimensions: { length: "32\"", breadth: "40\"", height: "3\"" }, priceMultiplier: 1.4 },
+const babyStandardSizes = [
+  { label: "16\" x 26\" x 1.5\"", value: "16x26x1.5", dimensions: { length: "16\"", breadth: "26\"", height: "1.5\"" }, priceMultiplier: 1.0 },
+]
+
+const adultStandardSizes = [
+  { label: "Single - 36\" x 72\" x 2\"", value: "36x72x2", dimensions: { length: "36\"", breadth: "72\"", height: "2\"" }, priceMultiplier: 1.0 },
+  { label: "Queen - 60\" x 72\" x 2\"", value: "60x72x2", dimensions: { length: "60\"", breadth: "72\"", height: "2\"" }, priceMultiplier: 1.2 },
+  { label: "King - 72\" x 78\" x 2\"", value: "72x78x2", dimensions: { length: "72\"", breadth: "78\"", height: "2\"" }, priceMultiplier: 1.4 },
 ]
 
 // Fabric price multipliers
 const fabricMultipliers: Record<string, number> = {
-  cotton: 1.0,
-  "organic-cotton": 1.15,
-  bamboo: 1.2,
+  "gingham-beige": 1.0,
+  "gingham-blue": 1.05,
+  "gingham-pink": 1.1,
 }
 
 const fabricOptions = [
-  { value: "cotton", label: "Cotton" },
-  { value: "organic-cotton", label: "Organic Cotton" },
-  { value: "bamboo", label: "Bamboo" },
+  { value: "gingham-beige", label: "Gingham Beige", image: "/gingham_small_beige.jpeg" },
+  { value: "gingham-blue", label: "Gingham Blue", image: "/gingham_small_blue.jpeg" },
+  { value: "gingham-pink", label: "Gingham Pink", image: "/gingham_small_pink.jpeg" },
 ]
 
 export function TopperConfigurator({
@@ -44,6 +48,7 @@ export function TopperConfigurator({
   const topperState = useTopper()
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [useCustomDimensions, setUseCustomDimensions] = useState(false)
+  const standardSizes = product.category === "baby" ? babyStandardSizes : adultStandardSizes
   
   const getProductImages = (): string[] => {
     return product.images && product.images.length > 0 ? product.images : ["/topper.jpg"]
@@ -280,21 +285,6 @@ export function TopperConfigurator({
                   </div>
                 )}
                 
-                <div>
-                  <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                  <Select value={topperState.topperFabric || ""} onValueChange={topperState.setTopperFabric}>
-                    <SelectTrigger className="w-full text-foreground">
-                      <SelectValue placeholder="Select fabric" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fabricOptions.map((fabric) => (
-                        <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
-                          {fabric.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             </div>
           </div>
@@ -304,6 +294,31 @@ export function TopperConfigurator({
       {/* Right Sidebar - Price and Add to Cart */}
       <div className="lg:col-span-4">
         <div className="sticky top-24 p-6 bg-white border-2 border-[#EED9C4]">
+          <div className="mb-6">
+            <label className="text-base font-medium text-foreground mb-3 block">Fabric</label>
+            <Select value={topperState.topperFabric || ""} onValueChange={topperState.setTopperFabric}>
+              <SelectTrigger className="w-full text-foreground py-3">
+                <SelectValue placeholder="Select fabric" />
+              </SelectTrigger>
+              <SelectContent>
+                {fabricOptions.map((fabric) => (
+                  <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
+                    <span className="flex items-center gap-3">
+                      <Image
+                        src={fabric.image}
+                        alt={fabric.label}
+                        width={28}
+                        height={28}
+                        className="rounded-none"
+                      />
+                      <span className="text-base">{fabric.label}</span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="mb-6">
             <h3 className="text-lg font-medium text-foreground mb-2">Total Price</h3>
             <div className="text-2xl font-semibold text-foreground">

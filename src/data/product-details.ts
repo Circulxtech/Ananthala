@@ -553,15 +553,13 @@ export const productDetails: Record<number, ProductDetail> = {
       "Fabric Type": "Breathable Muslin",
       "Care Instructions": "Machine washable",
       "Safety Standards": "GOTS Certified",
-      "Sizes Available": "Newborn, Small, Medium, Large",
+      "Sizes Available": "Standard (25\" x 11\" x 7\"), Large (30\" x 13\" x 9\")",
       Warranty: "1 Year",
       Certifications: "GOTS, OEKO-TEX, GREENGUARD Gold",
     },
     sizes: [
-      { name: "Newborn", price: 39 },
-      { name: "Small", price: 44 },
-      { name: "Medium", price: 49 },
-      { name: "Large", price: 54 },
+      { name: "Standard (25\" x 11\" x 7\")", price: 39 },
+      { name: "Large (30\" x 13\" x 9\")", price: 44 },
     ],
   },
   15: {
@@ -732,7 +730,7 @@ export const productDetails: Record<number, ProductDetail> = {
   },
   19: {
     id: 19,
-    name: "GRACE Mattress",
+    name: "Grace Mattress",
     category: "grace",
     price: 29999,
     rating: 4.8,
@@ -775,7 +773,7 @@ export const productDetails: Record<number, ProductDetail> = {
   },
   20: {
     id: 20,
-    name: "GRACE Topper",
+    name: "Grace Topper",
     category: "grace",
     price: 14999,
     rating: 5.0,
@@ -816,7 +814,7 @@ export const productDetails: Record<number, ProductDetail> = {
   },
   21: {
     id: 21,
-    name: "GRACE Lounger",
+    name: "Grace Lounger",
     category: "grace",
     price: 7999,
     rating: 4.8,
@@ -857,7 +855,7 @@ export const productDetails: Record<number, ProductDetail> = {
   },
   22: {
     id: 22,
-    name: "GRACE Pillow",
+    name: "Grace Pillow",
     category: "grace",
     price: 4999,
     rating: 4.8,

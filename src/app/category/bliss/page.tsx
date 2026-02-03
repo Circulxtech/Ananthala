@@ -14,6 +14,7 @@ import { ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRef } from "react"
+import { CustomerTestimonialVideos } from "@/components/sections/customer-testimonial-videos"
 
 export default function BlissPage() {
   const shopSectionRef = useRef<HTMLElement>(null)
@@ -146,7 +147,7 @@ export default function BlissPage() {
                         {/* Left Side - Image */}
                         <div className="relative aspect-[4/3] overflow-hidden ">
                           <Image
-                            src={slide.image}
+                            src={slide.image || "/placeholder.svg"}
                             alt={slide.title}
                             fill
                             className="object-cover"
@@ -180,7 +181,7 @@ export default function BlissPage() {
         </section>
 
         {/* Shop Section */}
-        <section className="py-16 px-4 bg-stone-50">
+        <section id="shop" className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-8 text-center font-cormorant">
               Shop
@@ -194,7 +195,7 @@ export default function BlissPage() {
                   <Link href={item.href} className="block">
                     <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
                       <Image
-                        src={item.image}
+                        src={item.image || "/placeholder.svg"}
                         alt={item.name}
                         fill
                         className="object-cover"
@@ -219,93 +220,8 @@ export default function BlissPage() {
           </div>
         </section>
 
-        {/* Customer Testimonials */}
-        <section className="py-16 px-4 bg-stone-50">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center font-cormorant">
-              Customer Testimonials
-            </h2>
-            <p className="text-center text-foreground mb-8 max-w-2xl mx-auto">
-              Hear from our satisfied customers about their experience with Ananthala products
-            </p>
-            <div className="relative">
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: true,
-                }}
-                className="w-full"
-              >
-                <CarouselContent className="-ml-2 md:-ml-4">
-                  {[
-                    {
-                      id: 1,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "Sarah Johnson",
-                    },
-                    {
-                      id: 2,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "Michael Chen",
-                    },
-                    {
-                      id: 3,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "Emily Rodriguez",
-                    },
-                    {
-                      id: 4,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "David Thompson",
-                    },
-                    {
-                      id: 5,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "Priya Sharma",
-                    },
-                    {
-                      id: 6,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      name: "James Wilson",
-                    },
-                  ].map((testimonial) => (
-                    <CarouselItem
-                      key={testimonial.id}
-                      className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
-                    >
-                      <div className="space-y-2">
-                        <div className="relative aspect-video overflow-hidden border border-[#EED9C4]">
-                          <video
-                            className="w-full h-full object-cover"
-                            controls
-                            controlsList="nodownload nofullscreen noremoteplayback"
-                            disablePictureInPicture
-                            onContextMenu={(e) => e.preventDefault()}
-                            poster={testimonial.poster}
-                          >
-                            <source src={testimonial.video} type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
-                        </div>
-                        <p className="text-left text-foreground font-medium">
-                          {testimonial.name}
-                        </p>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-                <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-              </Carousel>
-            </div>
-          </div>
-        </section>
+        {/* Customer Testimonial Videos - Real from Database */}
+        <CustomerTestimonialVideos />
 
         {/* About Us Section */}
         <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
@@ -321,14 +237,48 @@ export default function BlissPage() {
               </div>
               <div className="space-y-4">
                 <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
-                  About Us
+                  Our Crafted Heritage
                 </h2>
-                <p className="text-lg text-foreground leading-relaxed">
-                  At Ananthala, we are committed to crafting premium products that take care of your sleep health. Our mattresses are designed with comfort and support in mind, using only the finest materials and innovative technology.
+                <p className="text-lg text-foreground/90 font-medium">
+                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to
+                  provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
+                  help you wake up refreshed.
                 </p>
-                <p className="text-lg text-foreground leading-relaxed">
-                  Every product is expertly crafted to ensure you get the best sleep. We believe in quality, comfort, and putting your well-being first.
-                </p>
+                <div className="space-y-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Pressure Relief Technology
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Conforms to your body for optimal spinal alignment
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Temperature Regulation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Advanced cooling system keeps you comfortable all night
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Motion Isolation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Undisturbed sleep even with a restless partner
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 <Link href="/about">
                   <Button 
                     className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"

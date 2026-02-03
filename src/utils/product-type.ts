@@ -10,9 +10,9 @@ export type ProductType = "baby-hamper" | "kids-hamper" | "individual-baby" | "m
 export function getProductType(productId: number): ProductType {
   if (productId === 12) return "baby-hamper"
   if (productId === 13) return "kids-hamper"
-  if ([8, 16].includes(productId)) return "topper"
-  if ([9, 17].includes(productId)) return "lounger"
-  if ([10, 18].includes(productId)) return "head-pillow"
+  if ([8, 16, 20].includes(productId)) return "topper"
+  if ([9, 17, 21].includes(productId)) return "lounger"
+  if ([10, 18, 22].includes(productId)) return "head-pillow"
   if (productId === 11) return "pillow-bumpers"
   if ([14].includes(productId)) return "individual-baby"
   if ([1, 2, 3, 4, 7, 15, 19].includes(productId)) return "mattress"

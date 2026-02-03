@@ -1,14 +1,19 @@
 "use client"
 
+import { CarouselNext } from "@/components/ui/carousel"
+import { CarouselPrevious } from "@/components/ui/carousel"
+import { CarouselItem } from "@/components/ui/carousel"
+import { CarouselContent } from "@/components/ui/carousel"
+import { Carousel } from "@/components/ui/carousel"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { CustomerTestimonialVideos } from "@/components/sections/customer-testimonial-videos"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Volume2, VolumeX, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { CustomerReviewVideos } from "@/components/customer-review-videos"
 
 // Categories data
 const categories = [
@@ -51,7 +56,7 @@ const products = [
   },
   {
     id: 3,
-    name: "GRACE",
+    name: "Grace",
     image: "/firm-mattress-with-beige-bedding-modern-bedroom.jpg",
     position: "center",
   },
@@ -63,50 +68,25 @@ const products = [
   },
 ]
 
-// Testimonial videos data
-interface TestimonialVideo {
-  id: number
-  video: string
-  poster: string
-  name: string
-}
-
-const testimonialVideos: TestimonialVideo[] = [
+// Testimonial Videos data
+const testimonialVideos = [
   {
     id: 1,
-    video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
-    name: "Sarah Johnson",
+    name: "Jane Doe",
+    video: "/testimonial1.mp4",
+    poster: "/testimonial1.jpg",
   },
   {
     id: 2,
-    video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
-    name: "Michael Chen",
+    name: "John Smith",
+    video: "/testimonial2.mp4",
+    poster: "/testimonial2.jpg",
   },
   {
     id: 3,
-    video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
-    name: "Emily Rodriguez",
-  },
-  {
-    id: 4,
-    video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
-    name: "David Thompson",
-  },
-  {
-    id: 5,
-    video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
-    name: "Priya Sharma",
-  },
-  {
-    id: 6,
-    video: "/ananthala hero section video.mp4",
-    poster: "/productmattress.jpg",
-    name: "James Wilson",
+    name: "Emily Johnson",
+    video: "/testimonial3.mp4",
+    poster: "/testimonial3.jpg",
   },
 ]
 
@@ -147,9 +127,9 @@ export default function Home() {
   const getCategoryPath = (productName: string) => {
     const name = productName.toLowerCase()
     // Map product names to category pages (matching second section redirects)
-    if (name === "joy") return "/category/joy"
-    if (name === "bliss") return "/category/bliss"
-    if (name === "grace") return "/category/grace"
+    if (name === "joy") return "/category/joy#shop"
+    if (name === "bliss") return "/category/bliss#shop"
+    if (name === "grace") return "/category/grace#shop"
     if (name.includes("pillow") || name.includes("bedsheet")) return "/category/bliss"
     return "/category/bliss"
   }
@@ -189,7 +169,7 @@ export default function Home() {
               className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md shadow-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto min-w-[160px]"
               style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
             >
-              <Link href="/category/bliss" className="flex items-center justify-center">
+              <Link href="/#find-your-perfect-mattress" className="flex items-center justify-center">
                 Shop
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
@@ -263,7 +243,7 @@ export default function Home() {
                     {category.title}
                   </h2>
                   <button
-                    className="px-6 py-3 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground text-base  shadow-lg transition-all duration-200 hover:scale-105 cursor-default"
+                    className="px-6 py-3 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground text-base shadow-lg transition-all duration-200 hover:scale-105 cursor-default"
                     style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
                   >
                     SHOP
@@ -307,13 +287,12 @@ export default function Home() {
         </section>
 
         {/* Products Section */}
-        <section className="py-24 px-4 bg-white">
+        <section id="find-your-perfect-mattress" className="py-24 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="mb-4 text-4xl font-medium text-foreground">Find Your Perfect Mattress</h2>
               <p className="max-w-2xl mx-auto text-xl font-medium text-foreground">
-                Each mattress is expertly crafted with premium materials to ensure the perfect night's sleep, every
-                night.
+                Each mattress is expertly crafted with premium materials to ensure the perfect night's sleep, every night.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -348,7 +327,7 @@ export default function Home() {
                     >
                       <div className="bg-[#EED9C4] px-8 py-4 text-center relative min-w-[200px]">
                         <span
-                          className="tracking-wider  text-base md:text-lg font-semibold uppercase text-foreground relative z-10"
+                          className="tracking-wider text-base md:text-lg font-semibold uppercase text-foreground relative z-10"
                           style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
                         >
                           {product.name}
@@ -405,7 +384,7 @@ export default function Home() {
                 </div>
                 <button
                   onClick={() => router.push("/about")}
-                  className="bg-[#EED9C4] text-foreground font-medium text-lg px-8 py-3 hover:bg-[#D9BB9B]  transition-colors"
+                  className="bg-[#EED9C4] text-foreground font-medium text-lg px-8 py-3 hover:bg-[#D9BB9B] transition-colors"
                 >
                   More
                 </button>
@@ -419,8 +398,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Customer Review Videos Section - UPDATED */}
-        <CustomerReviewVideos />
+        {/* Customer Testimonials - Real Videos from Database */}
+        <CustomerTestimonialVideos />
       </main>
       <Footer />
     </div>

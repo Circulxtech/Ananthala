@@ -35,29 +35,26 @@ const kidsProducts = [
 // Standard sizes in inches (L x B x H) with price multipliers
 const standardSizes = {
   mattress: [
-    { label: "36\" x 48\" x 4\"", value: "36x48x4", dimensions: { length: "36\"", breadth: "48\"", height: "4\"" }, priceMultiplier: 1.0 },
-    { label: "42\" x 54\" x 5\"", value: "42x54x5", dimensions: { length: "42\"", breadth: "54\"", height: "5\"" }, priceMultiplier: 1.3 },
-    { label: "48\" x 60\" x 6\"", value: "48x60x6", dimensions: { length: "48\"", breadth: "60\"", height: "6\"" }, priceMultiplier: 1.6 },
+    { label: "24\" x 48\" x 2\"", value: "24x48x2", dimensions: { length: "24\"", breadth: "48\"", height: "2\"" }, priceMultiplier: 1.0 },
+    { label: "24\" x 48\" x 4\"", value: "24x48x4", dimensions: { length: "24\"", breadth: "48\"", height: "4\"" }, priceMultiplier: 1.2 },
   ],
   pillows: [
-    { label: "16\" x 20\" x 4\"", value: "16x20x4", dimensions: { length: "16\"", breadth: "20\"", height: "4\"" }, priceMultiplier: 1.0 },
-    { label: "18\" x 24\" x 5\"", value: "18x24x5", dimensions: { length: "18\"", breadth: "24\"", height: "5\"" }, priceMultiplier: 1.2 },
-    { label: "20\" x 28\" x 6\"", value: "20x28x6", dimensions: { length: "20\"", breadth: "28\"", height: "6\"" }, priceMultiplier: 1.4 },
+    { label: "18\" x 4\" x 4\"", value: "18x4x4", dimensions: { length: "18\"", breadth: "4\"", height: "4\"" }, priceMultiplier: 1.0 },
   ],
  
 }
 
 // Fabric price multipliers
 const fabricMultipliers: Record<string, number> = {
-  cotton: 1.0,
-  "organic-cotton": 1.15,
-  bamboo: 1.2,
+  "gingham-beige": 1.0,
+  "gingham-blue": 1.05,
+  "gingham-pink": 1.1,
 }
 
 const fabricOptions = [
-  { value: "cotton", label: "Cotton" },
-  { value: "organic-cotton", label: "Organic Cotton" },
-  { value: "bamboo", label: "Bamboo" },
+  { value: "gingham-beige", label: "Gingham Beige", image: "/gingham_small_beige.jpeg" },
+  { value: "gingham-blue", label: "Gingham Blue", image: "/gingham_small_blue.jpeg" },
+  { value: "gingham-pink", label: "Gingham Pink", image: "/gingham_small_pink.jpeg" },
 ]
 
 /**
@@ -368,22 +365,6 @@ export function KidsHamperConfigurator({
                     </div>
                   )}
                   
-                  {/* Fabric Dropdown */}
-                  <div>
-                    <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                    <Select value={hamperState.kidsMattressFabric || ""} onValueChange={hamperState.setKidsMattressFabric}>
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select fabric" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fabricOptions.map((fabric) => (
-                          <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
-                            {fabric.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
             </div>
@@ -525,22 +506,6 @@ export function KidsHamperConfigurator({
                     </div>
                   )}
                   
-                  {/* Fabric Dropdown */}
-                  <div>
-                    <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                    <Select value={hamperState.kidsPillowsFabric || ""} onValueChange={hamperState.setKidsPillowsFabric}>
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select fabric" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fabricOptions.map((fabric) => (
-                          <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
-                            {fabric.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
             </div>
@@ -566,6 +531,38 @@ export function KidsHamperConfigurator({
             ))}
           </div>
           
+          {/* Fabric Selection */}
+          <div className="mt-6">
+            <label className="text-base font-medium text-foreground mb-3 block">Fabric</label>
+            <Select
+              value={hamperState.kidsMattressFabric || hamperState.kidsPillowsFabric || ""}
+              onValueChange={(value) => {
+                hamperState.setKidsMattressFabric(value)
+                hamperState.setKidsPillowsFabric(value)
+              }}
+            >
+              <SelectTrigger className="w-full text-foreground py-3">
+                <SelectValue placeholder="Select fabric" />
+              </SelectTrigger>
+              <SelectContent>
+                {fabricOptions.map((fabric) => (
+                  <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
+                    <span className="flex items-center gap-3">
+                      <Image
+                        src={fabric.image}
+                        alt={fabric.label}
+                        width={28}
+                        height={28}
+                        className="rounded-none"
+                      />
+                      <span className="text-base">{fabric.label}</span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Price Section */}
           <div className="mt-6 pt-6 border-t border-[#EED9C4]">
             <h3 className="text-lg font-medium text-foreground mb-2">Total Price</h3>

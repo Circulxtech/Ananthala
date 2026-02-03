@@ -17,21 +17,19 @@ interface PillowBumpersConfiguratorProps {
 }
 
 const standardSizes = [
-  { label: "10\" x 12\" x 1.5\"", value: "10x12x1.5", dimensions: { length: "10\"", breadth: "12\"", height: "1.5\"" }, priceMultiplier: 1.0 },
-  { label: "12\" x 14\" x 2\"", value: "12x14x2", dimensions: { length: "12\"", breadth: "14\"", height: "2\"" }, priceMultiplier: 1.15 },
-  { label: "14\" x 16\" x 2.5\"", value: "14x16x2.5", dimensions: { length: "14\"", breadth: "16\"", height: "2.5\"" }, priceMultiplier: 1.3 },
+  { label: "18\" x 4\" x 4\" (Set of 2)", value: "18x4x4", dimensions: { length: "18\"", breadth: "4\"", height: "4\"" }, priceMultiplier: 1.0 },
 ]
 
 const fabricMultipliers: Record<string, number> = {
-  cotton: 1.0,
-  "organic-cotton": 1.15,
-  bamboo: 1.2,
+  "gingham-beige": 1.0,
+  "gingham-blue": 1.05,
+  "gingham-pink": 1.1,
 }
 
 const fabricOptions = [
-  { value: "cotton", label: "Cotton" },
-  { value: "organic-cotton", label: "Organic Cotton" },
-  { value: "bamboo", label: "Bamboo" },
+  { value: "gingham-beige", label: "Gingham Beige", image: "/gingham_small_beige.jpeg" },
+  { value: "gingham-blue", label: "Gingham Blue", image: "/gingham_small_blue.jpeg" },
+  { value: "gingham-pink", label: "Gingham Pink", image: "/gingham_small_pink.jpeg" },
 ]
 
 export function PillowBumpersConfigurator({
@@ -273,21 +271,6 @@ export function PillowBumpersConfigurator({
                   </div>
                 )}
                 
-                <div>
-                  <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
-                  <Select value={bumpersState.bumpersFabric || ""} onValueChange={bumpersState.setBumpersFabric}>
-                    <SelectTrigger className="w-full text-foreground">
-                      <SelectValue placeholder="Select fabric" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fabricOptions.map((fabric) => (
-                        <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
-                          {fabric.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             </div>
           </div>
@@ -296,6 +279,31 @@ export function PillowBumpersConfigurator({
 
       <div className="lg:col-span-4">
         <div className="sticky top-24 p-6 bg-white border-2 border-[#EED9C4]">
+          <div className="mb-6">
+            <label className="text-base font-medium text-foreground mb-3 block">Fabric</label>
+            <Select value={bumpersState.bumpersFabric || ""} onValueChange={bumpersState.setBumpersFabric}>
+              <SelectTrigger className="w-full text-foreground py-3">
+                <SelectValue placeholder="Select fabric" />
+              </SelectTrigger>
+              <SelectContent>
+                {fabricOptions.map((fabric) => (
+                  <SelectItem key={fabric.value} value={fabric.value} className="text-foreground">
+                    <span className="flex items-center gap-3">
+                      <Image
+                        src={fabric.image}
+                        alt={fabric.label}
+                        width={28}
+                        height={28}
+                        className="rounded-none"
+                      />
+                      <span className="text-base">{fabric.label}</span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="mb-6">
             <h3 className="text-lg font-medium text-foreground mb-2">Total Price</h3>
             <div className="text-2xl font-semibold text-foreground">

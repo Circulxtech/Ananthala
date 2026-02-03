@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import connectDB from "@/lib/mongodb"
 import User from "@/models/User"
 import nodemailer from "nodemailer"
-import twilio from "twilio"
+import { sendMsg91OTP } from "@/lib/msz91"
 
 export const runtime = "nodejs"
 
@@ -73,35 +73,9 @@ async function sendOTPEmail(email: string, otp: string) {
   }
 }
 
+// Send SMS OTP using MSG91 service
 async function sendOTPSMS(phone: string, otp: string) {
-  try {
-    // Validate Twilio credentials
-    const accountSid = process.env.TWILIO_ACCOUNT_SID
-    const authToken = process.env.TWILIO_AUTH_TOKEN
-    const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER
-
-    if (!accountSid || !authToken || !twilioPhoneNumber) {
-      throw new Error(
-        "Twilio credentials not configured. Please add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER to your .env.local file.",
-      )
-    }
-
-    // Create Twilio client
-    const client = twilio(accountSid, authToken)
-
-    // Send SMS
-    const message = await client.messages.create({
-      body: `Your Ananthala OTP is: ${otp}. Valid for 5 minutes. Do not share this OTP with anyone.`,
-      from: twilioPhoneNumber,
-      to: phone,
-    })
-
-    console.log(`[SMS_SUCCESS] Message sent with SID: ${message.sid}`)
-    return true
-  } catch (error) {
-    console.error("[SMS_ERROR]", error)
-    throw error
-  }
+  return sendMsg91OTP(phone, otp)
 }
 
 export async function POST(request: Request) {
@@ -181,7 +155,7 @@ export async function POST(request: Request) {
       }
 
       try {
-        // Send OTP via SMS using Twilio
+        // Send OTP via SMS using MSG91
         await sendOTPSMS(phone, otp)
 
         // Update user with OTP
@@ -199,7 +173,7 @@ export async function POST(request: Request) {
           {
             success: false,
             message:
-              smsError.message || "Failed to send OTP SMS. Please verify your Twilio configuration in .env.local",
+              smsError.message || "Failed to send OTP SMS. Please verify your MSG91 configuration in .env.local",
           },
           { status: 500 },
         )

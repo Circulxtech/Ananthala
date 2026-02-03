@@ -6,15 +6,16 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ShoppingCart, User, Menu, X, Search, LogOut, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { CartDrawer } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 const menuItems = [
-  { label: "PILLOWS", href: "/pillows" },
-  { label: "BEDDING", href: "/bedding" },
-  { label: "BESTSELLERS", href: "/bestsellers" },
-  { label: "NEW LAUNCHES", href: "/new-launches" },
+  { label: "About", href: "/about" },
+  { label: "Joy", href: "/category/joy" },
+  { label: "Bliss", href: "/category/bliss" },
+  { label: "Grace", href: "/category/grace" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contact Us", href: "/contact-us" },
 ]
 
 interface AuthenticatedUser {
@@ -28,7 +29,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const { cartItems, isCartOpen, setIsCartOpen } = useCart()
+  const { cartItems } = useCart()
   const [user, setUser] = useState<AuthenticatedUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -96,14 +97,14 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-[#F5F1ED] border-b sticky top-0 z-50" style={{ borderColor: "#D9CFC7" }}>
+      <header className="bg-white border-b sticky top-0 z-50" style={{ borderColor: "#D9CFC7" }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
+                className="text-foreground hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -112,7 +113,7 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
+                className="text-foreground hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
                 onClick={handleSearchIconClick}
               >
                 <Search className="h-5 w-5" />
@@ -139,7 +140,7 @@ export function Header() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors relative"
+                          className="text-foreground hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors relative"
                         >
                           <div
                             className={`w-8 h-8 rounded-full bg-gradient-to-br ${getGradientColor(user.fullname)} flex items-center justify-center text-white font-semibold text-sm`}
@@ -171,7 +172,7 @@ export function Header() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
+                      className="text-foreground hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
                       >
                         <User className="h-5 w-5" />
                         <span className="sr-only">User account</span>
@@ -183,8 +184,8 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors relative"
-                onClick={() => setIsCartOpen(true)}
+                className="text-foreground hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors relative"
+                onClick={() => router.push("/cart")}
               >
                 <ShoppingCart className="h-5 w-5" />
                 {cartItems.length > 0 && (
@@ -200,7 +201,7 @@ export function Header() {
 
         {isSearchOpen && (
           <div
-            className="absolute top-full left-0 right-0 bg-[#F5F1ED] border-b shadow-lg animate-in slide-in-from-top duration-300 z-40"
+            className="absolute top-full left-0 right-0 bg-white border-b shadow-lg animate-in slide-in-from-top duration-300 z-40"
             style={{ borderColor: "#D9CFC7" }}
           >
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -233,16 +234,16 @@ export function Header() {
 
         {isMenuOpen && (
           <div
-            className="fixed left-0 top-16 bottom-0 w-40 bg-[#F5F1ED] border-r shadow-lg animate-in slide-in-from-left duration-300 overflow-y-auto z-40"
+            className="fixed left-0 top-16 bottom-0 w-56 bg-white border-r shadow-lg animate-in slide-in-from-left duration-300 overflow-y-auto z-40"
             style={{ borderColor: "#D9CFC7" }}
           >
-            <nav className="p-3">
-              <ul className="space-y-0.5">
+            <nav className="p-4">
+              <ul className="space-y-1">
                 {menuItems.map((item, index) => (
                   <li key={index}>
                     <Link
                       href={item.href}
-                      className="block py-2 px-3 text-[#6D4530] text-sm font-normal tracking-wide hover:text-[#8B5A3C] hover:bg-[#8B5A3C]/10 transition-all duration-300 rounded-md"
+                      className="block py-2.5 px-4 text-foreground text-base font-medium uppercase tracking-wide hover:text-[#8B5A3C] hover:bg-[#8B5A3C]/10 transition-all duration-300 rounded-md"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {item.label}
@@ -272,7 +273,6 @@ export function Header() {
         />
       )}
 
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cartItems={cartItems} />
     </>
   )
 }

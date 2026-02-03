@@ -3,6 +3,7 @@
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Carousel,
   CarouselContent,
@@ -13,10 +14,72 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 
-import { useRef } from "react"
-import { ChevronRight } from "lucide-react"
+import { useState, useRef } from "react"
+import { Loader2, ChevronRight } from "lucide-react"
 
-export default function JoyCollectionPage() {
+
+import { useCart } from "@/contexts/cart-context"
+import { type CartItem } from "@/components/cart/cart-drawer"
+import { CustomerTestimonialVideos } from "@/components/sections/customer-testimonial-videos"
+
+export default function JoyPage() {
+  const [hamperSelected, setHamperSelected] = useState(true)
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [bedSpreadColor, setBedSpreadColor] = useState("")
+  const [pillowSize, setPillowSize] = useState("")
+  const [swaddleSelected, setSwaddleSelected] = useState(false)
+  const [selectedHamperImage, setSelectedHamperImage] = useState(0)
+  const [mattressVariant, setMattressVariant] = useState("")
+  const [mattressDimension, setMattressDimension] = useState("")
+  const [mattressFabric, setMattressFabric] = useState("")
+  const [mattressApplicator, setMattressApplicator] = useState("")
+  const [selectedColor, setSelectedColor] = useState("royal-blue")
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [isAddingHamper, setIsAddingHamper] = useState(false)
+  const [isAddingMattress, setIsAddingMattress] = useState(false)
+  const [addingProductId, setAddingProductId] = useState<string | null>(null)
+  const [addingSwaddleType, setAddingSwaddleType] = useState<string | null>(null)
+
+  // Color to images mapping
+  const colorImages: Record<string, string[]> = {
+    "royal-blue": ["/productmattress.jpg", "/topper.jpg", "/lounger.jpg", "/pillow.jpg", "/bumpers.jpg"],
+    gray: ["/topper.jpg", "/productmattress.jpg", "/lounger.jpg", "/pillow.jpg", "/bumpers.jpg"],
+    black: ["/lounger.jpg", "/productmattress.jpg", "/topper.jpg", "/pillow.jpg", "/bumpers.jpg"],
+    "dark-brown": ["/bumpers.jpg", "/productmattress.jpg", "/topper.jpg", "/lounger.jpg", "/pillow.jpg"],
+  }
+
+  const colors = [
+    { name: "royal-blue", label: "Royal Blue", hex: "#4169E1", overlay: "rgba(65, 105, 225, 0.5)", blendMode: "overlay" },
+    { name: "gray", label: "Gray", hex: "#4A4A4A", overlay: "rgba(74, 74, 74, 0.4)", blendMode: "multiply" },
+    { name: "black", label: "Black", hex: "#000000", overlay: "rgba(0, 0, 0, 0.3)", blendMode: "multiply" },
+    { name: "dark-brown", label: "Dark Brown", hex: "#5C4033", overlay: "rgba(92, 64, 51, 0.5)", blendMode: "overlay" },
+  ]
+
+  const selectedColorData = colors.find(c => c.name === selectedColor) || colors[0]
+
+  const currentImages = colorImages[selectedColor] || colorImages["royal-blue"]
+
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color)
+    setSelectedImageIndex(0) // Reset to first image when color changes
+  }
+  
+  const hamperImages = [
+    { src: "/productmattress.jpg", item: "Mattress" },
+    { src: "/topper.jpg", item: "Topper" },
+    { src: "/lounger.jpg", item: "Lounger" },
+    { src: "/pillow.jpg", item: "Head Pillow" },
+    { src: "/bumpers.jpg", item: "Pillow Bumpers" },
+  ]
+
+  const babyProducts = [
+    { id: "mattress", name: "Mattress", price: 299, image: "/productmattress.jpg", productDetailId: 7 },
+    { id: "topper", name: "Topper", price: 149, image: "/topper.jpg", productDetailId: 8 },
+    { id: "lounger", name: "Lounger", price: 199, image: "/lounger.jpg", productDetailId: 9 },
+    { id: "head-pillow", name: "Head Pillow", price: 79, image: "/pillow.jpg", productDetailId: 10 },
+    { id: "pillow-bumpers", name: "Pillow Bumpers", price: 89, image: "/bumpers.jpg", productDetailId: 11 },
+  ]
+
   const shopSectionRef = useRef<HTMLElement>(null)
   const aboutUsSectionRef = useRef<HTMLElement>(null)
 
@@ -28,25 +91,164 @@ export default function JoyCollectionPage() {
     aboutUsSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  // Color to images mapping for display
-  const colorImages: Record<string, string[]> = {
-    "royal-blue": ["/productmattress.jpg", "/topper.jpg", "/lounger.jpg", "/pillow.jpg", "/bumpers.jpg"],
-    gray: ["/topper.jpg", "/productmattress.jpg", "/lounger.jpg", "/pillow.jpg", "/bumpers.jpg"],
-    black: ["/lounger.jpg", "/productmattress.jpg", "/topper.jpg", "/pillow.jpg", "/bumpers.jpg"],
-    "dark-brown": ["/bumpers.jpg", "/productmattress.jpg", "/topper.jpg", "/lounger.jpg", "/pillow.jpg"],
+  const { addToCart } = useCart()
+
+  const toggleItem = (itemId: string) => {
+    setSelectedItems((prev) =>
+      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+    )
   }
 
-  const currentImages = colorImages["royal-blue"]
+  const handleAddHamperToCart = async () => {
+    setIsAddingHamper(true)
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    // Get items to add: if hamperSelected is true, add all products; otherwise add only selected items
+    const itemsToAdd = hamperSelected 
+      ? babyProducts 
+      : babyProducts.filter(product => selectedItems.includes(product.id))
+    
+    itemsToAdd.forEach((product) => {
+      const sizeInfo = product.id === "mattress" && mattressDimension 
+        ? `${mattressVariant || "Standard"} - ${mattressDimension}${mattressApplicator ? ` - ${mattressApplicator}` : ""}`
+        : "Standard"
+      
+      const colorInfo = selectedColor ? ` - ${colors.find(c => c.name === selectedColor)?.label || selectedColor}` : ""
+      
+      const cartItem: CartItem = {
+        id: `joy-hamper-${product.id}-${selectedColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        name: `JOY ${product.name}`,
+        image: product.id === "mattress" ? currentImages[0] : product.image,
+        size: `${sizeInfo}${colorInfo}`,
+        quantity: 1,
+        price: product.price,
+      }
+      addToCart(cartItem)
+    })
+    
+    // Add complimentary bed spread if color is selected
+    if (bedSpreadColor) {
+      const colorLabel = bedSpreadColor.charAt(0).toUpperCase() + bedSpreadColor.slice(1)
+      const bedSpreadItem: CartItem = {
+        id: `joy-bedspread-${bedSpreadColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        name: "JOY Bed Spread (Complimentary)",
+        image: "/bedsheet.jpg",
+        size: colorLabel,
+        quantity: 1,
+        price: 0,
+      }
+      addToCart(bedSpreadItem)
+    }
+    
+    // Add complimentary pillow if size is selected
+    if (pillowSize) {
+      const pillowItem: CartItem = {
+        id: `joy-pillow-${pillowSize}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        name: "JOY Pillow (Complimentary)",
+        image: "/pillow.jpg",
+        size: pillowSize,
+        quantity: 1,
+        price: 0,
+      }
+      addToCart(pillowItem)
+    }
+    
+    setHamperSelected(true)
+    setIsAddingHamper(false)
+  }
 
-  const babyProducts = [
-    { id: "mattress", name: "Mattress", price: 299, image: "/productmattress.jpg", productDetailId: 7 },
-    { id: "topper", name: "Topper", price: 149, image: "/topper.jpg", productDetailId: 8 },
-    { id: "lounger", name: "Lounger", price: 199, image: "/lounger.jpg", productDetailId: 9 },
-    { id: "head-pillow", name: "Head Pillow", price: 79, image: "/pillow.jpg", productDetailId: 10 },
-    { id: "pillow-bumpers", name: "Pillow Bumpers", price: 89, image: "/bumpers.jpg", productDetailId: 11 },
-  ]
+  const handleAddProductToCart = async (productId: string) => {
+    setAddingProductId(productId)
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    const product = babyProducts.find(p => p.id === productId)
+    if (product) {
+      const sizeInfo = productId === "mattress" && mattressDimension 
+        ? `${mattressVariant || "Standard"} - ${mattressDimension}${mattressApplicator ? ` - ${mattressApplicator}` : ""}`
+        : "Standard"
+      
+      const cartItem: CartItem = {
+        id: `joy-${productId}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        name: `JOY ${product.name}`,
+        image: product.image,
+        size: sizeInfo,
+        quantity: 1,
+        price: product.price,
+      }
+      addToCart(cartItem)
+    }
+    
+    setHamperSelected(false)
+    toggleItem(productId)
+    setAddingProductId(null)
+  }
 
-  const totalHamperPrice = babyProducts.reduce((sum, product) => sum + product.price, 0)
+  const handleAddSwaddleToCart = async (swaddleType: string) => {
+    setAddingSwaddleType(swaddleType)
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    const cartItem: CartItem = {
+      id: `joy-swaddle-${swaddleType.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      name: `JOY ${swaddleType} Swaddle`,
+      image: "/cotton.jpg",
+      size: "Standard",
+      quantity: 1,
+      price: 49,
+    }
+    addToCart(cartItem)
+    
+    setSwaddleSelected(true)
+    setAddingSwaddleType(null)
+  }
+
+  const handleAddMattressToCart = async () => {
+    setIsAddingMattress(true)
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    const sizeInfo = `${mattressVariant || "Standard"} - ${mattressDimension || "Standard"}${mattressFabric ? ` - ${mattressFabric}` : ""}${mattressApplicator ? ` - ${mattressApplicator}` : ""}`
+    
+    const mattressItem: CartItem = {
+      id: `joy-mattress-${mattressVariant}-${mattressDimension}-${selectedColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      name: "JOY Mattress",
+      image: currentImages[0],
+      size: `${sizeInfo}${selectedColor ? ` - ${colors.find(c => c.name === selectedColor)?.label || selectedColor}` : ""}`,
+      quantity: 1,
+      price: 299,
+    }
+    addToCart(mattressItem)
+    
+    // Add complimentary pillow if size is selected
+    if (pillowSize) {
+      const pillowItem: CartItem = {
+        id: `joy-pillow-${pillowSize}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        name: "JOY Pillow (Complimentary)",
+        image: "/pillow.jpg",
+        size: pillowSize,
+        quantity: 1,
+        price: 0,
+      }
+      addToCart(pillowItem)
+    }
+    
+    // Add complimentary bed spread if color is selected
+    if (bedSpreadColor) {
+      const bedSpreadItem: CartItem = {
+        id: `joy-bedspread-${bedSpreadColor}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        name: "JOY Bed Spread (Complimentary)",
+        image: "/bedsheet.jpg",
+        size: bedSpreadColor,
+        quantity: 1,
+        price: 0,
+      }
+      addToCart(bedSpreadItem)
+    }
+    
+    setIsAddingMattress(false)
+  }
 
   return (
     <div className="min-h-screen">
@@ -66,7 +268,7 @@ export default function JoyCollectionPage() {
                   <ChevronRight className="w-4 h-4 text-foreground/50" />
                 </li>
                 <li className="text-foreground font-medium">
-                  Joy 
+                  Joy
                 </li>
               </ol>
             </nav>
@@ -160,7 +362,7 @@ export default function JoyCollectionPage() {
                         {/* Left Side - Image */}
                         <div className="relative aspect-[4/3] overflow-hidden ">
                           <Image
-                            src={slide.image}
+                            src={slide.image || "/placeholder.svg"}
                             alt={slide.title}
                             fill
                             className="object-cover"
@@ -193,8 +395,9 @@ export default function JoyCollectionPage() {
           </div>
         </section>
 
+       
         {/* Products Section */}
-        <section ref={shopSectionRef} className="py-16 px-4 bg-stone-50">
+        <section id="shop" ref={shopSectionRef} className="py-16 px-4 bg-stone-50">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-8 text-center font-cormorant">
               Shop
@@ -205,7 +408,7 @@ export default function JoyCollectionPage() {
                 <Link href="/product/12" className="block">
                   <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
                     <Image
-                      src={currentImages[0]}
+                      src={currentImages[0] || "/placeholder.svg"}
                       alt="JOY Baby Hamper"
                       fill
                       className="object-cover"
@@ -215,7 +418,7 @@ export default function JoyCollectionPage() {
                 </Link>
                 <h3 className="text-base font-semibold text-foreground mb-2 text-center">JOY Baby Hamper</h3>
                 <div className="text-sm font-medium text-foreground mb-3 text-center">
-                  Starting from ₹{totalHamperPrice.toLocaleString()}
+                  Starting from ₹{babyProducts.reduce((sum, product) => sum + product.price, 0).toLocaleString()}
                 </div>
                 <Link href="/product/12">
                   <Button 
@@ -231,7 +434,7 @@ export default function JoyCollectionPage() {
                 <Link href="/product/13" className="block">
                   <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
                     <Image
-                      src={currentImages[0]}
+                      src={currentImages[0] || "/placeholder.svg"}
                       alt="JOY Kids Hamper"
                       fill
                       className="object-cover"
@@ -241,7 +444,7 @@ export default function JoyCollectionPage() {
                 </Link>
                 <h3 className="text-base font-semibold text-foreground mb-2 text-center">JOY Kids Hamper</h3>
                 <div className="text-sm font-medium text-foreground mb-3 text-center">
-                  Starting from ₹{totalHamperPrice.toLocaleString()}
+                  Starting from ₹{babyProducts.reduce((sum, product) => sum + product.price, 0).toLocaleString()}
                 </div>
                 <Link href="/product/13">
                   <Button 
@@ -261,7 +464,7 @@ export default function JoyCollectionPage() {
                   <Link href={`/product/${product.productDetailId}`} className="block">
                     <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
                       <Image
-                        src={product.image}
+                        src={product.image || "/placeholder.svg"}
                         alt={product.name}
                         fill
                         className="object-cover"
@@ -312,93 +515,8 @@ export default function JoyCollectionPage() {
           </div>
         </section>
 
-        {/* Customer Testimonials */}
-        <section className="py-16 px-4 bg-stone-50">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 text-center font-cormorant">
-              Customer Testimonials
-            </h2>
-            <p className="text-center text-foreground mb-8 max-w-2xl mx-auto">
-              Hear from our satisfied customers about their experience with Ananthala products
-            </p>
-            <div className="relative">
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: true,
-                }}
-                className="w-full"
-              >
-                <CarouselContent className="-ml-2 md:-ml-4">
-                  {[
-                    {
-                      id: 1,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "Sarah Johnson",
-                    },
-                    {
-                      id: 2,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "Michael Chen",
-                    },
-                    {
-                      id: 3,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "Emily Rodriguez",
-                    },
-                    {
-                      id: 4,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "David Thompson",
-                    },
-                    {
-                      id: 5,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "Priya Sharma",
-                    },
-                    {
-                      id: 6,
-                      video: "/ananthala hero section video.mp4",
-                      poster: "/productmattress.jpg",
-                      name: "James Wilson",
-                    },
-                  ].map((testimonial) => (
-                    <CarouselItem
-                      key={testimonial.id}
-                      className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
-                    >
-                      <div className="space-y-2">
-                        <div className="relative aspect-video overflow-hidden border border-[#EED9C4]">
-                          <video
-                            className="w-full h-full object-cover"
-                            controls
-                            controlsList="nodownload nofullscreen noremoteplayback"
-                            disablePictureInPicture
-                            onContextMenu={(e) => e.preventDefault()}
-                            poster={testimonial.poster}
-                          >
-                            <source src={testimonial.video} type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
-                        </div>
-                        <p className="text-left text-foreground font-medium">
-                          {testimonial.name}
-                        </p>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-                <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-              </Carousel>
-            </div>
-          </div>
-        </section>
+        {/* Customer Testimonial Videos - Real from Database */}
+        <CustomerTestimonialVideos />
 
         {/* About Us Section */}
         <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
@@ -414,14 +532,48 @@ export default function JoyCollectionPage() {
               </div>
               <div className="space-y-4">
                 <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
-                  About Us
+                  Our Crafted Heritage
                 </h2>
-                <p className="text-lg text-foreground leading-relaxed">
-                  At Ananthala, we are committed to crafting premium products that take care of your baby's health. Our baby products are designed with safety and comfort in mind, using only the finest materials and innovative technology.
+                <p className="text-lg text-foreground/90 font-medium">
+                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to
+                  provide the perfect balance of comfort and support. Every layer is thoughtfully designed to
+                  help you wake up refreshed.
                 </p>
-                <p className="text-lg text-foreground leading-relaxed">
-                  Every product is expertly crafted to ensure your little one gets the best care. We believe in quality, safety, and putting your baby's well-being first.
-                </p>
+                <div className="space-y-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Pressure Relief Technology
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Conforms to your body for optimal spinal alignment
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Temperature Regulation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Advanced cooling system keeps you comfortable all night
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
+                    <div>
+                      <p className="mb-1 font-medium text-lg text-foreground">
+                        Motion Isolation
+                      </p>
+                      <p className="font-medium text-lg text-foreground">
+                        Undisturbed sleep even with a restless partner
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 <Link href="/about">
                   <Button 
                     className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"

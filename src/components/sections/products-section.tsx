@@ -36,10 +36,10 @@ export function ProductsSection() {
 
   const getCategoryPath = (productName: string) => {
     const name = productName.toLowerCase()
-    if (name.includes("pillow")) return "/pillows"
-    if (name.includes("bed sheet") || name.includes("blanket")) return "/bedding"
-    if (name.includes("towel")) return "/bedding"
-    return "/mattress"
+    if (name.includes("pillow")) return "/category/grace"
+    if (name.includes("bed sheet") || name.includes("blanket")) return "/category/grace"
+    if (name.includes("towel")) return "/category/grace"
+    return "/category/grace"
   }
 
   const onNavigate = (productName: string) => {
