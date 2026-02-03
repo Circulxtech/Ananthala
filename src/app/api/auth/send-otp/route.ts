@@ -1,0 +1,215 @@
+import { NextResponse } from "next/server"
+import connectDB from "@/lib/mongodb"
+import User from "@/models/User"
+import nodemailer from "nodemailer"
+import twilio from "twilio"
+
+export const runtime = "nodejs"
+
+// Helper function to generate 4-digit OTP
+function generateOTP() {
+  return Math.floor(1000 + Math.random() * 9000).toString()
+}
+
+// Helper function to send email
+async function sendOTPEmail(email: string, otp: string) {
+  try {
+    const emailProvider = process.env.EMAIL_PROVIDER || "gmail"
+
+    let transporter
+
+    if (emailProvider === "gmail") {
+      if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
+        throw new Error("Gmail credentials not configured. Please check your .env.local file.")
+      }
+
+      transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_APP_PASSWORD,
+        },
+      })
+    } else if (emailProvider === "smtp") {
+      if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
+        throw new Error("SMTP credentials not configured. Please check your .env.local file.")
+      }
+
+      transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number.parseInt(process.env.SMTP_PORT || "587"),
+        secure: process.env.SMTP_SECURE === "true",
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASSWORD,
+        },
+      })
+    } else {
+      throw new Error(`Unsupported email provider: ${emailProvider}`)
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+      to: email,
+      subject: "Your OTP for Ananthala Login",
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: 0 auto;">
+          <h2 style="color: #6D4530; text-align: center; margin-bottom: 20px;">Ananthala Login OTP</h2>
+          <p style="font-size: 16px; color: #6D4530; margin-bottom: 10px;">Your one-time password is:</p>
+          <div style="background-color: #F5F1ED; border: 2px solid #8B5A3C; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0;">
+            <h1 style="color: #8B5A3C; letter-spacing: 5px; margin: 0;">${otp}</h1>
+          </div>
+          <p style="font-size: 14px; color: #8B5A3C; margin-top: 20px;">This OTP will expire in 5 minutes.</p>
+          <p style="font-size: 12px; color: #B8A396; margin-top: 20px; text-align: center;">If you didn't request this OTP, please ignore this email.</p>
+        </div>
+      `,
+    }
+
+    await transporter.sendMail(mailOptions)
+    return true
+  } catch (error) {
+    console.error("[EMAIL_ERROR]", error)
+    throw error
+  }
+}
+
+async function sendOTPSMS(phone: string, otp: string) {
+  try {
+    // Validate Twilio credentials
+    const accountSid = process.env.TWILIO_ACCOUNT_SID
+    const authToken = process.env.TWILIO_AUTH_TOKEN
+    const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER
+
+    if (!accountSid || !authToken || !twilioPhoneNumber) {
+      throw new Error(
+        "Twilio credentials not configured. Please add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER to your .env.local file.",
+      )
+    }
+
+    // Create Twilio client
+    const client = twilio(accountSid, authToken)
+
+    // Send SMS
+    const message = await client.messages.create({
+      body: `Your Ananthala OTP is: ${otp}. Valid for 5 minutes. Do not share this OTP with anyone.`,
+      from: twilioPhoneNumber,
+      to: phone,
+    })
+
+    console.log(`[SMS_SUCCESS] Message sent with SID: ${message.sid}`)
+    return true
+  } catch (error) {
+    console.error("[SMS_ERROR]", error)
+    throw error
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const { email, phone, method } = await request.json()
+
+    // Validate input
+    if (!method || !["email", "phone"].includes(method)) {
+      return NextResponse.json({ success: false, message: "Invalid OTP method" }, { status: 400 })
+    }
+
+    if (method === "email" && !email) {
+      return NextResponse.json({ success: false, message: "Email is required" }, { status: 400 })
+    }
+
+    if (method === "phone" && !phone) {
+      return NextResponse.json({ success: false, message: "Phone number is required" }, { status: 400 })
+    }
+
+    // Connect to database
+    await connectDB()
+
+    // Generate OTP
+    const otp = generateOTP()
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000) // 5 minutes from now
+
+    if (method === "email") {
+      // Check if user exists with email
+      let user = await User.findOne({ email: email.toLowerCase() })
+
+      // If user doesn't exist, create a temporary record
+      if (!user) {
+        user = new User({
+          fullname: "OTP User",
+          email: email.toLowerCase(),
+          password: "otp-auth-placeholder",
+          phone: "",
+          otpCode: otp,
+          otpExpiry: otpExpiry,
+          otpMethod: "email",
+        })
+      } else {
+        // Update existing user
+        user.otpCode = otp
+        user.otpExpiry = otpExpiry
+        user.otpMethod = "email"
+      }
+
+      try {
+        // Send OTP via email
+        await sendOTPEmail(email, otp)
+        await user.save()
+
+        return NextResponse.json(
+          { success: true, message: "OTP sent to email", maskedEmail: email.replace(/(.{2})(.*)(@.*)/, "$1***$3") },
+          { status: 200 },
+        )
+      } catch (emailError: any) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              emailError.message || "Failed to send OTP email. Please verify your email configuration in .env.local",
+          },
+          { status: 500 },
+        )
+      }
+    } else if (method === "phone") {
+      // Check if user exists with phone
+      const user = await User.findOne({ phone })
+
+      if (!user) {
+        return NextResponse.json(
+          { success: false, message: "No account found with this phone number. Please sign up first." },
+          { status: 404 },
+        )
+      }
+
+      try {
+        // Send OTP via SMS using Twilio
+        await sendOTPSMS(phone, otp)
+
+        // Update user with OTP
+        user.otpCode = otp
+        user.otpExpiry = otpExpiry
+        user.otpMethod = "phone"
+        await user.save()
+
+        return NextResponse.json(
+          { success: true, message: "OTP sent to phone", maskedPhone: phone.slice(-4).padStart(phone.length, "*") },
+          { status: 200 },
+        )
+      } catch (smsError: any) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              smsError.message || "Failed to send OTP SMS. Please verify your Twilio configuration in .env.local",
+          },
+          { status: 500 },
+        )
+      }
+    }
+  } catch (error: any) {
+    console.error("[SEND_OTP_ERROR]", error)
+    return NextResponse.json(
+      { success: false, message: error.message || "Something went wrong. Please try again." },
+      { status: 500 },
+    )
+  }
+}
