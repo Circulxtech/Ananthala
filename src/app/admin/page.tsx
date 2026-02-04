@@ -197,7 +197,7 @@ export default function AdminLoginPage() {
                     id="admin-email"
                     name="email"
                     type="email"
-                    placeholder="admin@ananthala.com"
+                    placeholder=""
                     className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3 rounded-lg"
                     required
                     disabled={isLoading}
@@ -218,7 +218,7 @@ export default function AdminLoginPage() {
                     id="admin-password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder=""
                     className="pl-12 pr-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3 rounded-lg"
                     required
                     disabled={isLoading}
