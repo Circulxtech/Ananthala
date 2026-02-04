@@ -183,7 +183,7 @@ export default function AdminLoginPage() {
           <div className="bg-white rounded-2xl shadow-2xl border border-[#E5D5C5] p-8 md:p-10">
             <h2 className="text-2xl font-medium text-[#6D4530] mb-8 text-center tracking-wide">Admin Login</h2>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6 font-roboto">
               {/* Email Address Field */}
               <div>
                 <label htmlFor="admin-email" className="block text-[#6D4530] text-sm font-medium mb-2">
@@ -198,7 +198,7 @@ export default function AdminLoginPage() {
                     name="email"
                     type="email"
                     placeholder="admin@ananthala.com"
-                    className="pl-12 h-12 bg-[#F5F1ED] border-[#E5D5C5] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] rounded-lg"
+                    className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3 rounded-lg"
                     required
                     disabled={isLoading}
                   />
@@ -219,7 +219,7 @@ export default function AdminLoginPage() {
                     name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="pl-12 pr-12 h-12 bg-[#F5F1ED] border-[#E5D5C5] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] rounded-lg"
+                    className="pl-12 pr-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3 rounded-lg"
                     required
                     disabled={isLoading}
                   />

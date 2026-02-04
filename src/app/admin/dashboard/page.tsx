@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Shield, Package, Users, ShoppingCart, BarChart3, TrendingUp, Clock, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+
 interface DashboardStats {
   totalUsers: number
   totalProducts: number
@@ -22,14 +23,14 @@ interface RecentUser {
   phone?: string
 }
 
-interface RecentOrder {
+interface RecentProduct {
   id: string
-  productTitle: string
+  name: string
   seller: string
-  quantity: number
-  amount: number
-  status: "pending" | "processing" | "shipped" | "delivered"
-  date: string
+  category: string
+  price: number
+  stock: number
+  dateAdded: string
 }
 
 interface CategoryData {
@@ -44,13 +45,27 @@ interface InventoryData {
   productCount: number
 }
 
+const getStatusColor = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "pending":
+      return "bg-yellow-100 text-yellow-700"
+    case "completed":
+      return "bg-green-100 text-green-700"
+    case "cancelled":
+      return "bg-red-100 text-red-700"
+    default:
+      return "bg-gray-100 text-gray-700"
+  }
+}
+
 export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([])
-  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
+  const [recentProducts, setRecentProducts] = useState<RecentProduct[]>([])
   const [categoryData, setCategoryData] = useState<CategoryData[]>([])
   const [inventoryData, setInventoryData] = useState<InventoryData[]>([])
+  
   const [error, setError] = useState("")
   const router = useRouter()
 
@@ -88,23 +103,24 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true)
-      const [statsRes, ordersRes] = await Promise.all([
+      const [statsRes, productsRes] = await Promise.all([
         fetch("/api/admin/dashboard/stats", { credentials: "include" }),
         fetch("/api/admin/dashboard/recent-orders", { credentials: "include" }),
       ])
 
-      if (!statsRes.ok || !ordersRes.ok) {
+      if (!statsRes.ok || !productsRes.ok) {
         throw new Error("Failed to fetch dashboard data")
       }
 
       const statsData = await statsRes.json()
-      const ordersData = await ordersRes.json()
+      const productsData = await productsRes.json()
 
       setStats(statsData.stats)
       setRecentUsers(statsData.recentUsers)
       setCategoryData(statsData.categoryData)
       setInventoryData(statsData.inventoryByCategory)
-      setRecentOrders(ordersData.recentOrders)
+      setRecentProducts(productsData.recentProducts)
+       // Set recentOrders here
       setIsLoading(false)
     } catch (err) {
       setError("Failed to load dashboard data")
@@ -112,16 +128,16 @@ export default function AdminDashboard() {
     }
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "delivered":
-        return "bg-green-100 text-green-700"
-      case "shipped":
+  const getCategoryColor = (category: string) => {
+    switch (category.toLowerCase()) {
+      case "mattress":
+        return "bg-amber-100 text-amber-700"
+      case "pillow":
         return "bg-blue-100 text-blue-700"
-      case "processing":
+      case "bedding":
         return "bg-purple-100 text-purple-700"
-      case "pending":
-        return "bg-yellow-100 text-yellow-700"
+      case "bedsheet":
+        return "bg-green-100 text-green-700"
       default:
         return "bg-gray-100 text-gray-700"
     }
@@ -220,67 +236,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Category Distribution */}
-        <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6">
-          <h3 className="text-lg font-semibold text-[#6D4530] mb-4 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-orange-600" />
-            Product Categories
-          </h3>
-          <div className="space-y-4">
-            {categoryData.map((cat) => (
-              <div key={cat._id} className="flex items-center gap-3">
-                <div className="flex-1">
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium text-[#6D4530] capitalize">{cat._id}</span>
-                    <span className="text-sm font-bold text-[#8B5A3C]">{cat.count}</span>
-                  </div>
-                  <div className="w-full bg-[#F5F1ED] rounded-full h-2">
-                    <div
-                      className="bg-gradient-to-r from-[#8B5A3C] to-[#D9CFC7] h-2 rounded-full transition-all"
-                      style={{
-                        width: `${Math.min(100, (cat.count / (categoryData[0]?.count || 1)) * 100)}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Inventory by Category */}
-        <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6">
-          <h3 className="text-lg font-semibold text-[#6D4530] mb-4 flex items-center gap-2">
-            <Package className="w-5 h-5 text-green-600" />
-            Stock by Category
-          </h3>
-          <div className="space-y-4">
-            {inventoryData.map((item) => (
-              <div key={item._id} className="border-b border-[#E5D5C5] pb-3 last:border-b-0 last:pb-0">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <p className="font-medium text-[#6D4530] capitalize">{item._id}</p>
-                    <p className="text-xs text-[#8B5A3C]">{item.productCount} products</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-[#6D4530]">{item.totalStock}</p>
-                    <p className="text-xs text-[#8B5A3C]">₹{item.avgPrice.toFixed(0)}</p>
-                  </div>
-                </div>
-                <div className="w-full bg-[#F5F1ED] rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-[#8B5A3C] to-[#D9CFC7] h-2 rounded-full"
-                    style={{
-                      width: `${Math.min(100, (item.totalStock / (inventoryData[0]?.totalStock || 1)) * 100)}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Joined Users */}
@@ -307,43 +263,66 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Recent Orders */}
+        {/* Recently Added Products Table */}
         <div className="bg-white rounded-xl border border-[#E5D5C5] shadow-md p-6">
           <h3 className="text-lg font-semibold text-[#6D4530] mb-4 flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5 text-purple-600" />
-            Recent Product Activity
+            <Package className="w-5 h-5 text-orange-600" />
+            Recently Added Products
           </h3>
-          <div className="space-y-3">
-            {recentOrders.length > 0 ? (
-              recentOrders.map((order) => (
-                <div key={order.id} className="border-b border-[#E5D5C5] pb-3 last:border-b-0 last:pb-0">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <p className="font-medium text-[#6D4530] truncate">{order.productTitle}</p>
-                      <p className="text-xs text-[#8B5A3C]">by {order.seller}</p>
-                    </div>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ml-2 ${getStatusColor(order.status)}`}
-                    >
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-end">
-                    <span className="text-xs text-[#8B5A3C] flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {order.date}
-                    </span>
-                    <div className="text-right">
-                      <p className="font-bold text-[#6D4530]">₹{order.amount.toFixed(0)}</p>
-                      <p className="text-xs text-[#8B5A3C]">{order.quantity} units</p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-[#8B5A3C] py-4">No recent activity</p>
-            )}
-          </div>
+          {recentProducts.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b-2 border-[#E5D5C5] bg-[#F5F1ED]">
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#6D4530]">Product Name</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#6D4530]">Category</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#6D4530]">Seller</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold text-[#6D4530]">Price</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold text-[#6D4530]">Stock</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#6D4530]">Date Added</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentProducts.map((product) => (
+                    <tr key={product.id} className="border-b border-[#E5D5C5] hover:bg-[#FAF8F6] transition-colors">
+                      <td className="px-4 py-3">
+                        <p className="font-medium text-[#6D4530] truncate">{product.name}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getCategoryColor(product.category)}`}
+                        >
+                          {product.category}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-sm text-[#8B5A3C]">{product.seller}</p>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <p className="font-semibold text-[#6D4530]">₹{product.price.toFixed(0)}</p>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`inline-block px-2 py-1 rounded text-sm font-medium ${product.stock > 10 ? "bg-green-100 text-green-700" : product.stock > 0 ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700"}`}>
+                          {product.stock}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-sm text-[#8B5A3C] flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          {product.dateAdded}
+                        </p>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Package className="w-12 h-12 text-[#D9CFC7] mx-auto mb-3" />
+              <p className="text-[#8B5A3C] font-medium">No products added yet</p>
+            </div>
+          )}
         </div>
       </div>
 

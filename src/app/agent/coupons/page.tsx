@@ -214,7 +214,7 @@ export default function CouponManagementPage() {
               Add Coupon
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px] font-roboto">
             <DialogHeader>
               <DialogTitle className="text-[#6D4530]">Add New Coupon</DialogTitle>
               <DialogDescription className="text-[#8B5A3C]/70">
@@ -240,7 +240,7 @@ export default function CouponManagementPage() {
                   placeholder="e.g., SAVE20"
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                  className="border-[#D9CFC7] focus:border-[#8B5A3C]"
+                  className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                   disabled={isSubmitting}
                 />
               </div>

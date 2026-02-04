@@ -5,7 +5,6 @@ import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/contexts/cart-context"
 import { FixedSidebar } from "@/components/layout/fixed-sidebar"
 import { Toaster } from "@/components/ui/toaster"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 
 const cormorantGaramond = Cormorant_Garamond({ 

@@ -3,9 +3,9 @@ import mongoose, { Schema, models } from "mongoose"
 export interface IProductVariant {
   variantId: string
   weight: number // in kg
-  length: number // in cm
-  width: number // in cm
-  height: number // in cm
+  length: number // in inch
+  width: number // in inch
+  height: number // in inch
   color: string
   price: number
   stock: number
@@ -114,8 +114,8 @@ const ProductSchema = new Schema<IProduct>(
       type: String,
       required: [true, "Category is required"],
       enum: {
-        values: ["mattress", "pillow", "bedding"],
-        message: "Category must be either mattress, pillow, or bedding",
+        values: ["joy","bliss","grace", "mattress", "pillow", "bedding", "bedsheet"],
+        message: "Category must be either joy,bliss,grace ,mattress, pillow, bedding, or bedsheet",
       },
       trim: true,
     },

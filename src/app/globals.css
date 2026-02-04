@@ -78,6 +78,8 @@
 
 @theme inline {
   --font-sans: "Cormorant Garamond", serif;
+  /* Added Roboto font for forms and form inputs */
+  --font-roboto: "Roboto", system-ui, -apple-system, sans-serif;
   /* Added Google Sans font variable for admin and agent portals */
   --font-google-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback";

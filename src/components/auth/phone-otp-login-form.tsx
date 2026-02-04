@@ -111,7 +111,7 @@ export function PhoneOTPLoginForm() {
 
   if (step === "phone") {
     return (
-      <form onSubmit={handleSendOTP} className="space-y-6">
+      <form onSubmit={handleSendOTP} className="space-y-6 font-roboto">
         <div>
           <label htmlFor="phone" className="block text-[#6D4530] text-sm md:text-base font-semibold mb-3">
             Phone Number
@@ -125,7 +125,7 @@ export function PhoneOTPLoginForm() {
               placeholder="+91 9876543210"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base"
+              className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
               required
               disabled={isLoading}
             />
@@ -145,7 +145,7 @@ export function PhoneOTPLoginForm() {
   }
 
   return (
-    <form onSubmit={handleVerifyOTP} className="space-y-6">
+    <form onSubmit={handleVerifyOTP} className="space-y-6 font-roboto">
       <div>
         <p className="text-[#6D4530] text-sm md:text-base font-semibold mb-3">Enter OTP</p>
         <p className="text-xs text-[#8B5A3C] mb-4">Code sent to {maskedPhone}</p>

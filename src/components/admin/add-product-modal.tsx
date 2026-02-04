@@ -223,7 +223,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] w-full lg:max-w-7xl max-h-[95vh] overflow-y-auto p-4 sm:p-6 md:p-8">
+      <DialogContent className="max-w-[95vw] w-full lg:max-w-7xl max-h-[95vh] overflow-y-auto p-4 sm:p-6 md:p-8 font-roboto">
         <DialogHeader>
           <DialogTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-[#6D4530]">
             Add New Product
@@ -242,7 +242,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 font-roboto">
           {submitError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 flex gap-2 sm:gap-3">
               <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -266,7 +266,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                   placeholder="Enter product title"
                   value={formData.productTitle}
                   onChange={(e) => handleInputChange("productTitle", e.target.value)}
-                  className="border-[#D9CFC7] h-10 sm:h-11"
+                  className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                   required
                 />
               </div>
@@ -280,7 +280,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                   placeholder="Enter product description"
                   value={formData.description}
                   onChange={(e) => handleInputChange("description", e.target.value)}
-                  className="border-[#D9CFC7] min-h-[140px] sm:min-h-[160px]"
+                  className="pl-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3 min-h-[140px] sm:min-h-[160px]"
                   rows={6}
                   required
                 />
@@ -295,7 +295,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                   placeholder="e.g., Kg, box, piece, meter"
                   value={formData.units}
                   onChange={(e) => handleInputChange("units", e.target.value)}
-                  className="border-[#D9CFC7] h-10 sm:h-11"
+                  className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                   required
                 />
               </div>
@@ -409,14 +409,14 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                         placeholder="e.g., 2.5"
                         value={variant.weight}
                         onChange={(e) => handleVariantChange(variant.id, "weight", e.target.value)}
-                        className="border-[#D9CFC7] h-10 sm:h-11"
+                        className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                         required
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor={`length-${variant.id}`} className="text-sm text-[#6D4530]">
-                        Length (inch)*
+                        Length (cm)*
                       </Label>
                       <Input
                         id={`length-${variant.id}`}
@@ -425,14 +425,14 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                         placeholder="e.g., 30"
                         value={variant.length}
                         onChange={(e) => handleVariantChange(variant.id, "length", e.target.value)}
-                        className="border-[#D9CFC7] h-10 sm:h-11"
+                        className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                         required
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor={`width-${variant.id}`} className="text-sm text-[#6D4530]">
-                        Width (inch)*
+                        Width (cm)*
                       </Label>
                       <Input
                         id={`width-${variant.id}`}
@@ -441,14 +441,14 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                         placeholder="e.g., 20"
                         value={variant.width}
                         onChange={(e) => handleVariantChange(variant.id, "width", e.target.value)}
-                        className="border-[#D9CFC7] h-10 sm:h-11"
+                        className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                         required
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor={`height-${variant.id}`} className="text-sm text-[#6D4530]">
-                        Height (inch)*
+                        Height (cm)*
                       </Label>
                       <Input
                         id={`height-${variant.id}`}
@@ -457,7 +457,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                         placeholder="e.g., 15"
                         value={variant.height}
                         onChange={(e) => handleVariantChange(variant.id, "height", e.target.value)}
-                        className="border-[#D9CFC7] h-10 sm:h-11"
+                        className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                         required
                       />
                     </div>
@@ -472,7 +472,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                         placeholder="e.g., Blue, White, Gray"
                         value={variant.color}
                         onChange={(e) => handleVariantChange(variant.id, "color", e.target.value)}
-                        className="border-[#D9CFC7] h-10 sm:h-11"
+                        className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                         required
                       />
                     </div>
@@ -488,7 +488,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                         placeholder="e.g., 1200"
                         value={variant.price}
                         onChange={(e) => handleVariantChange(variant.id, "price", e.target.value)}
-                        className="border-[#D9CFC7] h-10 sm:h-11"
+                        className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                         required
                       />
                     </div>
@@ -503,7 +503,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                         placeholder="e.g., 50"
                         value={variant.stock}
                         onChange={(e) => handleVariantChange(variant.id, "stock", e.target.value)}
-                        className="border-[#D9CFC7] h-10 sm:h-11"
+                        className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                         required
                       />
                     </div>
@@ -538,7 +538,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                   placeholder="Enter seller name"
                   value={formData.sellerName}
                   onChange={(e) => handleInputChange("sellerName", e.target.value)}
-                  className="border-[#D9CFC7] h-10 sm:h-11"
+                  className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                   required
                 />
               </div>
@@ -553,7 +553,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                   placeholder="Enter seller email"
                   value={formData.sellerEmail}
                   onChange={(e) => handleInputChange("sellerEmail", e.target.value)}
-                  className="border-[#D9CFC7] h-10 sm:h-11"
+                  className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                   required
                 />
                 <p className="text-xs text-[#8B5A3C]/70">
@@ -571,7 +571,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                 placeholder="Enter location"
                 value={formData.location}
                 onChange={(e) => handleInputChange("location", e.target.value)}
-                className="border-[#D9CFC7] h-10 sm:h-11"
+                className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                 required
               />
             </div>
@@ -588,13 +588,14 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                 Product Category*
               </Label>
               <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
-                <SelectTrigger className="border-[#D9CFC7] h-10 sm:h-11 bg-white">
-                  <SelectValue placeholder="Select Category" />
+                <SelectTrigger className="border-[#D9CFC7] h-10 sm:h-11">
+                  <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="mattress">Mattress</SelectItem>
                   <SelectItem value="pillow">Pillow</SelectItem>
                   <SelectItem value="bedding">Bedding</SelectItem>
+                  <SelectItem value="bedsheet">Bedsheet</SelectItem>
                 </SelectContent>
               </Select>
             </div>

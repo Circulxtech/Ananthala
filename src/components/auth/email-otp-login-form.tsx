@@ -99,7 +99,7 @@ export function EmailOTPLoginForm() {
 
   if (step === "email") {
     return (
-      <form onSubmit={handleSendOTP} className="space-y-6">
+      <form onSubmit={handleSendOTP} className="space-y-6 font-roboto">
         <div>
           <label htmlFor="email" className="block text-[#6D4530] text-sm md:text-base font-semibold mb-3">
             Email Address
@@ -113,7 +113,7 @@ export function EmailOTPLoginForm() {
               placeholder="your.email@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base"
+              className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
               required
               disabled={isLoading}
             />
@@ -133,7 +133,7 @@ export function EmailOTPLoginForm() {
   }
 
   return (
-    <form onSubmit={handleVerifyOTP} className="space-y-6">
+    <form onSubmit={handleVerifyOTP} className="space-y-6 font-roboto">
       <div>
         <p className="text-[#6D4530] text-sm md:text-base font-semibold mb-3">Enter OTP</p>
         <p className="text-xs text-[#8B5A3C] mb-4">Code sent to {maskedEmail}</p>

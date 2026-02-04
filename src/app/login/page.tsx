@@ -9,7 +9,7 @@ export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<"password" | "email-otp" | "phone-otp">("password")
 
   return (
-    <div className="min-h-screen bg-[#F5F1ED] flex items-center justify-center px-4 py-12 md:py-8">
+    <div className="min-h-screen bg-[#F5F1ED] flex items-center justify-center px-4 py-12 md:py-8 font-roboto">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8 md:mb-12">
@@ -18,7 +18,7 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6 md:p-10 border border-[#E5D5C5]">
+        <div className="bg-white rounded-lg shadow-lg p-6 md:p-10 border border-[#E5D5C5] font-roboto">
           <h1 className="text-2xl md:text-3xl font-serif text-[#6D4530] mb-8 text-center font-cormorant">Sign In</h1>
 
           <div className="flex gap-2 mb-8 bg-[#F5F1ED] p-1 rounded-lg">

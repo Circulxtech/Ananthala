@@ -77,10 +77,10 @@ export async function POST(request: Request) {
     }
 
     const categoryLower = category.toLowerCase()
-    if (categoryLower !== "mattress" && categoryLower !== "pillow" && categoryLower !== "bedding") {
+    if (categoryLower !== "mattress" && categoryLower !== "pillow" && categoryLower !== "bedding" && categoryLower !== "joy" && categoryLower !== "bliss" && categoryLower !== "grace") {
       console.error("[v0] Invalid category:", category)
       return NextResponse.json(
-        { success: false, message: "Category must be either Mattress, Pillow, or Bedding" },
+        { success: false, message: "Category must be either joy,bliss,grace,Mattress, Pillow,Bedding or bedsheet" },
         { status: 400 },
       )
     }

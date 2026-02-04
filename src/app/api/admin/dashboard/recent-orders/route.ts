@@ -18,24 +18,28 @@ export async function GET(request: NextRequest) {
 
     await connectDB()
 
-    // Since we don't have an Order model yet, we'll use recently updated products
-    const recentOrders = await Product.find()
-      .select("productTitle sellerName variants createdAt updatedAt status")
-      .sort({ updatedAt: -1 })
-      .limit(8)
+    // Fetch recently added products
+    const recentProducts = await Product.find()
+      .select("productTitle sellerName category variants createdAt")
+      .sort({ createdAt: -1 })
+      .limit(10)
       .lean()
 
-    const formattedOrders = recentOrders.map((product, index) => ({
+    const formattedProducts = recentProducts.map((product) => ({
       id: product._id?.toString(),
-      productTitle: product.productTitle,
+      name: product.productTitle,
       seller: product.sellerName,
-      quantity: product.variants[0]?.stock || 0,
-      amount: product.variants[0]?.price || 0,
-      status: ["delivered", "processing", "pending", "shipped"][index % 4],
-      date: new Date(product.updatedAt || product.createdAt).toLocaleDateString(),
+      category: product.category || "uncategorized",
+      price: product.variants[0]?.price || 0,
+      stock: product.variants[0]?.stock || 0,
+      dateAdded: new Date(product.createdAt).toLocaleDateString("en-IN", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }),
     }))
 
-    return NextResponse.json({ recentOrders: formattedOrders }, { status: 200 })
+    return NextResponse.json({ recentProducts: formattedProducts }, { status: 200 })
   } catch (error) {
     console.error("Recent orders error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

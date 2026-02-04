@@ -143,8 +143,12 @@ export default function ProductManagementPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="mattress">Mattress</SelectItem>
+                  <SelectItem value="joy">JOY</SelectItem>
+                 <SelectItem value="bliss">Bliss</SelectItem>
+                <SelectItem value="grace">Grace</SelectItem>
                 <SelectItem value="pillow">Pillow</SelectItem>
+                <SelectItem value="bedding">Bedding</SelectItem>
+                <SelectItem value="bedsheet">Bedsheet</SelectItem>
               </SelectContent>
             </Select>
 
