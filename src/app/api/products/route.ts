@@ -107,6 +107,7 @@ export async function POST(request: Request) {
       const width = Number.parseFloat(variant.width)
       const height = Number.parseFloat(variant.height)
       const color = variant.color?.trim()
+      const fabric = variant.fabric?.trim()
       const price = Number.parseFloat(variant.price)
       const stock = Number.parseInt(variant.stock, 10)
 
@@ -118,6 +119,11 @@ export async function POST(request: Request) {
       if (!color) {
         console.error(`[v0] Missing color in variant ${index + 1}`)
         throw new Error(`Variant ${index + 1} requires a color.`)
+      }
+
+      if (!fabric) {
+        console.error(`[v0] Missing fabric in variant ${index + 1}`)
+        throw new Error(`Variant ${index + 1} requires a fabric selection.`)
       }
 
       if (weight <= 0 || length <= 0 || width <= 0 || height <= 0 || price <= 0 || stock < 0) {
@@ -132,6 +138,7 @@ export async function POST(request: Request) {
         width,
         height,
         color,
+        fabric,
         price,
         stock,
       }

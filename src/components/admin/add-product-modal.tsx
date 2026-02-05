@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { ProductFormData, ProductVariant } from "@/types/product"
+import { fabricOptions } from "@/data/fabric"
 
 interface AddProductModalProps {
   isOpen: boolean
@@ -41,6 +42,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
         width: "",
         height: "",
         color: "",
+        fabric: "",
         price: "",
         stock: "",
       },
@@ -112,6 +114,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
           width: "",
           height: "",
           color: "",
+          fabric: "",
           price: "",
           stock: "",
         },
@@ -211,6 +214,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
           width: "",
           height: "",
           color: "",
+          fabric: "",
           price: "",
           stock: "",
         },
@@ -475,6 +479,34 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                         className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                         required
                       />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor={`fabric-${variant.id}`} className="text-sm text-[#6D4530]">
+                        Fabric*
+                      </Label>
+                      <Select value={variant.fabric} onValueChange={(value) => handleVariantChange(variant.id, "fabric", value)}>
+                        <SelectTrigger
+                          id={`fabric-${variant.id}`}
+                          className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
+                        >
+                          <SelectValue placeholder="Select fabric" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-[#D9CFC7]">
+                          {fabricOptions.map((fabric) => (
+                            <SelectItem key={fabric.id} value={fabric.id} className="flex items-center gap-2">
+                              <div className="flex items-center gap-2">
+                                <img
+                                  src={fabric.image || "/placeholder.svg"}
+                                  alt={fabric.name}
+                                  className="h-6 w-6 rounded object-cover"
+                                />
+                                <span>{fabric.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div className="space-y-2">
