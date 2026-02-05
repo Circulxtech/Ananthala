@@ -110,7 +110,7 @@ export function EmailOTPLoginForm() {
               id="email"
               name="email"
               type="email"
-              placeholder="your.email@example.com"
+              placeholder=""
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
