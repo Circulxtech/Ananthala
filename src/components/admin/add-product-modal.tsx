@@ -592,6 +592,10 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="joy">joy</SelectItem>
+                  <SelectItem value="bliss">Bliss</SelectItem>
+                  <SelectItem value="grace">grace</SelectItem>
+                  
                   <SelectItem value="mattress">Mattress</SelectItem>
                   <SelectItem value="pillow">Pillow</SelectItem>
                   <SelectItem value="bedding">Bedding</SelectItem>
