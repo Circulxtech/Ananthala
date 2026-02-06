@@ -14,13 +14,27 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Loader2, ChevronRight } from "lucide-react"
 
 
 import { useCart } from "@/contexts/cart-context"
 import { type CartItem } from "@/components/cart/cart-drawer"
 import { CustomerTestimonialVideos } from "@/components/sections/customer-testimonial-videos"
+
+interface ApiProductVariant {
+  price: number
+}
+
+interface ApiProduct {
+  _id: string
+  productTitle: string
+  category: string
+  subCategory?: string
+  imageUrls: string[]
+  variants: ApiProductVariant[]
+  status: "visible" | "hidden"
+}
 
 export default function JoyPage() {
   const [hamperSelected, setHamperSelected] = useState(true)
@@ -83,6 +97,10 @@ export default function JoyPage() {
   const shopSectionRef = useRef<HTMLElement>(null)
   const aboutUsSectionRef = useRef<HTMLElement>(null)
 
+  // State for backend products
+  const [backendProducts, setBackendProducts] = useState<ApiProduct[]>([])
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true)
+
   const scrollToShop = () => {
     shopSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
@@ -92,6 +110,27 @@ export default function JoyPage() {
   }
 
   const { addToCart } = useCart()
+
+  // Fetch products with category "joy" from backend
+  useEffect(() => {
+    const fetchJoyProducts = async () => {
+      try {
+        setIsLoadingProducts(true)
+        const response = await fetch("/api/products?category=joy&status=visible")
+        const data = await response.json()
+
+        if (response.ok && data?.success) {
+          setBackendProducts(Array.isArray(data.products) ? data.products : [])
+        }
+      } catch (error) {
+        console.error("Error fetching joy products:", error)
+      } finally {
+        setIsLoadingProducts(false)
+      }
+    }
+
+    fetchJoyProducts()
+  }, [])
 
   const toggleItem = (itemId: string) => {
     setSelectedItems((prev) =>
@@ -455,62 +494,51 @@ export default function JoyPage() {
                 </Link>
               </div>
 
-              {/* Individual Products */}
-              {babyProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white"
-                >
-                  <Link href={`/product/${product.productDetailId}`} className="block">
-                    <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
-                      <Image
-                        src={product.image || "/placeholder.svg"}
-                        alt={product.name}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                    </div>
-                  </Link>
-                  <h3 className="text-base font-semibold text-foreground mb-2 text-center">{product.name}</h3>
-                  <div className="text-sm font-medium text-foreground mb-3 text-center">
-                    Starting at ₹{product.price.toLocaleString()}
-                  </div>
-                  <Link href={`/product/${product.productDetailId}`}>
-                    <Button 
-                      className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
-                    >
-                      Customize
-                    </Button>
-                  </Link>
+              {/* Backend Products with category "joy" */}
+              {isLoadingProducts ? (
+                <div className="col-span-full flex items-center justify-center py-10">
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin text-foreground/70" />
+                  <span className="text-foreground/70">Loading products...</span>
                 </div>
-              ))}
+              ) : (
+                backendProducts.map((product) => {
+                  const minPrice = product.variants.reduce(
+                    (currentMin, variant) => Math.min(currentMin, variant.price),
+                    Number.POSITIVE_INFINITY,
+                  )
+                  const startingPrice = Number.isFinite(minPrice) ? minPrice : 0
 
-              {/* Swaddles Card */}
-              <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white">
-                <Link href="/product/swaddles" className="block">
-                  <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
-                    <Image
-                      src="/swaddle.jpg"
-                      alt="Swaddles"
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                </Link>
-                <h3 className="text-base font-semibold text-foreground mb-2 text-center">Swaddles</h3>
-                <div className="text-sm font-medium text-foreground mb-3 text-center">
-                  Starting at ₹49
-                </div>
-                <Link href="/product/swaddles">
-                  <Button 
-                    className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
-                  >
-                    Customize
-                  </Button>
-                </Link>
-              </div>
+                  return (
+                    <div
+                      key={product._id}
+                      className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white"
+                    >
+                      <Link href={`/product/${product._id}`} className="block">
+                        <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                          <Image
+                            src={product.imageUrls?.[0] || "/placeholder.svg"}
+                            alt={product.productTitle}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
+                        </div>
+                      </Link>
+                      <h3 className="text-base font-semibold text-foreground mb-2 text-center">{product.productTitle}</h3>
+                      <div className="text-sm font-medium text-foreground mb-3 text-center">
+                        Starting at ₹{startingPrice.toLocaleString("en-IN")}
+                      </div>
+                      <Link href={`/product/${product._id}`}>
+                        <Button 
+                          className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
+                        >
+                          Customize
+                        </Button>
+                      </Link>
+                    </div>
+                  )
+                })
+              )}
             </div>
           </div>
         </section>

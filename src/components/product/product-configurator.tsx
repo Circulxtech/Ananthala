@@ -1,0 +1,361 @@
+"use client"
+
+import { useState, useMemo, useEffect } from "react"
+import Image from "next/image"
+import { Loader2, ShoppingCart } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { type CartItem } from "@/components/cart/cart-drawer"
+import type { ProductDetail } from "@/data/product-details"
+
+interface ApiProductVariant {
+  weight: number
+  length: number
+  width: number
+  height: number
+  color: string
+  price: number
+  stock: number
+}
+
+interface ProductConfiguratorProps {
+  product: ProductDetail
+  variants?: ApiProductVariant[]
+  onAddToCart: (item: CartItem) => void
+  isAddingToCart: boolean
+}
+
+export function ProductConfigurator({
+  product,
+  variants = [],
+  onAddToCart,
+  isAddingToCart,
+}: ProductConfiguratorProps) {
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [useCustomDimensions, setUseCustomDimensions] = useState(false)
+  const [customLength, setCustomLength] = useState("")
+  const [customWidth, setCustomWidth] = useState("")
+  const [customHeight, setCustomHeight] = useState("")
+  const [selectedSize, setSelectedSize] = useState("")
+  const [selectedFabric, setSelectedFabric] = useState("")
+  const [quantity, setQuantity] = useState(1)
+
+  const productImages = product.images?.length ? product.images : ["/placeholder.svg"]
+  const customSizeLabel = `${customLength || "-"}x${customWidth || "-"}x${customHeight || "-"} cm`
+  const hasCustomDimensions = Boolean(customLength && customWidth && customHeight)
+  const minVariantPrice = useMemo(() => {
+    if (!variants.length) return undefined
+    return variants.reduce((min, variant) => Math.min(min, variant.price), variants[0].price)
+  }, [variants])
+
+  const parsedSelectedSize = useMemo(() => {
+    if (!selectedSize || useCustomDimensions) return null
+    const sizeMatch = selectedSize.match(/(\d+)x(\d+)x(\d+)(?:\s*cm)?/)
+    if (!sizeMatch) return null
+    return {
+      length: Number(sizeMatch[1]),
+      width: Number(sizeMatch[2]),
+      height: Number(sizeMatch[3]),
+    }
+  }, [selectedSize, useCustomDimensions])
+
+  // Find all variants that match the selected size
+  const matchingVariants = useMemo(() => {
+    if (!parsedSelectedSize || !variants.length) return []
+
+    return variants.filter(
+      (v) =>
+        v.length === parsedSelectedSize.length &&
+        v.width === parsedSelectedSize.width &&
+        v.height === parsedSelectedSize.height
+    )
+  }, [parsedSelectedSize, variants])
+
+  // Get unique colors from matching variants (for the selected size)
+  const availableColors = useMemo(() => {
+    if (useCustomDimensions || !selectedSize) {
+      // For custom dimensions or no size selected, show all colors
+      if (!variants.length) return []
+      return Array.from(new Set(variants.map((v) => v.color).filter(Boolean)))
+    }
+    
+    // For selected size, show colors available for that size
+    if (matchingVariants.length === 0) return []
+    return Array.from(new Set(matchingVariants.map((v) => v.color).filter(Boolean)))
+  }, [matchingVariants, variants, selectedSize, useCustomDimensions])
+
+  // Find the variant that matches the selected size and fabric
+  const selectedVariant = useMemo(() => {
+    if (!parsedSelectedSize || !variants.length) return null
+
+    // If fabric is selected, find variant matching both size and color
+    if (selectedFabric) {
+      return matchingVariants.find((v) => v.color === selectedFabric) || null
+    }
+    
+    // Otherwise, return the first matching variant
+    return matchingVariants[0] || null
+  }, [parsedSelectedSize, selectedFabric, matchingVariants])
+
+  const price = selectedVariant?.price ?? minVariantPrice ?? 0
+  const totalPrice = price * quantity
+  const hasSufficientStock =
+    !parsedSelectedSize || (selectedVariant && selectedVariant.stock >= quantity)
+  const canAddToCart =
+    (useCustomDimensions ? hasCustomDimensions : Boolean(selectedSize)) &&
+    (availableColors.length <= 1 || Boolean(selectedFabric)) &&
+    hasSufficientStock
+
+  // Update selected fabric when variant changes (auto-select if only one color)
+  useEffect(() => {
+    if (matchingVariants.length > 0) {
+      const uniqueColors = Array.from(new Set(matchingVariants.map((v) => v.color).filter(Boolean)))
+      
+      // If current fabric is not available for this size, reset it
+      if (selectedFabric && !uniqueColors.includes(selectedFabric)) {
+        setSelectedFabric("")
+      }
+      
+      // Auto-select if only one color available
+      if (!selectedFabric && uniqueColors.length === 1) {
+        setSelectedFabric(uniqueColors[0])
+      }
+    } else if (!useCustomDimensions && selectedFabric) {
+      // Reset fabric if no matching variants
+      setSelectedFabric("")
+    }
+  }, [matchingVariants, selectedFabric, useCustomDimensions])
+
+  const handleAddToCart = async () => {
+    if (!canAddToCart) return
+
+    const finalSize = useCustomDimensions ? customSizeLabel : selectedSize
+    const item: CartItem = {
+      id: `${product.id}-${finalSize}-${Date.now()}`,
+      name: product.name,
+      image: productImages[0],
+      size: finalSize,
+      fabric: selectedFabric || selectedVariant?.color || undefined,
+      quantity,
+      price,
+    }
+    onAddToCart(item)
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="lg:col-span-8">
+        <div className="p-6 bg-white border-2 border-[#EED9C4]">
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div className="relative aspect-square overflow-hidden">
+                <Image
+                  src={productImages[selectedImageIndex] || "/placeholder.svg"}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              </div>
+
+              {productImages.length > 1 && (
+                <div className="grid grid-cols-5 gap-2">
+                  {productImages.map((image, index) => (
+                    <button
+                      key={`${image}-${index}`}
+                      onClick={() => setSelectedImageIndex(index)}
+                      type="button"
+                      className={`relative aspect-square overflow-hidden border-2 transition-all cursor-pointer hover:opacity-80 ${
+                        selectedImageIndex === index
+                          ? "border-[#EED9C4] opacity-100"
+                          : "border-transparent opacity-60"
+                      }`}
+                    >
+                      <Image
+                        src={image}
+                        alt={`${product.name} view ${index + 1}`}
+                        fill
+                        className="object-cover pointer-events-none"
+                        unoptimized
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <h3 className="text-3xl font-medium text-foreground mb-3">{product.name}</h3>
+              <h4 className="text-2xl font-medium text-foreground mb-4">Dimensions </h4>
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUseCustomDimensions(false)
+                      setSelectedSize("")
+                    }}
+                    className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
+                      !useCustomDimensions
+                        ? "bg-[#EED9C4] text-foreground"
+                        : "bg-gray-200 text-foreground/70 hover:bg-gray-300"
+                    }`}
+                  >
+                    Standard
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUseCustomDimensions(true)
+                      setSelectedSize(customSizeLabel)
+                    }}
+                    className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
+                      useCustomDimensions
+                        ? "bg-[#EED9C4] text-foreground"
+                        : "bg-gray-200 text-foreground/70 hover:bg-gray-300"
+                    }`}
+                  >
+                    Custom
+                  </button>
+                </div>
+
+                <div>
+                  {!useCustomDimensions ? (
+                    <>
+                      <label className="text-base font-medium text-foreground mb-2 block">Select Size</label>
+                      <Select value={selectedSize || undefined} onValueChange={setSelectedSize}>
+                        <SelectTrigger className="w-full text-foreground">
+                          <SelectValue placeholder="Select dimensions" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {product.sizes.map((size) => (
+                            <SelectItem key={size.name} value={size.name.split(" - ")[0]}>
+                              {size.name.split(" - ")[0]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </>
+                  ) : (
+                    <>
+                      <label className="text-base font-medium text-foreground mb-2 block">Custom Dimensions (cm)</label>
+                      <div className="grid grid-cols-3 gap-3">
+                        <Input
+                          type="number"
+                          min="1"
+                          value={customLength}
+                          onChange={(event) => {
+                            setCustomLength(event.target.value)
+                            setSelectedSize(`${event.target.value || "-"}x${customWidth || "-"}x${customHeight || "-"} cm`)
+                          }}
+                          placeholder="Length"
+                        />
+                        <Input
+                          type="number"
+                          min="1"
+                          value={customWidth}
+                          onChange={(event) => {
+                            setCustomWidth(event.target.value)
+                            setSelectedSize(`${customLength || "-"}x${event.target.value || "-"}x${customHeight || "-"} cm`)
+                          }}
+                          placeholder="Width"
+                        />
+                        <Input
+                          type="number"
+                          min="1"
+                          value={customHeight}
+                          onChange={(event) => {
+                            setCustomHeight(event.target.value)
+                            setSelectedSize(`${customLength || "-"}x${customWidth || "-"}x${event.target.value || "-"} cm`)
+                          }}
+                          placeholder="Height"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {availableColors.length > 0 && (
+                  <div>
+                    <label className="text-base font-medium text-foreground mb-2 block">Fabric / Color</label>
+                    <Select value={selectedFabric || undefined} onValueChange={setSelectedFabric}>
+                      <SelectTrigger className="w-full text-foreground">
+                        <SelectValue placeholder="Select fabric/color" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableColors.map((color) => (
+                          <SelectItem key={color} value={color}>
+                            {color}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-base font-medium text-foreground mb-2 block">Quantity</label>
+                  <div className="inline-flex items-center border rounded" style={{ borderColor: "#EED9C4" }}>
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-4 py-2 text-foreground hover:opacity-70 transition-opacity"
+                    >
+                      -
+                    </button>
+                    <span className="px-6 py-2 min-w-[60px] text-center text-foreground">{quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-4 py-2 text-foreground hover:opacity-70 transition-opacity"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="lg:col-span-4">
+        <div className="p-6 bg-white border-2 border-[#EED9C4] space-y-6">
+          <div>
+            <p className="text-lg font-medium text-foreground">Total Price</p>
+            <p className="text-2xl font-semibold text-foreground mt-2">
+              ₹{totalPrice.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+              <span className="text-sm font-normal text-foreground/70"> (inclusive of all taxes)</span>
+            </p>
+          </div>
+          {selectedVariant && !hasSufficientStock && (
+            <p className="text-sm text-red-600">
+              Only {selectedVariant.stock} left in stock for this selection.
+            </p>
+          )}
+          <Button
+            className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-3 text-base"
+            onClick={handleAddToCart}
+            disabled={isAddingToCart || !canAddToCart}
+          >
+            {isAddingToCart ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Adding...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <ShoppingCart className="h-4 w-4" />
+                Add to Cart
+              </span>
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}

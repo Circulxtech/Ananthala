@@ -4,9 +4,9 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { ChevronLeft, ChevronRight, Check } from "lucide-react"
-import { useState } from "react"
-import { getProductDetailById } from "@/data/product-details"
+import { ChevronLeft, ChevronRight, Check, Loader2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { getProductDetailById, type ProductDetail } from "@/data/product-details"
 import { type CartItem } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
 import { getProductType, isBlissProduct, isGraceProduct, isJoyProduct } from "@/utils/product-type"
@@ -27,12 +27,171 @@ import { GraceTopperProductTemplate } from "@/collections/grace/templates/GraceT
 import { GraceLoungerProductTemplate } from "@/collections/grace/templates/GraceLoungerProductTemplate"
 import { GraceHeadPillowProductTemplate } from "@/collections/grace/templates/GraceHeadPillowProductTemplate"
 import { SimpleProductConfigurator } from "@/components/product/simple-product-configurator"
+import { ProductConfigurator } from "@/components/product/product-configurator"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+
+interface ApiProductVariant {
+  weight: number
+  length: number
+  width: number
+  height: number
+  color: string
+  price: number
+  stock: number
+}
+
+interface ApiProduct {
+  _id: string
+  productTitle: string
+  description: string
+  units: string
+  sellerName: string
+  sellerEmail: string
+  location: string
+  category: string
+  subCategory?: string
+  imageUrls: string[]
+  variants: ApiProductVariant[]
+  status: "visible" | "hidden"
+}
+
+const toTitleCase = (value: string) => (value ? value.charAt(0).toUpperCase() + value.slice(1) : value)
+
+const formatVariantSize = (variant: ApiProductVariant) => {
+  return `${variant.length}x${variant.width}x${variant.height} cm`
+}
+
+const mapApiProductToDetail = (product: ApiProduct): ProductDetail => {
+  const variants = Array.isArray(product.variants) ? product.variants : []
+  const minPrice = variants.reduce((currentMin, variant) => Math.min(currentMin, variant.price), Number.POSITIVE_INFINITY)
+  const startingPrice = Number.isFinite(minPrice) ? minPrice : 0
+  const totalStock = variants.reduce((sum, variant) => sum + (variant.stock || 0), 0)
+  const uniqueColors = Array.from(new Set(variants.map((variant) => variant.color).filter(Boolean)))
+  const features = [
+    product.sellerName ? `Seller: ${product.sellerName}` : null,
+    product.location ? `Location: ${product.location}` : null,
+    uniqueColors.length ? `Colors: ${uniqueColors.join(", ")}` : null,
+  ].filter(Boolean) as string[]
+
+  return {
+    id: product._id,
+    name: product.productTitle,
+    category: product.category,
+    price: startingPrice,
+    rating: 0,
+    reviews: 0,
+    description: product.description,
+    images: product.imageUrls?.length ? product.imageUrls : ["/placeholder.svg"],
+    firmness: "Standard",
+    height: variants[0]?.height ? `${variants[0].height} cm` : "Standard",
+    materials: [
+      `Category: ${toTitleCase(product.category)}`,
+      ...(product.subCategory ? [`Collection: ${toTitleCase(product.subCategory)}`] : []),
+    ],
+    features,
+    specifications: {
+      Units: product.units,
+      Variants: `${variants.length}`,
+      "Total Stock": `${totalStock}`,
+    },
+    sizes: variants.length
+      ? variants.map((variant) => ({
+          name: formatVariantSize(variant),
+          price: variant.price,
+        }))
+      : [{ name: "Standard", price: startingPrice }],
+  }
+}
 
 export default function ProductDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const productId = parseInt(params.id as string)
-  const product = getProductDetailById(productId)
+  const rawId = params.id as string
+  const isNumericId = /^\d+$/.test(rawId)
+  const numericId = isNumericId ? Number(rawId) : null
+  const staticProduct = numericId !== null ? getProductDetailById(numericId) : undefined
+
+  const [apiProduct, setApiProduct] = useState<ProductDetail | null>(null)
+  const [rawApiProduct, setRawApiProduct] = useState<ApiProduct | null>(null)
+  const [isLoading, setIsLoading] = useState(!staticProduct)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<"features" | "specs">("features")
+  const [isAddingToCart, setIsAddingToCart] = useState(false)
+  const { addToCart } = useCart()
+
+  useEffect(() => {
+    if (staticProduct) {
+      setApiProduct(null)
+      setRawApiProduct(null)
+      setIsLoading(false)
+      setLoadError(null)
+      return
+    }
+
+    let isMounted = true
+
+    const fetchProduct = async () => {
+      try {
+        setIsLoading(true)
+        setLoadError(null)
+        const response = await fetch(`/api/products/${rawId}`)
+        const data = await response.json()
+
+        if (!response.ok || !data?.success) {
+          throw new Error(data?.message || "Product not found")
+        }
+
+        if (data.product?.status === "hidden") {
+          throw new Error("This product is not currently available.")
+        }
+
+        if (isMounted) {
+          const productData = data.product as ApiProduct
+          setRawApiProduct(productData)
+          setApiProduct(mapApiProductToDetail(productData))
+        }
+      } catch (error: any) {
+        if (isMounted) {
+          setLoadError(error.message || "Product not found")
+          setApiProduct(null)
+          setRawApiProduct(null)
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    fetchProduct()
+
+    return () => {
+      isMounted = false
+    }
+  }, [rawId, staticProduct])
+
+  const product = staticProduct ?? apiProduct
+  const productId = staticProduct ? numericId : null
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <main className="pt-16 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center text-foreground">
+            <Loader2 className="mx-auto mb-4 h-6 w-6 animate-spin" />
+            Loading product details...
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
 
   if (!product) {
     return (
@@ -41,7 +200,7 @@ export default function ProductDetailPage() {
         <main className="pt-16 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-black mb-4">
-              Product Not Found in database
+              {loadError || "Product Not Found in database"}
             </h1>
             <button
               onClick={() => router.push("/")}
@@ -57,17 +216,15 @@ export default function ProductDetailPage() {
     )
   }
 
-  const productType = getProductType(productId)
+  const productType = productId !== null ? getProductType(productId) : "simple"
   const isBabyProduct = product.category === "baby"
-  const isJoy = isJoyProduct(productId)
-  const isBliss = isBlissProduct(productId)
-  const isGrace = isGraceProduct(productId)
-  
-  // Shared state
-  const [activeTab, setActiveTab] = useState<"features" | "specs">("features")
-  const [isAddingToCart, setIsAddingToCart] = useState(false)
-  
-  const { addToCart } = useCart()
+  const isJoy = productId !== null ? isJoyProduct(productId) : false
+  const isBliss = productId !== null ? isBlissProduct(productId) : false
+  const isGrace = productId !== null ? isGraceProduct(productId) : false
+  const shippingInformation =
+    (product as ProductDetail).shippingInformation ||
+    product.specifications?.["Shipping information"] ||
+    ""
 
   // Color scheme
   const colors = isBabyProduct
@@ -187,7 +344,7 @@ export default function ProductDetailPage() {
           {productType === "baby-hamper" && (
             <BabyHamperProductTemplate
               product={product}
-              productId={productId}
+              productId={productId!}
               onAddToCart={handleAddToCart}
               isAddingToCart={isAddingToCart}
             />
@@ -196,7 +353,7 @@ export default function ProductDetailPage() {
           {productType === "kids-hamper" && (
             <KidsHamperProductTemplate
               product={product}
-              productId={productId}
+              productId={productId!}
               onAddToCart={handleAddToCart}
               isAddingToCart={isAddingToCart}
             />
@@ -205,7 +362,7 @@ export default function ProductDetailPage() {
           {productType === "individual-baby" && (
             <IndividualProductTemplate
               product={product}
-              productId={productId}
+              productId={productId!}
               onAddToCart={handleAddToCart}
               isAddingToCart={isAddingToCart}
             />
@@ -215,21 +372,21 @@ export default function ProductDetailPage() {
             isBliss ? (
               <BlissMattressProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
             ) : isGrace ? (
               <GraceMattressProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
             ) : (
               <MattressProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
@@ -240,21 +397,21 @@ export default function ProductDetailPage() {
             isBliss ? (
               <BlissTopperProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
             ) : isGrace ? (
               <GraceTopperProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
             ) : (
               <TopperProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
@@ -265,21 +422,21 @@ export default function ProductDetailPage() {
             isBliss ? (
               <BlissLoungerProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
             ) : isGrace ? (
               <GraceLoungerProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
             ) : (
               <LoungerProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
@@ -290,21 +447,21 @@ export default function ProductDetailPage() {
             isBliss ? (
               <BlissHeadPillowProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
             ) : isGrace ? (
               <GraceHeadPillowProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
             ) : (
               <HeadPillowProductTemplate
                 product={product}
-                productId={productId}
+                productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
@@ -314,7 +471,7 @@ export default function ProductDetailPage() {
           {productType === "pillow-bumpers" && (
             <PillowBumpersProductTemplate
               product={product}
-              productId={productId}
+              productId={productId!}
               onAddToCart={handleAddToCart}
               isAddingToCart={isAddingToCart}
             />
@@ -322,92 +479,47 @@ export default function ProductDetailPage() {
           
           {productType === "simple" && (
             <>
-              <SimpleProductConfigurator
-                product={product}
-                onAddToCart={handleAddToCart}
-                isAddingToCart={isAddingToCart}
-                colors={colors}
-              />
-
-              {/* Product Details Tabs - Only for simple products */}
-              <div
-                className="mt-16 border-t pt-12"
-                style={{ borderColor: colors.border }}
-              >
-                <div
-                  className="flex gap-8 mb-8 border-b"
-                  style={{ borderColor: colors.border }}
-                >
-                  <button
-                    onClick={() => setActiveTab("features")}
-                    className="pb-4 transition-colors relative text-black text-lg font-medium"
-                  >
-                    Features & Materials
-                    {activeTab === "features" && (
-                      <div
-                        className="absolute bottom-0 left-0 right-0 h-0.5"
-                        style={{ backgroundColor: colors.accent }}
-                      ></div>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("specs")}
-                    className="pb-4 transition-colors relative text-black text-lg font-medium"
-                  >
-                    Specifications
-                    {activeTab === "specs" && (
-                      <div
-                        className="absolute bottom-0 left-0 right-0 h-0.5"
-                        style={{ backgroundColor: colors.accent }}
-                      ></div>
-                    )}
-                  </button>
-                </div>
-
-                {activeTab === "features" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                      <h3 className="mb-4 text-black">Key Features</h3>
-                      <ul className="space-y-3">
-                        {product.features.map((feature: string, index: number) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <Check className="w-5 h-5 mt-0.5 shrink-0 text-black text-lg" />
-                            <span className="text-black">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
+              {productId === null ? (
+                <>
+                  <ProductConfigurator
+                    product={product}
+                    variants={rawApiProduct?.variants || []}
+                    onAddToCart={handleAddToCart}
+                    isAddingToCart={isAddingToCart}
+                  />
+                  <section className="w-full bg-white py-12">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                      <Accordion type="single" collapsible className="w-full space-y-4">
+                        <AccordionItem value="description" className="border-2 border-[#EED9C4] px-4">
+                          <AccordionTrigger className="text-lg font-medium text-foreground hover:no-underline">
+                            Description
+                          </AccordionTrigger>
+                          <AccordionContent className="text-foreground/80 leading-relaxed">
+                            {product.description}
+                          </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="shipping" className="border-2 border-[#EED9C4] px-4 last:border-b-2!">
+                          <AccordionTrigger className="text-lg font-medium text-foreground hover:no-underline">
+                            Shipping information
+                          </AccordionTrigger>
+                          <AccordionContent className="text-foreground/80 leading-relaxed">
+                            {shippingInformation || "Shipping information will be shared after order confirmation."}
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
                     </div>
-                    <div>
-                      <h3 className="mb-4 text-black">Materials</h3>
-                      <ul className="space-y-3">
-                        {product.materials.map((material: string, index: number) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <div className="w-2 h-2 rounded-full mt-2 shrink-0 bg-black text-lg"></div>
-                            <span className="text-black">{material}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
+                  </section>
+                </>
+              ) : (
+                <SimpleProductConfigurator
+                  product={product}
+                  onAddToCart={handleAddToCart}
+                  isAddingToCart={isAddingToCart}
+                  colors={colors}
+                />
+              )}
 
-                {activeTab === "specs" && (
-                  <div className="max-w-3xl">
-                    <div className="grid grid-cols-1 gap-4">
-                      {Object.entries(product.specifications).map(([key, value]) => (
-                        <div
-                          key={key}
-                          className="grid grid-cols-2 gap-4 py-4 border-b last:border-0"
-                          style={{ borderColor: colors.border }}
-                        >
-                          <span className="text-black">{key}</span>
-                          <span className="text-black">{value as string}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+             
             </>
           )}
         </div>

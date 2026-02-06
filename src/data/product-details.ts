@@ -1,5 +1,5 @@
 export interface ProductDetail {
-  id: number
+  id: number | string
   name: string
   category: string
   price: number
@@ -13,6 +13,7 @@ export interface ProductDetail {
   features: string[]
   specifications: Record<string, string>
   sizes: { name: string; price: number }[]
+  shippingInformation?: string
 }
 
 export const productDetails: Record<number, ProductDetail> = {

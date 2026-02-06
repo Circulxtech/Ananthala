@@ -15,6 +15,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRef } from "react"
 import { CustomerTestimonialVideos } from "@/components/sections/customer-testimonial-videos"
+import { CategoryProductsGrid } from "@/components/sections/category-products-grid"
 
 export default function BlissPage() {
   const shopSectionRef = useRef<HTMLElement>(null)
@@ -216,6 +217,12 @@ export default function BlissPage() {
                   </Link>
                 </div>
               ))}
+            </div>
+            <div className="mt-12">
+              <h3 className="text-2xl md:text-3xl font-medium text-foreground mb-6 text-center font-cormorant">
+                New Products
+              </h3>
+              <CategoryProductsGrid collection="bliss" />
             </div>
           </div>
         </section>

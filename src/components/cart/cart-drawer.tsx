@@ -72,6 +72,9 @@ export function CartDrawer({ isOpen, onClose, cartItems = [] }: CartDrawerProps)
                     <div className="flex-1 min-w-0">
                       <h3 className="font-serif text-black text-lg mb-2 leading-tight">{item.name}</h3>
                       <p className="text-black text-sm mb-2">Size: {item.size}</p>
+                      {item.fabric && (
+                        <p className="text-black text-sm mb-2">Fabric: {item.fabric}</p>
+                      )}
                       <p className="text-black text-sm">Qty: {item.quantity}</p>
                     </div>
                     <div className="text-right">
