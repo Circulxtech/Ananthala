@@ -7,6 +7,7 @@ export interface IProductVariant {
   width: number // in inch
   height: number // in inch
   color: string
+  fabric: string // fabric type/id
   price: number
   stock: number
 }
@@ -58,6 +59,11 @@ const ProductVariantSchema = new Schema<IProductVariant>(
       required: [true, "Color is required"],
       trim: true,
       maxlength: [50, "Color cannot exceed 50 characters"],
+    },
+    fabric: {
+      type: String,
+      required: [true, "Fabric is required"],
+      trim: true,
     },
     price: {
       type: Number,
