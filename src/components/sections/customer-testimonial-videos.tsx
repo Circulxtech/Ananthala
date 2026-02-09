@@ -21,7 +21,7 @@ export function CustomerTestimonialVideos() {
   const [selectedVideo, setSelectedVideo] = useState<ReviewVideo | null>(null)
   const [autoPlayInterval, setAutoPlayInterval] = useState<NodeJS.Timeout | null>(null)
   const [isPaused, setIsPaused] = useState(false)
-  const canShowThree = videos.length > 3; // Declare canShowThree variable
+  const canShowFour = videos.length > 4
 
   // Fetch videos from database
   useEffect(() => {
@@ -45,9 +45,9 @@ export function CustomerTestimonialVideos() {
     fetchVideos()
   }, [])
 
-  // Auto-scroll carousel every 5 seconds if more than 3 videos
+  // Auto-scroll carousel every 5 seconds if more than 4 videos
   useEffect(() => {
-    if (videos.length > 3 && !isPaused) {
+    if (videos.length > 4 && !isPaused) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % videos.length)
       }, 5000)
@@ -70,29 +70,30 @@ export function CustomerTestimonialVideos() {
     setCurrentIndex((prev) => (prev + 1) % videos.length)
   }
 
-  // Show all videos if <= 3, otherwise show 3 in circular manner
+  // Show all videos if <= 4, otherwise show 4 in circular manner
   const getVisibleVideos = () => {
     if (videos.length === 0) return []
-    if (videos.length <= 3) {
+    if (videos.length <= 4) {
       return videos
     }
-    // Show 3 videos in a circular manner for 4+ videos
+    // Show 4 videos in a circular manner for 5+ videos
     return [
       videos[currentIndex % videos.length],
       videos[(currentIndex + 1) % videos.length],
       videos[(currentIndex + 2) % videos.length],
+      videos[(currentIndex + 3) % videos.length],
     ]
   }
 
   const visibleVideos = getVisibleVideos()
-  const showNavigation = videos.length > 3
+  const showNavigation = videos.length > 4
 
   if (loading) {
     return (
       <section className="py-16 px-4 bg-stone-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <p className="text-[#8B5A3C]">Loading customer testimonials...</p>
+            <p className="text-foreground">Loading customer testimonials...</p>
           </div>
         </div>
       </section>
@@ -108,7 +109,7 @@ export function CustomerTestimonialVideos() {
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4">What Our Divas Say</h2>
+          <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-4">What Our Divas Say</h2>
           <p className="text-center text-foreground/80 max-w-2xl mx-auto">
             Hear from our satisfied customers about their experience with Ananthala products
           </p>
@@ -116,11 +117,21 @@ export function CustomerTestimonialVideos() {
 
         {/* Videos Grid - Show all available videos */}
         <div className="relative">
-          <div className={`grid ${visibleVideos.length === 1 ? 'md:grid-cols-1' : visibleVideos.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6 mb-8`}>
+          <div
+            className={`grid ${
+              visibleVideos.length === 1
+                ? 'md:grid-cols-1'
+                : visibleVideos.length === 2
+                  ? 'md:grid-cols-2'
+                  : visibleVideos.length === 3
+                    ? 'md:grid-cols-3'
+                    : 'md:grid-cols-4'
+            } gap-6 mb-8`}
+          >
             {visibleVideos.map((video) => (
               <div
                 key={video._id}
-                className="group relative bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-[#EED9C4]"
+                className="group relative bg-white  overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-[#EED9C4]"
                 onClick={() => setSelectedVideo(video)}
               >
                 {/* Video Thumbnail */}
@@ -132,19 +143,19 @@ export function CustomerTestimonialVideos() {
                   {/* Play Button Overlay */}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all duration-300">
                     <div className="bg-white rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform duration-300 shadow-lg">
-                      <Play className="h-6 w-6 text-[#8B5A3C] fill-[#8B5A3C]" />
+                      <Play className="h-6 w-6 text-foreground fill-foreground" />
                     </div>
                   </div>
                 </div>
 
                 {/* Video Info */}
                 <div className="p-4">
-                  <h3 className="font-semibold text-[#6D4530] mb-1 line-clamp-1">{video.title}</h3>
+                  <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{video.title}</h3>
                   {video.customerName && (
-                    <p className="text-sm text-[#8B5A3C]/70 mb-2">— {video.customerName}</p>
+                    <p className="text-sm text-foreground mb-2">— {video.customerName}</p>
                   )}
                   {video.description && (
-                    <p className="text-sm text-[#8B5A3C]/60 line-clamp-2">{video.description}</p>
+                    <p className="text-sm text-foreground line-clamp-2">{video.description}</p>
                   )}
                 </div>
               </div>

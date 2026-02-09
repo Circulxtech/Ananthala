@@ -29,14 +29,6 @@ export default function GracePage() {
     aboutUsSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  const shopItems = [
-    { name: "Mattress", price: "29,999", image: "/mattress.jpg", href: "/product/19" },
-    { name: "Topper", price: "14,999", image: "/topper.jpg", href: "/product/20" },
-    { name: "Lounger", price: "7,999", image: "/lounger.jpg", href: "/product/21" },
-    { name: "Pillow", price: "4,999", image: "/pillow.jpg", href: "/product/22" },
-  ]
-
-
   return (
     <div className="min-h-screen">
       <Header />
@@ -187,41 +179,7 @@ export default function GracePage() {
             <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-8 text-center font-cormorant">
               Shop
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 gap-y-8">
-              {shopItems.map((item) => (
-                <div
-                  key={item.name}
-                  className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white"
-                >
-                  <Link href={item.href} className="block">
-                    <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
-                      <Image
-                        src={item.image || "/placeholder.svg"}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                    </div>
-                  </Link>
-                  <h3 className="text-base font-semibold text-foreground mb-2 text-center">{item.name}</h3>
-                  <div className="text-sm font-medium text-foreground mb-3 text-center">
-                    Starting at ₹{item.price}
-                  </div>
-                  <Link href={item.href}>
-                    <Button className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm">
-                      Customize
-                    </Button>
-                  </Link>
-                </div>
-              ))}
-            </div>
-            <div className="mt-12">
-              <h3 className="text-2xl md:text-3xl font-medium text-foreground mb-6 text-center font-cormorant">
-                New Products
-              </h3>
-              <CategoryProductsGrid collection="grace" />
-            </div>
+            <CategoryProductsGrid collection="grace" />
           </div>
         </section>
 

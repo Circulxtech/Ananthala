@@ -218,9 +218,13 @@ export default function ProductDetailPage() {
 
   const productType = productId !== null ? getProductType(productId) : "simple"
   const isBabyProduct = product.category === "baby"
+  const categorySlug = (rawApiProduct?.subCategory || rawApiProduct?.category || product.category || "").toLowerCase()
   const isJoy = productId !== null ? isJoyProduct(productId) : false
   const isBliss = productId !== null ? isBlissProduct(productId) : false
   const isGrace = productId !== null ? isGraceProduct(productId) : false
+  const isJoyCollection = isJoy || categorySlug === "joy"
+  const isBlissCollection = isBliss || categorySlug === "bliss"
+  const isGraceCollection = isGrace || categorySlug === "grace"
   const shippingInformation =
     (product as ProductDetail).shippingInformation ||
     product.specifications?.["Shipping information"] ||
@@ -265,7 +269,7 @@ export default function ProductDetailPage() {
       <Header />
       <main>
         {/* Breadcrumb */}
-        {(isJoy || isGrace) && !isBliss ? (
+        {(isJoyCollection || isGraceCollection) && !isBlissCollection ? (
           <>
             <div className="fixed top-20 left-0 right-0 z-40 bg-white border-b" style={{ borderColor: "#D9CFC7" }}>
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -281,10 +285,10 @@ export default function ProductDetailPage() {
                     </li>
                     <li>
                       <Link
-                        href={isGrace ? "/category/grace" : "/category/joy"}
+                        href={isGraceCollection ? "/category/grace" : "/category/joy"}
                         className="text-foreground hover:text-[#6D4530] transition-colors"
                       >
-                        {isGrace ? "Grace" : "Joy"}
+                        {isGraceCollection ? "Grace" : "Joy"}
                       </Link>
                     </li>
                     <li>
@@ -313,18 +317,20 @@ export default function ProductDetailPage() {
                     <ChevronRight className="w-4 h-4 text-foreground/50" />
                   </li>
                   <li>
-                    {isBliss ? (
+                    {isBlissCollection ? (
                       <Link href="/category/bliss" className="text-foreground hover:text-[#6D4530] transition-colors">
                         Bliss
                       </Link>
-                    ) : isGrace ? (
+                    ) : isGraceCollection ? (
                       <Link href="/category/grace" className="text-foreground hover:text-[#6D4530] transition-colors">
                         Grace
                       </Link>
-                    ) : (
-                      <Link href="/category/grace" className="text-foreground hover:text-[#6D4530] transition-colors">
-                        Products
+                    ) : isJoyCollection ? (
+                      <Link href="/category/joy" className="text-foreground hover:text-[#6D4530] transition-colors">
+                        Joy
                       </Link>
+                    ) : (
+                      <span className="text-foreground">Products</span>
                     )}
                   </li>
                   <li>
@@ -339,7 +345,7 @@ export default function ProductDetailPage() {
           </div>
         )}
 
-        <div className={`max-w-7xl mx-auto px-4 ${isJoy || isBliss || isGrace ? "pb-12 mt-8" : "py-12"}`}>
+        <div className={`max-w-7xl mx-auto px-4 ${isJoyCollection || isBlissCollection || isGraceCollection ? "pb-12 mt-8" : "py-12"}`}>
           {/* Product Templates - Complete page structure for each product type */}
           {productType === "baby-hamper" && (
             <BabyHamperProductTemplate
@@ -369,14 +375,14 @@ export default function ProductDetailPage() {
           )}
           
           {productType === "mattress" && (
-            isBliss ? (
+            isBlissCollection ? (
               <BlissMattressProductTemplate
                 product={product}
                 productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
-            ) : isGrace ? (
+            ) : isGraceCollection ? (
               <GraceMattressProductTemplate
                 product={product}
                 productId={productId!}
@@ -394,14 +400,14 @@ export default function ProductDetailPage() {
           )}
           
           {productType === "topper" && (
-            isBliss ? (
+            isBlissCollection ? (
               <BlissTopperProductTemplate
                 product={product}
                 productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
-            ) : isGrace ? (
+            ) : isGraceCollection ? (
               <GraceTopperProductTemplate
                 product={product}
                 productId={productId!}
@@ -419,14 +425,14 @@ export default function ProductDetailPage() {
           )}
           
           {productType === "lounger" && (
-            isBliss ? (
+            isBlissCollection ? (
               <BlissLoungerProductTemplate
                 product={product}
                 productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
-            ) : isGrace ? (
+            ) : isGraceCollection ? (
               <GraceLoungerProductTemplate
                 product={product}
                 productId={productId!}
@@ -444,14 +450,14 @@ export default function ProductDetailPage() {
           )}
           
           {productType === "head-pillow" && (
-            isBliss ? (
+            isBlissCollection ? (
               <BlissHeadPillowProductTemplate
                 product={product}
                 productId={productId!}
                 onAddToCart={handleAddToCart}
                 isAddingToCart={isAddingToCart}
               />
-            ) : isGrace ? (
+            ) : isGraceCollection ? (
               <GraceHeadPillowProductTemplate
                 product={product}
                 productId={productId!}

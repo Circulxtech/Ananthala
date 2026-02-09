@@ -442,58 +442,6 @@ export default function JoyPage() {
               Shop
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-8">
-              {/* Baby Hamper */}
-              <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white">
-                <Link href="/product/12" className="block">
-                  <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
-                    <Image
-                      src={currentImages[0] || "/placeholder.svg"}
-                      alt="JOY Baby Hamper"
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                </Link>
-                <h3 className="text-base font-semibold text-foreground mb-2 text-center">JOY Baby Hamper</h3>
-                <div className="text-sm font-medium text-foreground mb-3 text-center">
-                  Starting from ₹{babyProducts.reduce((sum, product) => sum + product.price, 0).toLocaleString()}
-                </div>
-                <Link href="/product/12">
-                  <Button 
-                    className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
-                  >
-                    Customize
-                  </Button>
-                </Link>
-              </div>
-
-              {/* Kids Hamper */}
-              <div className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white">
-                <Link href="/product/13" className="block">
-                  <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
-                    <Image
-                      src={currentImages[0] || "/placeholder.svg"}
-                      alt="JOY Kids Hamper"
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                </Link>
-                <h3 className="text-base font-semibold text-foreground mb-2 text-center">JOY Kids Hamper</h3>
-                <div className="text-sm font-medium text-foreground mb-3 text-center">
-                  Starting from ₹{babyProducts.reduce((sum, product) => sum + product.price, 0).toLocaleString()}
-                </div>
-                <Link href="/product/13">
-                  <Button 
-                    className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm"
-                  >
-                    Customize
-                  </Button>
-                </Link>
-              </div>
-
               {/* Backend Products with category "joy" */}
               {isLoadingProducts ? (
                 <div className="col-span-full flex items-center justify-center py-10">

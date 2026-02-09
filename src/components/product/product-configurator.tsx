@@ -226,7 +226,7 @@ export function ProductConfigurator({
                     <>
                       <label className="text-base font-medium text-foreground mb-2 block">Select Size</label>
                       <Select value={selectedSize || undefined} onValueChange={setSelectedSize}>
-                        <SelectTrigger className="w-full text-foreground">
+                    <SelectTrigger className="w-full text-foreground data-placeholder:text-foreground">
                           <SelectValue placeholder="Select dimensions" />
                         </SelectTrigger>
                         <SelectContent>
@@ -281,7 +281,7 @@ export function ProductConfigurator({
                   <div>
                     <label className="text-base font-medium text-foreground mb-2 block">Fabric / Color</label>
                     <Select value={selectedFabric || undefined} onValueChange={setSelectedFabric}>
-                      <SelectTrigger className="w-full text-foreground">
+                      <SelectTrigger className="w-full text-foreground ">
                         <SelectValue placeholder="Select fabric/color" />
                       </SelectTrigger>
                       <SelectContent>
