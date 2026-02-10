@@ -28,7 +28,7 @@ const menuItems = [
     icon: LayoutDashboard,
   },
   {
-    label: "Coupon Management",
+    label: "Offer-Coupons",
     href: "/agent/coupons",
     icon: Tag,
   },
