@@ -18,6 +18,7 @@ import {
   MessageSquare,
   ChevronDown,
   BookOpen,
+  Tag,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -69,6 +70,11 @@ const menuItems = [
     label: "Order Management",
     href: "/admin/orders",
     icon: ShoppingCart,
+  },
+  {
+    label: "Coupon Management",
+    href: "/admin/coupons",
+    icon: Tag,
   },
   {
     label: "Enquiry & Queries",
