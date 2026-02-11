@@ -19,6 +19,7 @@ import {
   ChevronDown,
   BookOpen,
   Tag,
+  Image,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -55,6 +56,11 @@ const menuItems = [
     label: "Review Videos",
     href: "/admin/review-videos",
     icon: MessageSquare,
+  },
+  {
+    label: "Homepage Cards",
+    href: "/admin/homepage-cards",
+    icon: Image,
   },
   {
     label: "User Management",

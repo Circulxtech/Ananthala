@@ -40,33 +40,14 @@ const categories = [
   },
 ]
 
-// Products data
-const products = [
-  {
-    id: 1,
-    name: "JOY",
-    image: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-    position: "center",
-  },
-  {
-    id: 2,
-    name: "BLISS",
-    image: "/hybrid-mattress-with-blue-accent-pillows-bedroom.jpg",
-    position: "center",
-  },
-  {
-    id: 3,
-    name: "Grace",
-    image: "/firm-mattress-with-beige-bedding-modern-bedroom.jpg",
-    position: "center",
-  },
-  {
-    id: 4,
-    name: "BEDSHEETS,PILLOWS AND MORE",
-    image: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-    position: "center",
-  },
-]
+interface HomepageCard {
+  _id: string
+  name: string
+  backgroundUrl?: string
+  position: "center" | "bottom-right" | "bottom-left"
+  isActive?: boolean
+  displayOrder?: number
+}
 
 // Testimonial Videos data
 const testimonialVideos = [
@@ -94,6 +75,7 @@ export default function Home() {
   const router = useRouter()
   const [isMuted, setIsMuted] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [homepageCards, setHomepageCards] = useState<HomepageCard[]>([])
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const toggleMute = () => {
@@ -122,6 +104,28 @@ export default function Home() {
     }, 5000)
 
     return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const fetchHomepageCards = async () => {
+      try {
+        const response = await fetch("/api/admin/homepage-cards")
+        const data = await response.json()
+
+        if (data.success) {
+          const activeCards = data.data
+            .filter((card: HomepageCard) => card.isActive)
+            .sort((a: HomepageCard, b: HomepageCard) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+
+          setHomepageCards(activeCards)
+        }
+      } catch (error) {
+        console.error("[v0] Error fetching homepage cards:", error)
+        setHomepageCards([])
+      }
+    }
+
+    fetchHomepageCards()
   }, [])
 
   const getCategoryPath = (productName: string) => {
@@ -296,41 +300,41 @@ export default function Home() {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {products.map((product) => {
+              {homepageCards.map((card) => {
                 const positionClasses = {
                   center: "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
                   "bottom-right": "bottom-6 left-1/2 -translate-x-1/2",
                   "bottom-left": "bottom-6 left-1/2 -translate-x-1/2",
                 }
 
+                const cardKey = card._id || card.name
+                const backgroundImage = card.backgroundUrl || ""
+                const isGifBackground = /\.(gif)(\?|#|$)/i.test(backgroundImage)
+                const positionKey = card.position || "center"
+
                 return (
                   <button
-                    key={product.id}
-                    onClick={() => onNavigate(product.name)}
+                    key={cardKey}
+                    onClick={() => onNavigate(card.name)}
                     className="relative group overflow-hidden aspect-3/4 cursor-pointer bg-gray-100"
                     style={{ overflow: "hidden" }}
                   >
-                    {/* Image placeholder - replace with actual Image component when images are ready */}
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                      <span className="text-gray-400 text-sm">Image Placeholder</span>
-                    </div>
-                    {/* Uncomment when images are ready:
-                    <Image
-                      src={product.image || "/placeholder.svg"}
-                      alt={product.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    */}
+                    {backgroundImage && isGifBackground ? (
+                      <img
+                        src={backgroundImage}
+                        alt={card.name}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : null}
                     <div
-                      className={`absolute ${positionClasses[product.position as keyof typeof positionClasses]} z-10`}
+                      className={`absolute ${positionClasses[positionKey as keyof typeof positionClasses]} z-10`}
                     >
                       <div className="bg-[#EED9C4] px-8 py-4 text-center relative min-w-[200px]">
                         <span
                           className="tracking-wider text-base md:text-lg font-semibold uppercase text-foreground relative z-10"
                           style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
                         >
-                          {product.name}
+                          {card.name}
                         </span>
                       </div>
                     </div>
