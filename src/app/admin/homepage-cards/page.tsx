@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 interface HomepageCard {
   _id: string
   name: string
+  backgroundUrl?: string
   position: "center" | "bottom-left" | "bottom-right"
   isActive: boolean
   createdAt: string
@@ -129,8 +130,12 @@ export default function HomepageCardsPage() {
             <div key={card._id} className="bg-white rounded-lg border border-[#D9CFC7] p-4 transition-all hover:shadow-md">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-24 h-24 rounded-md border border-[#EED9C4] bg-[#F9F7F4] flex items-center justify-center text-xs text-[#8B5A3C]/70">
-                    GIF
+                  <div className="w-24 h-24 rounded-md border border-[#EED9C4] bg-[#F9F7F4] flex items-center justify-center text-xs text-[#8B5A3C]/70 overflow-hidden">
+                    {card.backgroundUrl && /\.(gif)(\?|#|$)/i.test(card.backgroundUrl) ? (
+                      <img src={card.backgroundUrl} alt={`${card.name} GIF`} className="w-full h-full object-cover" />
+                    ) : (
+                      "GIF"
+                    )}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
