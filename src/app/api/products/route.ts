@@ -33,6 +33,7 @@ export async function POST(request: Request) {
     const category = formData.get("category") as string
     const subCategory = formData.get("subCategory") as string
     const variantsJson = formData.get("variants") as string
+    const detailSectionsJson = formData.get("detailSections") as string
 
     console.log("[v0] Received form data:", {
       productTitle,
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
       category,
       subCategory,
       hasVariants: !!variantsJson,
+      hasDetailSections: !!detailSectionsJson,
     })
 
     if (
@@ -98,6 +100,37 @@ export async function POST(request: Request) {
     if (!Array.isArray(variants) || variants.length === 0) {
       console.error("[v0] Invalid variants array:", variants)
       return NextResponse.json({ success: false, message: "At least one variant is required" }, { status: 400 })
+    }
+
+    // Parse detail sections (optional)
+    let detailSections: Array<{
+      title: string
+      body: string
+      imageUrl?: string
+      imageAlt?: string
+      imagePosition?: "left" | "right"
+      imageKey?: string
+    }> = []
+
+    if (detailSectionsJson) {
+      try {
+        const parsed = JSON.parse(detailSectionsJson)
+        if (Array.isArray(parsed)) {
+          detailSections = parsed
+            .map((section) => ({
+              title: typeof section.title === "string" ? section.title.trim() : "",
+              body: typeof section.body === "string" ? section.body.trim() : "",
+              imageUrl: typeof section.imageUrl === "string" ? section.imageUrl.trim() : "",
+              imageAlt: typeof section.imageAlt === "string" ? section.imageAlt.trim() : "",
+              imagePosition: section.imagePosition === "left" || section.imagePosition === "right" ? section.imagePosition : undefined,
+              imageKey: typeof section.imageKey === "string" ? section.imageKey : undefined,
+            }))
+            .filter((section) => section.title || section.body || section.imageUrl || section.imageKey)
+        }
+      } catch (parseError) {
+        console.error("[v0] Error parsing detail sections JSON:", parseError)
+        return NextResponse.json({ success: false, message: "Invalid detail sections data format" }, { status: 400 })
+      }
     }
 
     // Process variants - convert string values to numbers and validate
@@ -194,6 +227,37 @@ export async function POST(request: Request) {
       }
     }
 
+    if (detailSections.length > 0) {
+      for (const section of detailSections) {
+        if (!section.imageKey) continue
+        const file = formData.get(section.imageKey)
+        if (!(file instanceof File)) continue
+
+        const timestamp = Date.now()
+        const filename = `products/${sellerEmail}/detail-sections/${timestamp}_${file.name}`
+
+        try {
+          const blob = await put(filename, file, {
+            access: "public",
+            addRandomSuffix: true,
+            token: process.env.BLOB_READ_WRITE_TOKEN,
+          })
+          section.imageUrl = blob.url
+        } catch (uploadError: any) {
+          console.error(`[v0] Error uploading detail section image:`, uploadError)
+          return NextResponse.json(
+            {
+              success: false,
+              message: `Failed to upload detail section image: ${uploadError.message || "Unknown error"}`,
+            },
+            { status: 500 },
+          )
+        }
+      }
+    }
+
+    detailSections = detailSections.map(({ imageKey, ...rest }) => rest)
+
     // Connect to database
     console.log("[v0] Connecting to database...")
     await connectDB()
@@ -209,6 +273,7 @@ export async function POST(request: Request) {
       subCategory: subCategory || undefined,
       imageUrls,
       variants: processedVariants,
+      detailSections,
       status: "visible",
     }
 

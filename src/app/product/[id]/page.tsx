@@ -45,6 +45,14 @@ interface ApiProductVariant {
   stock: number
 }
 
+interface ApiProductDetailSection {
+  title: string
+  body: string
+  imageUrl?: string
+  imageAlt?: string
+  imagePosition?: "left" | "right"
+}
+
 interface ApiProduct {
   _id: string
   productTitle: string
@@ -57,6 +65,7 @@ interface ApiProduct {
   subCategory?: string
   imageUrls: string[]
   variants: ApiProductVariant[]
+  detailSections?: ApiProductDetailSection[]
   status: "visible" | "hidden"
 }
 
@@ -229,6 +238,8 @@ export default function ProductDetailPage() {
     (product as ProductDetail).shippingInformation ||
     product.specifications?.["Shipping information"] ||
     ""
+  const detailSections =
+    rawApiProduct?.detailSections?.filter((section) => section.title || section.body || section.imageUrl) || []
 
   // Color scheme
   const colors = isBabyProduct
@@ -515,6 +526,58 @@ export default function ProductDetailPage() {
                       </Accordion>
                     </div>
                   </section>
+                  {detailSections.length > 0 && (
+                    <section className="w-full bg-white py-12">
+                      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-28">
+                        {detailSections.map((section, index) => {
+                          const isImageLeft =
+                            section.imagePosition ? section.imagePosition === "left" : index % 2 === 1
+                          const image = section.imageUrl || "/placeholder.svg"
+                          return (
+                            <div
+                              key={`${section.title}-${index}`}
+                              className={`grid gap-y-32 gap-x-32 items-center ${
+                                isImageLeft ? "lg:grid-cols-[1.1fr_0.9fr]" : "lg:grid-cols-[0.9fr_1.1fr]"
+                              }`}
+                              
+                            >
+                              <div
+                                className={`order-2 ${
+                                  isImageLeft ? "lg:order-1" : "lg:order-2"
+                                }`}
+                              >
+                                <img
+                                  src={image}
+                                  alt={section.imageAlt || section.title || "Product detail"}
+                                  className="w-full h-full max-h-[420px] object-cover border border-[#EED9C4]"
+                                />
+                              </div>
+                              <div
+                                className={`order-1 ${
+                                  isImageLeft ? "lg:order-2" : "lg:order-1"
+                                }`}
+                              >
+                                {section.title && (
+                                  <h3 className="text-2xl sm:text-3xl font-semibold text-foreground mb-4">
+                                    {section.title}
+                                  </h3>
+                                )}
+                                {section.body && (
+                                  <div className="space-y-20 text-base sm:text-lg text-foreground leading-relaxed max-w-none">
+                                    {section.body
+                                      .split(/\n\s*\n/)
+                                      .map((paragraph, paragraphIndex) => (
+                                        <p key={paragraphIndex}>{paragraph}</p>
+                                      ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </section>
+                  )}
                 </>
               ) : (
                 <SimpleProductConfigurator

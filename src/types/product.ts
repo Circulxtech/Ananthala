@@ -10,6 +10,18 @@ export interface ProductVariant {
   stock: string
 }
 
+export interface ProductDetailSectionInput {
+  id: string
+  title: string
+  body: string
+  imageUrl: string
+  imageAlt: string
+  imagePosition: "left" | "right"
+  imageFile?: File | null
+  imagePreview?: string
+  imageKey?: string
+}
+
 export interface ProductFormData {
   productTitle: string
   description: string
@@ -20,6 +32,7 @@ export interface ProductFormData {
   category: string
   subCategory: string
   variants: ProductVariant[]
+  detailSections: ProductDetailSectionInput[]
 }
 
 export interface ProductWithVariants {
@@ -35,4 +48,5 @@ export interface ProductWithVariants {
   location: string
   subCategory?: string
   variants: ProductVariant[]
+  detailSections?: Omit<ProductDetailSectionInput, "id">[]
 }

@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import type { ProductFormData, ProductVariant } from "@/types/product"
+import type { ProductFormData, ProductVariant, ProductDetailSectionInput } from "@/types/product"
 import { fabricOptions } from "@/data/fabric"
 
 interface AddProductModalProps {
@@ -47,6 +47,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
         stock: "",
       },
     ],
+    detailSections: [],
   })
 
   const [productImages, setProductImages] = useState<ProductImage[]>([])
@@ -102,6 +103,40 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
     }))
   }
 
+  const handleDetailSectionChange = (
+    sectionId: string,
+    field: keyof ProductDetailSectionInput,
+    value: string,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      detailSections: prev.detailSections.map((section) =>
+        section.id === sectionId ? { ...section, [field]: value } : section,
+      ),
+    }))
+  }
+
+  const handleDetailSectionImageChange = (sectionId: string, file: File | null) => {
+    if (file && file.size > 25 * 1024 * 1024) {
+      alert(`File ${file.name} size exceeds 25 MB`)
+      return
+    }
+    setFormData((prev) => ({
+      ...prev,
+      detailSections: prev.detailSections.map((section) => {
+        if (section.id !== sectionId) return section
+        if (section.imagePreview) {
+          URL.revokeObjectURL(section.imagePreview)
+        }
+        return {
+          ...section,
+          imageFile: file,
+          imagePreview: file ? URL.createObjectURL(file) : "",
+        }
+      }),
+    }))
+  }
+
   const addVariant = () => {
     setFormData((prev) => ({
       ...prev,
@@ -122,6 +157,25 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
     }))
   }
 
+  const addDetailSection = () => {
+    setFormData((prev) => ({
+      ...prev,
+      detailSections: [
+        ...prev.detailSections,
+        {
+          id: crypto.randomUUID(),
+          title: "",
+          body: "",
+          imageUrl: "",
+          imageAlt: "",
+          imagePosition: "right",
+          imageFile: null,
+          imagePreview: "",
+        },
+      ],
+    }))
+  }
+
   const removeVariant = (variantId: string) => {
     if (formData.variants.length === 1) {
       alert("At least one variant is required")
@@ -130,6 +184,18 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
     setFormData((prev) => ({
       ...prev,
       variants: prev.variants.filter((variant) => variant.id !== variantId),
+    }))
+  }
+
+  const removeDetailSection = (sectionId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      detailSections: prev.detailSections.filter((section) => {
+        if (section.id === sectionId && section.imagePreview) {
+          URL.revokeObjectURL(section.imagePreview)
+        }
+        return section.id !== sectionId
+      }),
     }))
   }
 
@@ -146,6 +212,19 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
 
     try {
       const formDataToSend = new FormData()
+      const cleanedDetailSections = formData.detailSections
+        .map((section) => {
+          const imageKey = section.imageFile ? `detailSectionImage_${section.id}` : ""
+          return {
+            title: section.title.trim(),
+            body: section.body.trim(),
+            imageUrl: "",
+            imageAlt: section.imageAlt.trim(),
+            imagePosition: section.imagePosition,
+            imageKey,
+          }
+        })
+        .filter((section) => section.title || section.body || section.imageUrl || section.imageKey)
 
       formDataToSend.append("productTitle", formData.productTitle)
       formDataToSend.append("description", formData.description)
@@ -155,6 +234,13 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
       formDataToSend.append("location", formData.location)
       formDataToSend.append("category", formData.category)
       formDataToSend.append("subCategory", formData.subCategory)
+      formDataToSend.append("detailSections", JSON.stringify(cleanedDetailSections))
+      formData.detailSections.forEach((section) => {
+        if (section.imageFile) {
+          const imageKey = `detailSectionImage_${section.id}`
+          formDataToSend.append(imageKey, section.imageFile)
+        }
+      })
 
       formDataToSend.append("variants", JSON.stringify(formData.variants))
 
@@ -197,6 +283,11 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
   }
 
   const handleCancel = () => {
+    formData.detailSections.forEach((section) => {
+      if (section.imagePreview) {
+        URL.revokeObjectURL(section.imagePreview)
+      }
+    })
     setFormData({
       productTitle: "",
       description: "",
@@ -219,6 +310,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
           stock: "",
         },
       ],
+      detailSections: [],
     })
     setProductImages([])
     setSubmitError(null)
@@ -359,6 +451,139 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                 </p>
               )}
             </div>
+          </div>
+
+          {/* Detail Sections */}
+          <div className="space-y-4 sm:space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#D9CFC7] pb-2">
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-[#6D4530]">Detail Sections</h3>
+                <p className="text-xs sm:text-sm text-[#8B5A3C]/70">
+                  Add rich sections with headings, paragraphs, and images for the product page.
+                </p>
+              </div>
+              <Button
+                type="button"
+                onClick={addDetailSection}
+                className="bg-[#6D4530] hover:bg-[#8B5A3C] text-white w-full sm:w-auto"
+                size="sm"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Section
+              </Button>
+            </div>
+
+            {formData.detailSections.length === 0 ? (
+              <p className="text-xs sm:text-sm text-[#8B5A3C]/70">
+                No detail sections added yet. Use "Add Section" to include custom blocks.
+              </p>
+            ) : (
+              <div className="space-y-4 sm:space-y-5">
+                {formData.detailSections.map((section, index) => (
+                  <div
+                    key={section.id}
+                    className="border border-[#D9CFC7] rounded-lg p-4 sm:p-5 space-y-4 bg-[#F5F1ED]/30"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm sm:text-base font-semibold text-[#6D4530]">Section {index + 1}</h4>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeDetailSection(section.id)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        <span className="hidden sm:inline">Remove</span>
+                      </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor={`section-title-${section.id}`} className="text-sm text-[#6D4530]">
+                          Section Title
+                        </Label>
+                        <Input
+                          id={`section-title-${section.id}`}
+                          placeholder="e.g., Exceptional absorbency"
+                          value={section.title}
+                          onChange={(e) => handleDetailSectionChange(section.id, "title", e.target.value)}
+                          className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`section-image-${section.id}`} className="text-sm text-[#6D4530]">
+                          Section Image
+                        </Label>
+                        <Input
+                          id={`section-image-${section.id}`}
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleDetailSectionImageChange(section.id, e.target.files?.[0] || null)}
+                          className="h-12 bg-white border-[#D9CFC7] text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold"
+                        />
+                        {section.imagePreview && (
+                          <img
+                            src={section.imagePreview}
+                            alt={section.imageAlt || "Section preview"}
+                            className="mt-3 w-full max-h-48 object-cover rounded-lg border border-[#D9CFC7]"
+                          />
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`section-alt-${section.id}`} className="text-sm text-[#6D4530]">
+                          Image Alt Text
+                        </Label>
+                        <Input
+                          id={`section-alt-${section.id}`}
+                          placeholder="Describe the image"
+                          value={section.imageAlt}
+                          onChange={(e) => handleDetailSectionChange(section.id, "imageAlt", e.target.value)}
+                          className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`section-position-${section.id}`} className="text-sm text-[#6D4530]">
+                          Image Position
+                        </Label>
+                        <Select
+                          value={section.imagePosition}
+                          onValueChange={(value) => handleDetailSectionChange(section.id, "imagePosition", value)}
+                        >
+                          <SelectTrigger
+                            id={`section-position-${section.id}`}
+                            className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold"
+                          >
+                            <SelectValue placeholder="Select position" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border-[#D9CFC7]">
+                            <SelectItem value="left">Image on left</SelectItem>
+                            <SelectItem value="right">Image on right</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor={`section-body-${section.id}`} className="text-sm text-[#6D4530]">
+                        Paragraph
+                      </Label>
+                      <Textarea
+                        id={`section-body-${section.id}`}
+                        placeholder="Enter the paragraph text"
+                        value={section.body}
+                        onChange={(e) => handleDetailSectionChange(section.id, "body", e.target.value)}
+                        className="pl-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold min-h-[120px]"
+                        rows={4}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Variants */}

@@ -12,6 +12,14 @@ export interface IProductVariant {
   stock: number
 }
 
+export interface IProductDetailSection {
+  title: string
+  body: string
+  imageUrl?: string
+  imageAlt?: string
+  imagePosition?: "left" | "right"
+}
+
 export interface IProduct {
   productTitle: string
   description: string
@@ -23,6 +31,7 @@ export interface IProduct {
   subCategory: string
   imageUrls: string[] // Array of Vercel Blob URLs
   variants: IProductVariant[]
+  detailSections?: IProductDetailSection[]
   status: "visible" | "hidden"
   createdAt: Date
   updatedAt: Date
@@ -75,6 +84,35 @@ const ProductVariantSchema = new Schema<IProductVariant>(
       required: [true, "Stock is required"],
       min: [0, "Stock cannot be negative"],
       default: 0,
+    },
+  },
+  { _id: false },
+)
+
+const ProductDetailSectionSchema = new Schema<IProductDetailSection>(
+  {
+    title: {
+      type: String,
+      trim: true,
+      maxlength: [200, "Section title cannot exceed 200 characters"],
+    },
+    body: {
+      type: String,
+      trim: true,
+      maxlength: [3000, "Section body cannot exceed 3000 characters"],
+    },
+    imageUrl: {
+      type: String,
+      trim: true,
+    },
+    imageAlt: {
+      type: String,
+      trim: true,
+      maxlength: [200, "Image alt text cannot exceed 200 characters"],
+    },
+    imagePosition: {
+      type: String,
+      enum: ["left", "right"],
     },
   },
   { _id: false },
@@ -145,6 +183,10 @@ const ProductSchema = new Schema<IProduct>(
         validator: (v: IProductVariant[]) => v && v.length > 0,
         message: "At least one product variant is required",
       },
+    },
+    detailSections: {
+      type: [ProductDetailSectionSchema],
+      default: [],
     },
     status: {
       type: String,
