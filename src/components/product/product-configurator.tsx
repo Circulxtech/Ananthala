@@ -8,13 +8,14 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { type CartItem } from "@/components/cart/cart-drawer"
 import type { ProductDetail } from "@/data/product-details"
+import { fabricOptions } from "@/data/fabric"
 
 interface ApiProductVariant {
   weight: number
   length: number
   width: number
   height: number
-  color: string
+  fabric: string
   price: number
   stock: number
 }
@@ -72,26 +73,26 @@ export function ProductConfigurator({
     )
   }, [parsedSelectedSize, variants])
 
-  // Get unique colors from matching variants (for the selected size)
-  const availableColors = useMemo(() => {
+  // Get unique fabrics from matching variants (for the selected size)
+  const availableFabrics = useMemo(() => {
     if (useCustomDimensions || !selectedSize) {
-      // For custom dimensions or no size selected, show all colors
+      // For custom dimensions or no size selected, show all fabrics
       if (!variants.length) return []
-      return Array.from(new Set(variants.map((v) => v.color).filter(Boolean)))
+      return Array.from(new Set(variants.map((v) => v.fabric).filter(Boolean)))
     }
     
-    // For selected size, show colors available for that size
+    // For selected size, show fabrics available for that size
     if (matchingVariants.length === 0) return []
-    return Array.from(new Set(matchingVariants.map((v) => v.color).filter(Boolean)))
+    return Array.from(new Set(matchingVariants.map((v) => v.fabric).filter(Boolean)))
   }, [matchingVariants, variants, selectedSize, useCustomDimensions])
 
   // Find the variant that matches the selected size and fabric
   const selectedVariant = useMemo(() => {
     if (!parsedSelectedSize || !variants.length) return null
 
-    // If fabric is selected, find variant matching both size and color
+    // If fabric is selected, find variant matching both size and fabric
     if (selectedFabric) {
-      return matchingVariants.find((v) => v.color === selectedFabric) || null
+      return matchingVariants.find((v) => v.fabric === selectedFabric) || null
     }
     
     // Otherwise, return the first matching variant
@@ -104,22 +105,22 @@ export function ProductConfigurator({
     !parsedSelectedSize || (selectedVariant && selectedVariant.stock >= quantity)
   const canAddToCart =
     (useCustomDimensions ? hasCustomDimensions : Boolean(selectedSize)) &&
-    (availableColors.length <= 1 || Boolean(selectedFabric)) &&
+    (availableFabrics.length <= 1 || Boolean(selectedFabric)) &&
     hasSufficientStock
 
-  // Update selected fabric when variant changes (auto-select if only one color)
+  // Update selected fabric when variant changes (auto-select if only one fabric)
   useEffect(() => {
     if (matchingVariants.length > 0) {
-      const uniqueColors = Array.from(new Set(matchingVariants.map((v) => v.color).filter(Boolean)))
+      const uniqueFabrics = Array.from(new Set(matchingVariants.map((v) => v.fabric).filter(Boolean)))
       
       // If current fabric is not available for this size, reset it
-      if (selectedFabric && !uniqueColors.includes(selectedFabric)) {
+      if (selectedFabric && !uniqueFabrics.includes(selectedFabric)) {
         setSelectedFabric("")
       }
       
-      // Auto-select if only one color available
-      if (!selectedFabric && uniqueColors.length === 1) {
-        setSelectedFabric(uniqueColors[0])
+      // Auto-select if only one fabric available
+      if (!selectedFabric && uniqueFabrics.length === 1) {
+        setSelectedFabric(uniqueFabrics[0])
       }
     } else if (!useCustomDimensions && selectedFabric) {
       // Reset fabric if no matching variants
@@ -136,7 +137,7 @@ export function ProductConfigurator({
       name: product.name,
       image: productImages[0],
       size: finalSize,
-      fabric: selectedFabric || selectedVariant?.color || undefined,
+      fabric: selectedFabric || selectedVariant?.fabric || undefined,
       quantity,
       price,
     }
@@ -277,19 +278,29 @@ export function ProductConfigurator({
                   )}
                 </div>
 
-                {availableColors.length > 0 && (
+                {availableFabrics.length > 0 && (
                   <div>
-                    <label className="text-base font-medium text-foreground mb-2 block">Fabric / Color</label>
+                    <label className="text-base font-medium text-foreground mb-2 block">Fabric</label>
                     <Select value={selectedFabric || undefined} onValueChange={setSelectedFabric}>
                       <SelectTrigger className="w-full text-foreground ">
-                        <SelectValue placeholder="Select fabric/color" />
+                        <SelectValue placeholder="Select fabric" />
                       </SelectTrigger>
                       <SelectContent>
-                        {availableColors.map((color) => (
-                          <SelectItem key={color} value={color}>
-                            {color}
-                          </SelectItem>
-                        ))}
+                        {availableFabrics.map((fabricId) => {
+                          const fabricOption = fabricOptions.find((fabric) => fabric.id === fabricId)
+                          return (
+                            <SelectItem key={fabricId} value={fabricId}>
+                              <span className="flex items-center gap-2">
+                                <img
+                                  src={fabricOption?.image || "/placeholder.svg"}
+                                  alt={fabricOption?.name || fabricId}
+                                  className="h-6 w-6 rounded object-cover"
+                                />
+                                <span>{fabricOption?.name || fabricId}</span>
+                              </span>
+                            </SelectItem>
+                          )
+                        })}
                       </SelectContent>
                     </Select>
                   </div>

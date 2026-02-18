@@ -139,7 +139,6 @@ export async function POST(request: Request) {
       const length = Number.parseFloat(variant.length)
       const width = Number.parseFloat(variant.width)
       const height = Number.parseFloat(variant.height)
-      const color = variant.color?.trim()
       const fabric = variant.fabric?.trim()
       const price = Number.parseFloat(variant.price)
       const stock = Number.parseInt(variant.stock, 10)
@@ -147,11 +146,6 @@ export async function POST(request: Request) {
       if (isNaN(weight) || isNaN(length) || isNaN(width) || isNaN(height) || isNaN(price) || isNaN(stock)) {
         console.error(`[v0] Invalid numeric values in variant ${index + 1}:`, variant)
         throw new Error(`Variant ${index + 1} has invalid numeric values. Please check all fields.`)
-      }
-
-      if (!color) {
-        console.error(`[v0] Missing color in variant ${index + 1}`)
-        throw new Error(`Variant ${index + 1} requires a color.`)
       }
 
       if (!fabric) {
@@ -170,7 +164,6 @@ export async function POST(request: Request) {
         length,
         width,
         height,
-        color,
         fabric,
         price,
         stock,

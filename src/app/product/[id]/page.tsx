@@ -10,6 +10,7 @@ import { getProductDetailById, type ProductDetail } from "@/data/product-details
 import { type CartItem } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
 import { getProductType, isBlissProduct, isGraceProduct, isJoyProduct } from "@/utils/product-type"
+import { fabricOptions } from "@/data/fabric"
 import { BabyHamperProductTemplate } from "@/collections/joy/templates/BabyHamperProductTemplate"
 import { KidsHamperProductTemplate } from "@/collections/joy/templates/KidsHamperProductTemplate"
 import { IndividualProductTemplate } from "./templates/IndividualProductTemplate"
@@ -40,7 +41,7 @@ interface ApiProductVariant {
   length: number
   width: number
   height: number
-  color: string
+  fabric: string
   price: number
   stock: number
 }
@@ -70,6 +71,7 @@ interface ApiProduct {
 }
 
 const toTitleCase = (value: string) => (value ? value.charAt(0).toUpperCase() + value.slice(1) : value)
+const getFabricLabel = (fabricId: string) => fabricOptions.find((fabric) => fabric.id === fabricId)?.name || fabricId
 
 const formatVariantSize = (variant: ApiProductVariant) => {
   return `${variant.length}x${variant.width}x${variant.height} cm`
@@ -80,11 +82,11 @@ const mapApiProductToDetail = (product: ApiProduct): ProductDetail => {
   const minPrice = variants.reduce((currentMin, variant) => Math.min(currentMin, variant.price), Number.POSITIVE_INFINITY)
   const startingPrice = Number.isFinite(minPrice) ? minPrice : 0
   const totalStock = variants.reduce((sum, variant) => sum + (variant.stock || 0), 0)
-  const uniqueColors = Array.from(new Set(variants.map((variant) => variant.color).filter(Boolean)))
+  const uniqueFabrics = Array.from(new Set(variants.map((variant) => variant.fabric).filter(Boolean)))
   const features = [
     product.sellerName ? `Seller: ${product.sellerName}` : null,
     product.location ? `Location: ${product.location}` : null,
-    uniqueColors.length ? `Colors: ${uniqueColors.join(", ")}` : null,
+    uniqueFabrics.length ? `Fabrics: ${uniqueFabrics.map(getFabricLabel).join(", ")}` : null,
   ].filter(Boolean) as string[]
 
   return {

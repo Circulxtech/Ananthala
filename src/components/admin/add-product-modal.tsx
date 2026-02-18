@@ -41,7 +41,6 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
         length: "",
         width: "",
         height: "",
-        color: "",
         fabric: "",
         price: "",
         stock: "",
@@ -148,7 +147,6 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
           length: "",
           width: "",
           height: "",
-          color: "",
           fabric: "",
           price: "",
           stock: "",
@@ -304,7 +302,6 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
           length: "",
           width: "",
           height: "",
-          color: "",
           fabric: "",
           price: "",
           stock: "",
@@ -325,7 +322,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
             Add New Product
           </DialogTitle>
           <p className="text-xs sm:text-sm text-[#8B5A3C]/70">
-            Fill in the product details and add variants with different dimensions, weights, colors, and pricing
+            Fill in the product details and add variants with different dimensions, weights, fabrics, and pricing
           </p>
         </DialogHeader>
 
@@ -692,21 +689,6 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor={`color-${variant.id}`} className="text-sm text-[#6D4530]">
-                        Color*
-                      </Label>
-                      <Input
-                        id={`color-${variant.id}`}
-                        type="text"
-                        placeholder="e.g., Blue, White, Gray"
-                        value={variant.color}
-                        onChange={(e) => handleVariantChange(variant.id, "color", e.target.value)}
-                        className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
                       <Label htmlFor={`fabric-${variant.id}`} className="text-sm text-[#6D4530]">
                         Fabric*
                       </Label>
@@ -768,9 +750,9 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
 
                   <div className="bg-white rounded p-3 text-xs sm:text-sm text-[#6D4530] border border-[#D9CFC7]">
                     <strong>Summary:</strong>{" "}
-                    {variant.color && variant.weight && variant.length && variant.width && variant.height
-                      ? `${variant.color} · ${variant.weight}kg · ${variant.length}×${variant.width}×${variant.height}cm`
-                      : "Fill dimensions and color"}{" "}
+                    {variant.fabric && variant.weight && variant.length && variant.width && variant.height
+                      ? `${fabricOptions.find((fabric) => fabric.id === variant.fabric)?.name || variant.fabric} · ${variant.weight}kg · ${variant.length}×${variant.width}×${variant.height}cm`
+                      : "Fill dimensions and fabric"}{" "}
                     {variant.price ? `· ₹${variant.price}` : ""}
                     {variant.stock ? ` · ${variant.stock} in stock` : ""}
                   </div>
