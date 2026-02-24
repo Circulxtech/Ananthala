@@ -58,16 +58,15 @@ export async function sendMsg91OTP(phone: string, otp: string): Promise<boolean>
 
     const message = `Your Ananthala OTP is: ${otp}. Valid for 5 minutes. Do not share this OTP with anyone.`
 
-    // Build MSG91 API URL
-    const msg91Url = new URL("https://api.msg91.com/apiv5/flow/")
+    // Use MSG91 SMS API endpoint instead of flow for better compatibility
+    const msg91Url = new URL("https://api.msg91.com/apiv5/sendotp/")
     msg91Url.searchParams.append("authkey", authKey)
-    msg91Url.searchParams.append("route", "otp")
-    msg91Url.searchParams.append("sender", senderId)
-    msg91Url.searchParams.append("mobiles", normalizedPhone)
+    msg91Url.searchParams.append("mobile", normalizedPhone)
     msg91Url.searchParams.append("message", message)
+    msg91Url.searchParams.append("sender", senderId)
 
     const response = await fetch(msg91Url.toString(), {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
