@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import connectDB from "@/lib/mongodb"
 import User from "@/models/User"
 import { generateToken } from "@/lib/jwt"
+import { normalizePhoneNumber } from "@/lib/msz91"
 
 export const runtime = "nodejs"
 
@@ -25,13 +26,21 @@ export async function POST(request: Request) {
     let user
     if (email) {
       user = await User.findOne({ email: email.toLowerCase() })
+      console.log(`[v0] Looking up user by email: ${email}`)
     } else if (phone) {
-      user = await User.findOne({ phone })
+      // Normalize phone number before lookup
+      const normalizedPhone = normalizePhoneNumber(phone)
+      console.log(`[v0] Looking up user by phone. Original: ${phone}, Normalized: ${normalizedPhone}`)
+      user = await User.findOne({ phone: normalizedPhone })
     }
 
     if (!user) {
-      return NextResponse.json({ success: false, message: "User not found" }, { status: 404 })
+      console.error(`[v0] No user found for verification`)
+      return NextResponse.json({ success: false, message: "No account found. Please request OTP first." }, { status: 404 })
     }
+
+    console.log(`[v0] User found: ${user._id}, Email: ${user.email}, Phone: ${user.phone}`)
+
 
     // Check OTP
     if (!user.otpCode || user.otpCode !== otp) {
@@ -44,6 +53,15 @@ export async function POST(request: Request) {
         { success: false, message: "OTP has expired. Please request a new one." },
         { status: 401 },
       )
+    }
+
+    // For phone-based OTP, update user details if they're still placeholder values
+    if (phone && user.otpMethod === "phone") {
+      // User can provide full name during first login verification
+      // For now, keep the placeholder, full name can be updated in profile later
+      if (user.fullname === "Phone User") {
+        // Keep as is - user can update in profile section
+      }
     }
 
     // Clear OTP fields

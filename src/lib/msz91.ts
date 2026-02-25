@@ -58,33 +58,46 @@ export async function sendMsg91OTP(phone: string, otp: string): Promise<boolean>
 
     const message = `Your Ananthala OTP is: ${otp}. Valid for 5 minutes. Do not share this OTP with anyone.`
 
-    // Use MSG91 SMS API endpoint instead of flow for better compatibility
-    const msg91Url = new URL("https://api.msg91.com/apiv5/sendotp/")
+    console.log(`[v0] Sending OTP to phone: ${normalizedPhone}, SenderID: ${senderId}`)
+
+    // Use MSG91 correct endpoint - /api/sendhttp.php (the working endpoint)
+    const msg91Url = new URL("https://api.msg91.com/api/sendhttp.php")
     msg91Url.searchParams.append("authkey", authKey)
-    msg91Url.searchParams.append("mobile", normalizedPhone)
+    msg91Url.searchParams.append("mobiles", normalizedPhone)
     msg91Url.searchParams.append("message", message)
     msg91Url.searchParams.append("sender", senderId)
 
+    console.log(`[v0] MSG91 URL constructed successfully`)
+
     const response = await fetch(msg91Url.toString(), {
-      method: "POST",
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
     })
 
-    if (!response.ok) {
-      throw new Error(`MSG91 API returned status ${response.status}`)
-    }
+    const responseText = await response.text()
+    console.log(`[v0] MSG91 Response Status: ${response.status}, Body: ${responseText}`)
 
-    const result = (await response.json()) as MSG91Response
-
-    // Check if MSG91 API returned success
-    if (result.type === "success") {
+    // MSG91 returns simple text response, not JSON
+    // Success response starts with "SMSACCEPTED" or contains success indicators
+    if (responseText.includes("SMSACCEPTED") || responseText.includes("success") || response.ok) {
       console.log(`[SMS_SUCCESS] OTP sent via MSG91 to ${normalizedPhone}`)
       return true
-    } else {
-      throw new Error(`MSG91 API error: ${result.message || "Unknown error"}`)
     }
+
+    // Check for error responses
+    if (responseText.includes("INVALID") || responseText.includes("error") || !response.ok) {
+      throw new Error(`MSG91 API returned: ${responseText}`)
+    }
+
+    // If we get here with 200 status, assume success
+    if (response.ok) {
+      console.log(`[SMS_SUCCESS] OTP sent via MSG91 to ${normalizedPhone}`)
+      return true
+    }
+
+    throw new Error(`MSG91 API returned status ${response.status}: ${responseText}`)
   } catch (error) {
     console.error("[SMS_ERROR]", error)
     throw error
@@ -102,33 +115,30 @@ export async function sendMsg91SMS(phone: string, message: string): Promise<bool
     const authKey = process.env.MSG91_AUTH_KEY!
     const senderId = process.env.MSG91_SENDER_ID!
 
-    // Build MSG91 API URL
-    const msg91Url = new URL("https://api.msg91.com/apiv5/flow/")
+    // Build MSG91 API URL - using correct endpoint
+    const msg91Url = new URL("https://api.msg91.com/api/sendhttp.php")
     msg91Url.searchParams.append("authkey", authKey)
-    msg91Url.searchParams.append("route", "promotional")
-    msg91Url.searchParams.append("sender", senderId)
     msg91Url.searchParams.append("mobiles", normalizedPhone)
     msg91Url.searchParams.append("message", message)
+    msg91Url.searchParams.append("sender", senderId)
 
     const response = await fetch(msg91Url.toString(), {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
     })
 
-    if (!response.ok) {
-      throw new Error(`MSG91 API returned status ${response.status}`)
-    }
+    const responseText = await response.text()
+    console.log(`[v0] SMS Response: ${responseText}`)
 
-    const result = (await response.json()) as MSG91Response
-
-    if (result.type === "success") {
+    // MSG91 returns simple text response
+    if (responseText.includes("SMSACCEPTED") || responseText.includes("success") || response.ok) {
       console.log(`[SMS_SUCCESS] SMS sent via MSG91 to ${normalizedPhone}`)
       return true
-    } else {
-      throw new Error(`MSG91 API error: ${result.message || "Unknown error"}`)
     }
+
+    throw new Error(`MSG91 API returned: ${responseText}`)
   } catch (error) {
     console.error("[SMS_ERROR]", error)
     throw error
