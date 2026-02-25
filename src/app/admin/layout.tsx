@@ -52,6 +52,7 @@ const menuItems = [
     href: "/admin/blogs",
     icon: BookOpen,
   },
+   
   {
     label: "Review Videos",
     href: "/admin/review-videos",
@@ -76,6 +77,11 @@ const menuItems = [
     label: "Order Management",
     href: "/admin/orders",
     icon: ShoppingCart,
+  },
+  {
+    label: "Press",
+    href: "/admin/press",
+    icon: BookOpen,
   },
   {
     label: "Coupon Management",

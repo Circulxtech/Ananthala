@@ -64,11 +64,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Clear OTP fields
-    user.otpCode = ""
-    user.otpExpiry = null
-    user.otpMethod = null
-    await user.save()
+
 
     // Generate authentication token
     const token = generateToken(
@@ -76,6 +72,7 @@ export async function POST(request: Request) {
         userId: user._id.toString(),
         email: user.email,
         fullname: user.fullname,
+        id: undefined
       },
       rememberMe,
     )
