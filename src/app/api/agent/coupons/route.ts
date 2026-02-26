@@ -16,21 +16,35 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
+    const agentId = decoded.userId
+    console.log("[v0] Agent ID:", agentId)
+
     await connectDB()
 
-    // Get all coupons
-    const coupons = await Coupon.find().sort({ createdAt: -1 }).lean()
+    // Get coupons assigned to this agent OR coupons available to all agents (empty agents array)
+    // Query: agents contains this agentId OR agents is empty
+    const coupons = await Coupon.find({
+      $or: [
+        { agents: agentId }, // Coupons specifically assigned to this agent
+        { agents: { $size: 0 } }, // Coupons available to all agents (no specific assignment)
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .lean()
+
+    console.log(`[v0] Agent ${agentId} has access to ${coupons.length} coupons`)
 
     // Update statuses based on expiry date
     const updatedCoupons = coupons.map((coupon: any) => ({
       ...coupon,
       _id: coupon._id.toString(),
       status: new Date(coupon.expiryDate) < new Date() ? "expired" : coupon.status,
+      isAssignedToMe: coupon.agents?.includes(agentId) || false, // Flag if specifically assigned to this agent
     }))
 
     return NextResponse.json({ success: true, coupons: updatedCoupons })
   } catch (error) {
-    console.error("Error fetching coupons:", error)
+    console.error("[v0] Error fetching agent coupons:", error)
     return NextResponse.json({ error: "Failed to fetch coupons" }, { status: 500 })
   }
 }
