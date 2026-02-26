@@ -10,12 +10,20 @@ import { IndianRupee, ShoppingCart, ChevronRight } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
 import { getAllStates, getCitiesForState } from "@/lib/indian-states-cities"
 
+declare global {
+  interface Window {
+    Razorpay?: any
+  }
+}
+
 export default function CheckoutPage() {
   const router = useRouter()
   const { cartItems, clearCart } = useCart()
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isAuthChecking, setIsAuthChecking] = useState(true)
   const [allStates, setAllStates] = useState<string[]>([])
   const [availableCities, setAvailableCities] = useState<string[]>([])
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -27,8 +35,45 @@ export default function CheckoutPage() {
     state: "",
     zipCode: "",
     country: "India",
-    paymentMethod: "card",
+    paymentMethod: "razorpay",
   })
+
+  const loadRazorpayScript = () =>
+    new Promise<boolean>((resolve) => {
+      if (typeof window === "undefined") {
+        resolve(false)
+        return
+      }
+      if (window.Razorpay) {
+        resolve(true)
+        return
+      }
+      const script = document.createElement("script")
+      script.src = "https://checkout.razorpay.com/v1/checkout.js"
+      script.onload = () => resolve(true)
+      script.onerror = () => resolve(false)
+      document.body.appendChild(script)
+    })
+
+  useEffect(() => {
+    const ensureAuthenticated = async () => {
+      try {
+        const response = await fetch("/api/auth/verify")
+        const data = await response.json()
+        if (!data?.success) {
+          router.replace("/login?redirect=/checkout")
+          return
+        }
+      } catch (error) {
+        router.replace("/login?redirect=/checkout")
+        return
+      } finally {
+        setIsAuthChecking(false)
+      }
+    }
+
+    ensureAuthenticated()
+  }, [router])
 
   // Load states data from package
   useEffect(() => {
@@ -83,13 +128,125 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsProcessing(true)
+    setErrorMessage(null)
 
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      const scriptLoaded = await loadRazorpayScript()
+      if (!scriptLoaded) {
+        throw new Error("Razorpay SDK failed to load. Please try again.")
+      }
+      if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
+        throw new Error("Razorpay key is missing. Please configure NEXT_PUBLIC_RAZORPAY_KEY_ID.")
+      }
 
-    // Clear cart and redirect to success page
-    clearCart()
-    router.push("/checkout/success")
+      const orderResponse = await fetch("/api/payments/razorpay/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: Math.round(total * 100),
+          currency: "INR",
+          receipt: `order_${Date.now()}`,
+          notes: {
+            customer: `${formData.firstName} ${formData.lastName}`.trim(),
+            email: formData.email,
+          },
+        }),
+      })
+
+      const orderData = await orderResponse.json()
+      if (!orderResponse.ok || !orderData?.order?.id) {
+        throw new Error(orderData?.message || "Failed to create payment order.")
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: "Ananthala",
+        description: "Order Payment",
+        order_id: orderData.order.id,
+        prefill: {
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          email: formData.email,
+          contact: formData.phone,
+        },
+        notes: {
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
+        },
+        handler: async (response: any) => {
+          try {
+            const verifyResponse = await fetch("/api/payments/razorpay/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                customer: {
+                  firstName: formData.firstName,
+                  lastName: formData.lastName,
+                  email: formData.email,
+                  phone: formData.phone,
+                },
+                shippingAddress: {
+                  address: formData.address,
+                  city: formData.city,
+                  state: formData.state,
+                  zipCode: formData.zipCode,
+                  country: formData.country,
+                },
+                items: cartItems.map((item) => ({
+                  name: item.name,
+                  quantity: item.quantity,
+                  price: item.price,
+                  size: item.size,
+                  fabric: item.fabric,
+                })),
+                subtotal,
+                shippingCost: shipping,
+                discount: 0,
+                totalAmount: total,
+                paymentMethod: formData.paymentMethod,
+              }),
+            })
+
+            const verifyData = await verifyResponse.json()
+            if (!verifyResponse.ok || !verifyData?.success) {
+              throw new Error(verifyData?.message || "Payment verification failed.")
+            }
+
+            clearCart()
+            router.push("/checkout/success")
+          } catch (error: any) {
+            setErrorMessage(error?.message || "Payment verification failed.")
+            setIsProcessing(false)
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setIsProcessing(false)
+          },
+        },
+        theme: { color: "#EED9C4" },
+      }
+
+      const razorpay = new window.Razorpay(options)
+      razorpay.on("payment.failed", (response: any) => {
+        setErrorMessage(response?.error?.description || "Payment failed. Please try again.")
+        setIsProcessing(false)
+      })
+      razorpay.open()
+    } catch (error: any) {
+      setErrorMessage(error?.message || "Payment failed. Please try again.")
+      setIsProcessing(false)
+    }
+  }
+
+  if (isAuthChecking) {
+    return null
   }
 
   if (cartItems.length === 0) {
@@ -317,27 +474,21 @@ export default function CheckoutPage() {
                       <input
                         type="radio"
                         name="paymentMethod"
-                        value="card"
-                        checked={formData.paymentMethod === "card"}
+                        value="razorpay"
+                        checked={formData.paymentMethod === "razorpay"}
                         onChange={handleInputChange}
                         className="w-4 h-4"
                       />
-                      <span className="text-black text-lg">Credit/Debit Card</span>
+                      <span className="text-black text-lg">Razorpay (UPI, Card, Netbanking)</span>
                     </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="upi"
-                        checked={formData.paymentMethod === "upi"}
-                        onChange={handleInputChange}
-                        className="w-5 h-5"
-                      />
-                      <span className="text-black text-lg">UPI</span>
-                    </label>
-                   
                   </div>
                 </div>
+
+                {errorMessage && (
+                  <p className="text-sm text-red-600" role="alert">
+                    {errorMessage}
+                  </p>
+                )}
 
                 <button
                   type="submit"
@@ -470,4 +621,3 @@ export default function CheckoutPage() {
     </div>
   )
 }
-

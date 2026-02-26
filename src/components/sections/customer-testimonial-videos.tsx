@@ -90,7 +90,7 @@ export function CustomerTestimonialVideos() {
 
   if (loading) {
     return (
-      <section className="py-16 px-4 bg-stone-50">
+      <section className="py-16 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <p className="text-foreground">Loading customer testimonials...</p>
@@ -105,7 +105,7 @@ export function CustomerTestimonialVideos() {
   }
 
   return (
-    <section className="py-16 px-4 bg-stone-50">
+    <section className="py-16 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">

@@ -10,7 +10,7 @@ const orderSchema = new mongoose.Schema(
     customerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
     customerName: {
       type: String,
@@ -38,6 +38,7 @@ const orderSchema = new mongoose.Schema(
         quantity: Number,
         price: Number,
         size: String,
+        fabric: String,
       },
     ],
     subtotal: {
@@ -58,8 +59,8 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["card", "upi", "cod"],
-      default: "card",
+      enum: ["razorpay", "card", "upi", "cod"],
+      default: "razorpay",
     },
     paymentStatus: {
       type: String,
@@ -80,6 +81,14 @@ const orderSchema = new mongoose.Schema(
     ],
     trackingNumber: String,
     notes: String,
+    paymentGateway: {
+      type: String,
+      enum: ["razorpay"],
+      default: "razorpay",
+    },
+    razorpayOrderId: String,
+    razorpayPaymentId: String,
+    razorpaySignature: String,
   },
   { timestamps: true },
 )

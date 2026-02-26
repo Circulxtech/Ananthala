@@ -13,12 +13,12 @@ export function Footer() {
             <Link href="/" className="inline-block mb-4 hover:opacity-90 transition-opacity">
               <img src="/logo.png" alt="Ananthala Logo" className="h-16 w-auto" />
             </Link>
-            <p className="text-foreground mb-6 font-medium text-base leading-relaxed">
+            <p className="text-foreground mb-6 font-medium text-lg leading-relaxed">
               Premium mattresses crafted for your best sleep. Experience luxury comfort with our 100-night trial and
               15-year warranty.
             </p>
             {/* Contact Details */}
-            <div className="space-y-3 mb-6 text-foreground text-sm">
+            <div className="space-y-3 mb-6 text-foreground text-base">
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-foreground flex-shrink-0" />
                 <span className="font-medium">1-800-SLEEP-WELL</span>
@@ -66,8 +66,8 @@ export function Footer() {
 
           {/* CONTACT */}
           <div>
-            <h4 className="mb-4 text-foreground font-semibold text-base">CONTACT</h4>
-            <ul className="space-y-3 text-foreground text-sm">
+            <h4 className="mb-4 text-foreground font-semibold text-lg">CONTACT</h4>
+            <ul className="space-y-3 text-foreground text-base">
               <li>
                 <Link href="/dealer-enquiry" className="hover:text-amber-950 transition-colors font-medium">
                   Dealer Enquiry
@@ -103,16 +103,16 @@ export function Footer() {
 
           {/* ANANTHALA */}
           <div>
-            <h4 className="mb-4 text-foreground font-semibold text-base">ANANTHALA</h4>
-            <ul className="space-y-3 text-foreground text-sm">
+            <h4 className="mb-4 text-foreground font-semibold text-lg">ANANTHALA</h4>
+            <ul className="space-y-3 text-foreground text-base">
               <li>
                 <Link href="/" className="hover:text-amber-950 transition-colors font-medium">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/category/grace" className="hover:text-amber-950 transition-colors font-medium">
-                  Mattress
+                <Link href="/#find-your-perfect-mattress" className="hover:text-amber-950 transition-colors font-medium">
+                  Shop
                 </Link>
               </li>
               <li>
@@ -126,7 +126,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/story" className="hover:text-amber-950 transition-colors font-medium">
+                <Link href="/about" className="hover:text-amber-950 transition-colors font-medium">
                   Story
                 </Link>
               </li>
@@ -135,7 +135,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-amber-100 flex flex-col md:flex-row justify-between items-center gap-4 text-foreground text-sm">
+        <div className="pt-8 border-t border-amber-100 flex flex-col md:flex-row justify-between items-center gap-4 text-foreground text-base">
           <p className="font-medium">© 2025 Ananthala. All rights reserved.</p>
           <div className="flex flex-wrap gap-4 md:gap-6 justify-center md:justify-end">
             <Link href="/policy-privacy" className="hover:text-amber-950 transition-colors font-medium">

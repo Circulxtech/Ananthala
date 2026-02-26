@@ -48,9 +48,9 @@ export default function AboutPage() {
           </div>
           <div className="absolute inset-0 bg-[#EED9C4]/60"></div>
           <div className="relative h-full flex items-center justify-center px-4">
-            <div className="text-center text-black max-w-3xl">
-              <h1 className="mb-6 text-5xl font-semibold text-black">About Ananthala</h1>
-              <p className="text-black/90 font-semibold text-lg">
+            <div className="text-center text-foreground max-w-3xl">
+              <h1 className="mb-6 text-5xl font-semibold text-foreground">About Ananthala</h1>
+              <p className="text-foreground/90 font-semibold text-lg">
                 Crafting premium mattresses with care, precision, and acommitment to your best sleep.
               </p>
             </div>
@@ -62,8 +62,8 @@ export default function AboutPage() {
           <div className="max-w-6xl mx-auto">
             {/* TITLE SECTION */}
             <div className="mb-8 md:mb-12 text-center">
-              <p className="text-black text-4xl font-semibold mb-2">Our Journey</p>
-              <h2 className="text-lg text-black">The Ananthala Story</h2>
+              <p className="text-foreground text-4xl font-semibold mb-2">Our Journey</p>
+              <h2 className="text-lg text-foreground">The Ananthala Story</h2>
             </div>
             
             {/* IMAGE AND TEXT GRID */}
@@ -80,7 +80,7 @@ export default function AboutPage() {
               </div>
 
               {/* RIGHT SIDE — TEXT */}
-              <div className="space-y-6 text-black">
+              <div className="space-y-6 text-foreground">
                 <p className="text-lg font-medium">
                   Founded in 2015, Ananthala wa born from a simple yet profound realization: quality sleep is the
                   foundation of a quality life. Our founder, after years of struggling with poor sleep and back pain,
@@ -114,10 +114,10 @@ export default function AboutPage() {
               unoptimized
             />
           </div>
-          <div className="relative max-w-7xl mx-auto text-black pb-8">
+          <div className="relative max-w-7xl mx-auto text-foreground pb-8">
             <div className="text-center mb-8">
-              <p className="text-black text-4xl font-semibold mb-2">What We Stand For</p>
-              <p className="text-black font-medium text-lg max-w-2xl mx-auto">
+              <p className="text-foreground text-4xl font-semibold mb-2">What We Stand For</p>
+              <p className="text-foreground font-medium text-lg max-w-2xl mx-auto">
                 At Ananthala, every step we take is guided by our purpose and the future we strive to build.
               </p>
             </div>
@@ -126,16 +126,16 @@ export default function AboutPage() {
                 {/* Mission */}
                 <div className="bg-[#EED9C4] px-8 pt-8 pb-10 border border-white/20 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl cursor-pointer">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-[#EED9C4] text-black rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-[#EED9C4] text-foreground rounded-full flex items-center justify-center">
                       <Heart className="w-5 h-5" />
                     </div>
-                    <h3 className="text-xl font-semibold text-black">Our Mission</h3>
+                    <h3 className="text-xl font-semibold text-foreground">Our Mission</h3>
                   </div>
-                  <p className="text-lg font-medium text-black leading-relaxed mb-3">
+                  <p className="text-lg font-medium text-foreground leading-relaxed mb-3">
                     To craft exceptional mattresses that transform the way people sleep, using sustainable materials and
                     innovative design. We exist to help our customers wake up feeling their best, every single day.
                   </p>
-                  <p className="text-lg font-medium text-black leading-relaxed">
+                  <p className="text-lg font-medium text-foreground leading-relaxed">
                     We believe that everyone deserves access to quality sleep, which is why we've made it our mission to
                     create mattresses that combine luxury comfort with responsible manufacturing.
                   </p>
@@ -144,16 +144,16 @@ export default function AboutPage() {
               {/* Vision */}
                 <div className="bg-[#EED9C4] px-8 pt-8 pb-10 border border-white/20 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl cursor-pointer">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-[#EED9C4] text-black rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-[#EED9C4] text-foreground rounded-full flex items-center justify-center">
                       <Eye className="w-5 h-5" />
                     </div>
-                    <h3 className="text-xl font-semibold text-black">Our Vision</h3>
+                    <h3 className="text-xl font-semibold text-foreground">Our Vision</h3>
                   </div>
-                  <p className="text-lg font-medium text-black leading-relaxed mb-3">
+                  <p className="text-lg font-medium text-foreground leading-relaxed mb-3">
                     To become the most trusted sleep brand, known for exceptional quality, sustainability, and customer
                     care — setting new standards for what a mattress company can be.
                   </p>
-                  <p className="text-lg font-medium text-black leading-relaxed">
+                  <p className="text-lg font-medium text-foreground leading-relaxed">
                     We envision a future where quality sleep is recognized as essential to health and wellbeing, and where
                     sustainable practices are the norm, not the exception.
                   </p>
@@ -167,9 +167,9 @@ export default function AboutPage() {
         <section className="py-24 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <p className="text-black text-4xl font-semibold mb-2">What Drives Us</p>
+              <p className="text-foreground text-4xl font-semibold mb-2">What Drives Us</p>
               
-              <p className="text-black font-medium text-lg max-w-2xl mx-auto">
+              <p className="text-foreground font-medium text-lg max-w-2xl mx-auto">
                 These principles guide every decision we make and define who we are as a company.
               </p>
             </div>
@@ -186,8 +186,8 @@ export default function AboutPage() {
                       hover:scale-105 hover:shadow-xl hover:-translate-y-2
                       ${
                         isHighlighted
-                          ? "bg-[#EED9C4] text-black "
-                          : "bg-[#F5F1ED] hover:bg-[#FEF7E7] text-black"
+                          ? "bg-[#EED9C4] text-foreground "
+                          : "bg-[#F5F1ED] hover:bg-[#FEF7E7] text-foreground"
                       }
                     `}
                   >
@@ -196,7 +196,7 @@ export default function AboutPage() {
                         inline-flex items-center justify-center w-12 h-12 mb-4 rounded-full
                         transition-all duration-300 ease-in-out
                         group-hover:scale-110 hover:scale-110 hover:rotate-6
-                        ${isHighlighted ? "bg-white text-[#EED9C4]" : "bg-[#EED9C4] text-black"}
+                        ${isHighlighted ? "bg-white text-[#EED9C4]" : "bg-[#EED9C4] text-foreground"}
                       `}
                     >
                       <Icon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
@@ -214,8 +214,8 @@ export default function AboutPage() {
         <section className="py-24 px-4 bg-[#F5F1ED]">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="mb-6 text-3xl font-semibold text-black">Our Commitment to Sustainability</h2>
-              <p className="text-black font-semibold text-lg max-w-2xl mx-auto">
+              <h2 className="mb-6 text-3xl font-semibold text-foreground">Our Commitment to Sustainability</h2>
+              <p className="text-foreground font-semibold text-lg max-w-2xl mx-auto">
                 At Ananthala, we believe that taking care of our customers means taking care of our planet. 
               </p>
             </div>
@@ -231,9 +231,9 @@ export default function AboutPage() {
                 />
                 <div className="absolute inset-0 bg-[#EED9C4]/70"></div>
                 <div className="relative z-10 p-8 h-full flex flex-col">
-                  <h3 className="text-xl font-semibold text-black mb-4 text-center">Eco-Friendly Materials</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-4 text-center">Eco-Friendly Materials</h3>
                   <div className="flex-1 flex items-center justify-center">
-                    <p className="text-lg font-semibold text-black text-center">
+                    <p className="text-lg font-semibold text-foreground text-center">
                       Certified organic cotton, natural latex, and recyclable components. All materials are carefully
                       sourced from certified suppliers who share our commitment to environmental responsibility and
                       ethical practices.
@@ -252,9 +252,9 @@ export default function AboutPage() {
                 />
                 <div className="absolute inset-0 bg-[#EED9C4]/70"></div>
                 <div className="relative z-10 p-8 h-full flex flex-col">
-                  <h3 className="text-xl font-semibold text-black mb-4 text-center">Responsible Manufacturing</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-4 text-center">Responsible Manufacturing</h3>
                   <div className="flex-1 flex items-center justify-center">
-                    <p className="text-lg font-semibold text-black text-center">
+                    <p className="text-lg font-semibold text-foreground text-center">
                       Low-emission facilities powered by renewable energy. Our manufacturing processes are designed to
                       minimize waste and maximize efficiency, ensuring that every mattress we produce has the smallest
                       possible environmental footprint.
@@ -273,9 +273,9 @@ export default function AboutPage() {
                 />
                 <div className="absolute inset-0 bg-[#EED9C4]/70"></div>
                 <div className="relative z-10 p-8 h-full flex flex-col">
-                  <h3 className="text-xl font-semibold text-black mb-4 text-center">Mattress Recycling Program</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-4 text-center">Mattress Recycling Program</h3>
                   <div className="flex-1 flex items-center justify-center">
-                    <p className="text-lg font-semibold text-black text-center">
+                    <p className="text-lg font-semibold text-foreground text-center">
                       Free pickup and eco-friendly disposal of your old mattress. We partner with recycling facilities
                       to ensure that up to 95% of your old mattress materials are recycled or repurposed, keeping waste out
                       of    landfills.
@@ -291,3 +291,5 @@ export default function AboutPage() {
     </div>
   )
 }
+
+

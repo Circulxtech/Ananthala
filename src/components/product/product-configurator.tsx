@@ -108,6 +108,18 @@ export function ProductConfigurator({
     (availableFabrics.length <= 1 || Boolean(selectedFabric)) &&
     hasSufficientStock
 
+  useEffect(() => {
+    if (!useCustomDimensions && !selectedSize && product.sizes.length > 0) {
+      setSelectedSize(product.sizes[0].name.split(" - ")[0])
+    }
+  }, [product.sizes, selectedSize, useCustomDimensions])
+
+  useEffect(() => {
+    if (availableFabrics.length > 0 && !selectedFabric) {
+      setSelectedFabric(availableFabrics[0])
+    }
+  }, [availableFabrics, selectedFabric])
+
   // Update selected fabric when variant changes (auto-select if only one fabric)
   useEffect(() => {
     if (matchingVariants.length > 0) {

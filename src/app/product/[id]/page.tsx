@@ -509,7 +509,7 @@ export default function ProductDetailPage() {
                   <section className="w-full bg-white py-12">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                       <Accordion type="single" collapsible className="w-full space-y-4">
-                        <AccordionItem value="description" className="border-2 border-[#EED9C4] px-4">
+                        <AccordionItem value="description" className="border border-[#F3E7DA] px-4 rounded-lg shadow-sm">
                           <AccordionTrigger className="text-lg font-medium text-foreground hover:no-underline">
                             Description
                           </AccordionTrigger>
@@ -517,7 +517,7 @@ export default function ProductDetailPage() {
                             {product.description}
                           </AccordionContent>
                         </AccordionItem>
-                        <AccordionItem value="shipping" className="border-2 border-[#EED9C4] px-4 last:border-b-2!">
+                        <AccordionItem value="shipping" className="border border-[#F3E7DA] px-4 last:border-b-2! rounded-lg shadow-sm">
                           <AccordionTrigger className="text-lg font-medium text-foreground hover:no-underline">
                             Shipping information
                           </AccordionTrigger>

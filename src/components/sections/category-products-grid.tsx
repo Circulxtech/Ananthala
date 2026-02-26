@@ -105,8 +105,11 @@ export function CategoryProductsGrid({ collection }: CategoryProductsGridProps) 
     return <div className="py-10 text-center text-sm text-foreground/70">No products available.</div>
   }
 
+  const cardWidthClass = "w-full"
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 gap-y-8">
+    <div
+      className="grid grid-cols-[repeat(auto-fit,minmax(230px,300px))] gap-x-8 gap-y-10 justify-center"
+    >
       {displayProducts.map((product) => {
         const minPrice = product.variants.reduce(
           (currentMin, variant) => Math.min(currentMin, variant.price),
@@ -117,7 +120,7 @@ export function CategoryProductsGrid({ collection }: CategoryProductsGridProps) 
         return (
           <div
             key={product._id}
-            className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white"
+            className={`border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white ${cardWidthClass}`}
           >
             <Link href={`/product/${product._id}`} className="block">
               <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
@@ -132,7 +135,8 @@ export function CategoryProductsGrid({ collection }: CategoryProductsGridProps) 
             </Link>
             <h3 className="text-base font-semibold text-foreground mb-2 text-center">{product.productTitle}</h3>
             <div className="text-sm font-medium text-foreground mb-3 text-center">
-              Starting at ₹{startingPrice.toLocaleString("en-IN")}
+              Starting at {"\u20B9"}
+              {startingPrice.toLocaleString("en-IN")}
             </div>
             <Link href={`/product/${product._id}`}>
               <Button className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm">
@@ -145,3 +149,4 @@ export function CategoryProductsGrid({ collection }: CategoryProductsGridProps) 
     </div>
   )
 }
+

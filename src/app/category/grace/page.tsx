@@ -175,7 +175,7 @@ export default function GracePage() {
 
         {/* Shop Section */}
         <section id="shop" ref={shopSectionRef} className="py-16 px-4 bg-stone-50">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-[1800px] mx-auto">
             <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-8 text-center font-cormorant">
               Shop
             </h2>
