@@ -22,12 +22,24 @@ export function PhoneOTPLoginForm() {
   const handleSendOTP = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    // Validate phone number
-    const phoneRegex = /^[0-9\-+$$$$\s]+$/
-    if (!phoneRegex.test(phone) || phone.replace(/\D/g, "").length < 10) {
+    // Validate phone number - allow digits, +, -, spaces
+    const phoneDigits = phone.replace(/\D/g, "")
+    
+    console.log(`[v0] Phone input: ${phone}, digits only: ${phoneDigits}, length: ${phoneDigits.length}`)
+
+    if (phoneDigits.length < 10) {
       toast({
         title: "Error",
-        description: "Please enter a valid phone number",
+        description: "Please enter a valid phone number with at least 10 digits",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (phoneDigits.length > 12) {
+      toast({
+        title: "Error",
+        description: "Phone number is too long. Should be max 12 digits",
         variant: "destructive",
       })
       return
@@ -36,6 +48,7 @@ export function PhoneOTPLoginForm() {
     setIsLoading(true)
 
     try {
+      console.log(`[v0] Sending OTP request for phone: ${phone}`)
       const response = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -43,6 +56,7 @@ export function PhoneOTPLoginForm() {
       })
 
       const data = await response.json()
+      console.log(`[v0] Send OTP response:`, data)
 
       if (data.success) {
         setMaskedPhone(data.maskedPhone)
@@ -59,6 +73,7 @@ export function PhoneOTPLoginForm() {
         })
       }
     } catch (error) {
+      console.error(`[v0] Send OTP error:`, error)
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -71,9 +86,20 @@ export function PhoneOTPLoginForm() {
 
   const handleVerifyOTP = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    
+    if (otp.length !== 4) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid 4-digit OTP",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsLoading(true)
 
     try {
+      console.log(`[v0] Verifying OTP for phone: ${phone}, OTP: ${otp}`)
       const response = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -81,6 +107,7 @@ export function PhoneOTPLoginForm() {
       })
 
       const data = await response.json()
+      console.log(`[v0] Verify OTP response:`, data)
 
       if (data.success) {
         toast({
@@ -99,6 +126,7 @@ export function PhoneOTPLoginForm() {
         })
       }
     } catch (error) {
+      console.error(`[v0] Verify OTP error:`, error)
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -122,15 +150,15 @@ export function PhoneOTPLoginForm() {
               id="phone"
               name="phone"
               type="tel"
-              placeholder=""
+              placeholder="Enter 10-digit number (e.g., 9876543210 or +91-9876543210)"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
+              className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#8B5A3C] placeholder:text-sm focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
               required
               disabled={isLoading}
             />
           </div>
-          <p className="text-xs text-[#8B5A3C] mt-2">We'll send a 4-digit OTP to your registered phone number</p>
+          <p className="text-xs text-[#8B5A3C] mt-2">We'll send a 4-digit OTP to your phone number. No registration needed!</p>
         </div>
 
         <Button

@@ -11,6 +11,8 @@ export interface ICoupon {
   expiryDate: Date
   status: "active" | "expired" | "inactive"
   createdBy: string
+  agents?: string[] // Array of agent IDs assigned to this coupon
+  agentNames?: string[] // Array of agent names for display
   createdAt: Date
   updatedAt: Date
 }
@@ -73,6 +75,16 @@ const CouponSchema = new Schema<ICoupon>(
     createdBy: {
       type: String,
       required: true,
+    },
+    agents: {
+      type: [String],
+      default: [],
+      description: "Array of agent IDs assigned to this coupon",
+    },
+    agentNames: {
+      type: [String],
+      default: [],
+      description: "Array of agent names for display purposes",
     },
   },
   {

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import connectDB from "@/lib/mongodb"
 import User from "@/models/User"
 import nodemailer from "nodemailer"
-import { sendMsg91OTP } from "@/lib/msz91"
+import { sendMsg91OTP, normalizePhoneNumber } from "@/lib/msz91"
 
 export const runtime = "nodejs"
 
@@ -144,31 +144,54 @@ export async function POST(request: Request) {
         )
       }
     } else if (method === "phone") {
-      // Check if user exists with phone
-      const user = await User.findOne({ phone })
-
-      if (!user) {
-        return NextResponse.json(
-          { success: false, message: "No account found with this phone number. Please sign up first." },
-          { status: 404 },
-        )
-      }
-
       try {
-        // Send OTP via SMS using MSG91
-        await sendOTPSMS(phone, otp)
+        // Normalize phone number (adds +91 if not present)
+        const normalizedPhone = normalizePhoneNumber(phone)
+        console.log(`[v0] Original phone: ${phone}, Normalized: ${normalizedPhone}`)
 
-        // Update user with OTP
-        user.otpCode = otp
-        user.otpExpiry = otpExpiry
-        user.otpMethod = "phone"
+        // Check if user exists with normalized phone
+        let user = await User.findOne({ phone: normalizedPhone })
+
+        // If user doesn't exist, create a temporary record for passwordless registration
+        if (!user) {
+          console.log(`[v0] Creating new user with phone: ${normalizedPhone}`)
+          user = new User({
+            fullname: "Phone User",
+            email: `phone_${normalizedPhone}_${Date.now()}@temp.ananthala.com`,
+            password: "otp-auth-placeholder",
+            phone: normalizedPhone,
+            otpCode: otp,
+            otpExpiry: otpExpiry,
+            otpMethod: "phone",
+          })
+        } else {
+          console.log(`[v0] User found with phone: ${normalizedPhone}`)
+          // Update existing user with OTP
+          user.otpCode = otp
+          user.otpExpiry = otpExpiry
+          user.otpMethod = "phone"
+        }
+
+        // Send OTP via SMS using MSG91
+        console.log(`[v0] Attempting to send OTP via MSG91...`)
+        await sendOTPSMS(normalizedPhone, otp)
+        console.log(`[v0] SMS sent successfully`)
+
+        // Save user with OTP
         await user.save()
+        console.log(`[v0] User saved to database`)
 
         return NextResponse.json(
-          { success: true, message: "OTP sent to phone", maskedPhone: phone.slice(-4).padStart(phone.length, "*") },
+          { 
+            success: true, 
+            message: "OTP sent to phone", 
+            maskedPhone: normalizedPhone.slice(-4).padStart(normalizedPhone.length, "*"),
+            phone: normalizedPhone 
+          },
           { status: 200 },
         )
       } catch (smsError: any) {
+        console.error(`[v0] SMS Error:`, smsError)
         return NextResponse.json(
           {
             success: false,

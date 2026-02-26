@@ -17,6 +17,12 @@ import {
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+interface Agent {
+  id: string
+  name: string
+  email: string
+}
+
 interface Coupon {
   id: string
   code: string
@@ -28,6 +34,8 @@ interface Coupon {
   usedCount: number
   expiryDate: string
   status: "active" | "expired" | "inactive"
+  agents?: string[]
+  agentNames?: string[]
 }
 
 export default function AdminCouponManagementPage() {
@@ -35,8 +43,10 @@ export default function AdminCouponManagementPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [coupons, setCoupons] = useState<Coupon[]>([])
+  const [agents, setAgents] = useState<Agent[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoadingAgents, setIsLoadingAgents] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -47,13 +57,15 @@ export default function AdminCouponManagementPage() {
     maxDiscount: "",
     usageLimit: "",
     expiryDate: "",
+    agents: [] as string[],
   })
 
   const [messages, setMessages] = useState({ success: "", error: "" })
 
-  // Fetch coupons on mount
+  // Fetch coupons and agents on mount
   useEffect(() => {
     fetchCoupons()
+    fetchAgents()
   }, [])
 
   const fetchCoupons = async () => {
@@ -69,8 +81,9 @@ export default function AdminCouponManagementPage() {
 
       const data = await response.json()
       if (data.success) {
-        setCoupons(
-          data.coupons.map((coupon: any) => ({
+        console.log("[v0] Received coupons:", data.coupons.length)
+        const mappedCoupons = data.coupons.map((coupon: any) => {
+          const mapped = {
             id: coupon._id,
             code: coupon.code,
             discount: coupon.discount,
@@ -81,8 +94,13 @@ export default function AdminCouponManagementPage() {
             usedCount: coupon.usedCount,
             expiryDate: new Date(coupon.expiryDate).toISOString().split("T")[0],
             status: coupon.status,
-          })),
-        )
+            agents: coupon.agents || [],
+            agentNames: coupon.agentNames || [],
+          }
+          console.log(`[v0] Coupon ${coupon.code} - agentNames:`, mapped.agentNames)
+          return mapped
+        })
+        setCoupons(mappedCoupons)
       }
     } catch (error) {
       console.error("Error fetching coupons:", error)
@@ -90,6 +108,35 @@ export default function AdminCouponManagementPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const fetchAgents = async () => {
+    try {
+      setIsLoadingAgents(true)
+      const response = await fetch("/api/admin/agents", {
+        credentials: "include",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch agents")
+      }
+
+      const data = await response.json()
+      if (data.success) {
+        setAgents(data.agents)
+      }
+    } catch (error) {
+      console.error("Error fetching agents:", error)
+    } finally {
+      setIsLoadingAgents(false)
+    }
+  }
+
+  const toggleAgent = (agentId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      agents: prev.agents.includes(agentId) ? prev.agents.filter((id) => id !== agentId) : [...prev.agents, agentId],
+    }))
   }
 
   const handleAddCoupon = async () => {
@@ -106,6 +153,11 @@ export default function AdminCouponManagementPage() {
 
     setIsSubmitting(true)
     try {
+      // Get selected agent names
+      const selectedAgentNames = formData.agents.map(
+        (id) => agents.find((a) => a.id === id)?.name || ""
+      ).filter(Boolean)
+
       const response = await fetch("/api/admin/coupons", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -118,6 +170,8 @@ export default function AdminCouponManagementPage() {
           maxDiscount: formData.maxDiscount ? Number.parseInt(formData.maxDiscount) : undefined,
           usageLimit: Number.parseInt(formData.usageLimit),
           expiryDate: formData.expiryDate,
+          agents: formData.agents,
+          agentNames: selectedAgentNames,
         }),
       })
 
@@ -133,6 +187,7 @@ export default function AdminCouponManagementPage() {
           maxDiscount: "",
           usageLimit: "",
           expiryDate: "",
+          agents: [],
         })
         setIsAddDialogOpen(false)
         fetchCoupons()
@@ -336,6 +391,41 @@ export default function AdminCouponManagementPage() {
                   />
                 </div>
               </div>
+
+              {/* Agent Selection */}
+              <div className="grid gap-2 border-t border-[#D9CFC7] pt-4">
+                <Label className="text-[#6D4530]">
+                  Assign to Agents (Optional)
+                </Label>
+                <p className="text-sm text-[#8B5A3C]/70 mb-3">
+                  {formData.agents.length > 0
+                    ? `${formData.agents.length} agent(s) selected`
+                    : "No agents selected - coupon available to all"}
+                </p>
+                {isLoadingAgents ? (
+                  <p className="text-sm text-[#8B5A3C]">Loading agents...</p>
+                ) : agents.length === 0 ? (
+                  <p className="text-sm text-[#8B5A3C]/70">No agents available</p>
+                ) : (
+                  <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto border border-[#D9CFC7] rounded-lg p-3 bg-stone-50">
+                    {agents.map((agent) => (
+                      <label key={agent.id} className="flex items-center gap-3 cursor-pointer hover:bg-white p-2 rounded transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={formData.agents.includes(agent.id)}
+                          onChange={() => toggleAgent(agent.id)}
+                          disabled={isSubmitting}
+                          className="w-4 h-4 border-[#D9CFC7] text-[#8B5A3C] focus:ring-[#8B5A3C] rounded cursor-pointer"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-[#6D4530]">{agent.name}</p>
+                          <p className="text-xs text-[#8B5A3C]/70">{agent.email}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <DialogFooter>
               <Button
@@ -446,6 +536,7 @@ export default function AdminCouponManagementPage() {
                   <TableHead className="text-[#6D4530] font-semibold">Discount</TableHead>
                   <TableHead className="text-[#6D4530] font-semibold">Min. Purchase</TableHead>
                   <TableHead className="text-[#6D4530] font-semibold">Usage</TableHead>
+                  <TableHead className="text-[#6D4530] font-semibold">Agents</TableHead>
                   <TableHead className="text-[#6D4530] font-semibold">Expiry Date</TableHead>
                   <TableHead className="text-[#6D4530] font-semibold">Status</TableHead>
                   <TableHead className="text-[#6D4530] font-semibold text-right">Actions</TableHead>
@@ -486,6 +577,22 @@ export default function AdminCouponManagementPage() {
                           ></div>
                         </div>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {coupon.agentNames && coupon.agentNames.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {coupon.agentNames.map((name, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-1 text-xs bg-[#8B5A3C]/10 text-[#6D4530] rounded-full font-medium"
+                            >
+                              {name}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-[#8B5A3C]/70 text-sm">All agents</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-[#6D4530]">{coupon.expiryDate}</TableCell>
                     <TableCell>

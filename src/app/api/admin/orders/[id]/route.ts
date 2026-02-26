@@ -3,7 +3,7 @@ import { jwtVerify } from "@/lib/jwt"
 import { connectDB } from "@/lib/mongodb"
 import Order from "@/models/order"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const token = request.cookies.get("admin_token")?.value
 
@@ -16,9 +16,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     await connectDB()
 
-    const order = await Order.findById(params.id).lean()
+    const order = await Order.findById(id).lean()
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 })

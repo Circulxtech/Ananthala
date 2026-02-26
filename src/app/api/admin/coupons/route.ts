@@ -21,12 +21,30 @@ export async function GET(request: NextRequest) {
     // Get all coupons
     const coupons = await Coupon.find().sort({ createdAt: -1 }).lean()
 
-    // Update statuses based on expiry date
-    const updatedCoupons = coupons.map((coupon: any) => ({
-      ...coupon,
-      _id: coupon._id.toString(),
-      status: new Date(coupon.expiryDate) < new Date() ? "expired" : coupon.status,
-    }))
+    console.log("[v0] Fetched coupons count:", coupons.length)
+
+    // Populate agent names for each coupon if not already populated
+    const User = require("@/models/User").default
+    const updatedCoupons = await Promise.all(
+      coupons.map(async (coupon: any) => {
+        let agentNames = coupon.agentNames || []
+
+        // If agents exist but agentNames is empty, fetch agent names
+        if (coupon.agents && coupon.agents.length > 0 && agentNames.length === 0) {
+          const agentUsers = await User.find({ _id: { $in: coupon.agents } }, { fullname: 1 }).lean()
+          agentNames = agentUsers.map((user: any) => user.fullname)
+          console.log(`[v0] Fetched names for coupon ${coupon.code}:`, agentNames)
+        }
+
+        return {
+          ...coupon,
+          _id: coupon._id.toString(),
+          agents: coupon.agents || [],
+          agentNames: agentNames,
+          status: new Date(coupon.expiryDate) < new Date() ? "expired" : coupon.status,
+        }
+      }),
+    )
 
     return NextResponse.json({ success: true, coupons: updatedCoupons })
   } catch (error) {
@@ -49,7 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { code, discount, type, minPurchase, maxDiscount, usageLimit, expiryDate } = body
+    const { code, discount, type, minPurchase, maxDiscount, usageLimit, expiryDate, agents = [], agentNames = [] } = body
 
     // Validation
     if (!code || !discount || !type || minPurchase === undefined || !usageLimit || !expiryDate) {
@@ -89,6 +107,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Coupon code already exists" }, { status: 409 })
     }
 
+    // Fetch actual agent names from User collection based on agent IDs
+    let populatedAgentNames: string[] = []
+    if (agents.length > 0) {
+      const User = require("@/models/User").default
+      const agentUsers = await User.find({ _id: { $in: agents } }, { fullname: 1 }).lean()
+      populatedAgentNames = agentUsers.map((user: any) => user.fullname)
+      console.log("[v0] Fetched agent names:", populatedAgentNames)
+    }
+
     // Create new coupon
     const newCoupon = new Coupon({
       code: code.toUpperCase(),
@@ -101,6 +128,8 @@ export async function POST(request: NextRequest) {
       expiryDate: expiryDateTime,
       status: "active",
       createdBy: decoded.userId,
+      agents: agents.length > 0 ? agents : [],
+      agentNames: populatedAgentNames.length > 0 ? populatedAgentNames : [],
     })
 
     const savedCoupon = await newCoupon.save()
@@ -120,6 +149,8 @@ export async function POST(request: NextRequest) {
           usedCount: savedCoupon.usedCount,
           expiryDate: savedCoupon.expiryDate.toISOString().split("T")[0],
           status: savedCoupon.status,
+          agents: savedCoupon.agents || [],
+          agentNames: savedCoupon.agentNames || [],
         },
       },
       { status: 201 },

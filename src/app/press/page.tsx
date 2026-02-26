@@ -1,57 +1,50 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { Calendar, ExternalLink } from "lucide-react"
+import { Calendar, ExternalLink, Loader2 } from "lucide-react"
+import Image from "next/image"
 
-const pressReleases = [
-  {
-    id: 1,
-    title: "Ananthala Launches Revolutionary Organic Mattress Line",
-    date: "January 10, 2025",
-    source: "Business Weekly",
-    excerpt:
-      "Ananthala announces the launch of their new 100% organic mattress collection featuring advanced temperature regulation.",
-  },
-  {
-    id: 2,
-    title: "Sleep Better with Ananthala: Expert Reviews & Features",
-    date: "December 28, 2024",
-    source: "Health & Wellness Magazine",
-    excerpt:
-      "Industry experts praise Ananthala's commitment to quality and sustainability in the premium mattress market.",
-  },
-  {
-    id: 3,
-    title: "Ananthala Expands Dealer Network Across 15 States",
-    date: "December 15, 2024",
-    source: "Retail Today",
-    excerpt: "The premium mattress manufacturer continues its rapid expansion with new dealer partnerships nationwide.",
-  },
-  {
-    id: 4,
-    title: "Sustainable Sleep: How Ananthala is Changing the Industry",
-    date: "November 30, 2024",
-    source: "Green Living Quarterly",
-    excerpt: "An in-depth look at how Ananthala is combining luxury comfort with environmental responsibility.",
-  },
-  {
-    id: 5,
-    title: "Customer Satisfaction Report: Ananthala Leads Industry",
-    date: "November 8, 2024",
-    source: "Consumer Reviews Today",
-    excerpt: "With a 98% satisfaction rate, Ananthala customers report the best sleep quality in independent study.",
-  },
-  {
-    id: 6,
-    title: "The Innovation Behind Ananthala's Pressure Relief Technology",
-    date: "October 20, 2024",
-    source: "Sleep Science Journal",
-    excerpt: "Ananthala's patented pressure relief system provides optimal support across all body types.",
-  },
-]
+interface PressRelease {
+  _id: string
+  title: string
+  subheading?: string
+  content: string
+  image: string
+  externalLink?: string
+  createdAt: string
+}
 
 export default function Press() {
+  const [pressReleases, setPressReleases] = useState<PressRelease[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchPressReleases = async () => {
+      try {
+        console.log("[v0] Fetching press releases from /api/press")
+        const response = await fetch("/api/press")
+        console.log("[v0] API response status:", response.status)
+
+        const data = await response.json()
+        console.log("[v0] API response data:", data)
+
+        if (data.success) {
+          console.log("[v0] Setting press releases:", data.pressReleases)
+          setPressReleases(data.pressReleases)
+        } else {
+          console.error("[v0] API returned success: false, message:", data.message)
+        }
+      } catch (error) {
+        console.error("[v0] Error fetching press releases:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchPressReleases()
+  }, [])
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -97,41 +90,74 @@ export default function Press() {
 
         {/* Press Releases */}
         <section className="py-16 md:py-24 px-4 bg-stone-50">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <h2
               className="text-3xl md:text-4xl font-medium text-foreground mb-12 text-center"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               Latest Press Releases
             </h2>
-            <div className="space-y-6 md:space-y-8">
-              {pressReleases.map((release) => (
-                <a
-                  key={release.id}
-                  href="#"
-                  className="bg-white p-6 md:p-8 border border-amber-100 hover:shadow-lg transition-all group"
-                >
-                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
-                    <div>
-                      <h3 className="text-xl md:text-2xl font-medium text-foreground group-hover:text-[#8B5A3C] transition-colors mb-2">
-                        {release.title}
-                      </h3>
-                      <p className="text-foreground/80 font-medium mb-4">{release.excerpt}</p>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-[#8B5A3C]" />
+              </div>
+            ) : pressReleases.length === 0 ? (
+              <div className="text-center py-12 bg-white p-8 rounded-lg border border-amber-100">
+                <p className="text-foreground/70 text-lg">No press releases available at the moment.</p>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {pressReleases.map((release) => (
+                  <div
+                    key={release._id}
+                    className="bg-white border border-amber-100 hover:shadow-lg transition-all group overflow-hidden rounded-lg flex flex-col md:flex-row"
+                  >
+                    {/* Image */}
+                    <div className="md:w-1/3 relative h-48 md:h-auto min-h-64">
+                      <Image
+                        src={release.image}
+                        alt={release.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 p-6 md:p-8 flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-xl md:text-2xl font-medium text-foreground group-hover:text-[#8B5A3C] transition-colors mb-2">
+                          {release.title}
+                        </h3>
+                        {release.subheading && (
+                          <p className="text-foreground/80 font-medium mb-3 italic">{release.subheading}</p>
+                        )}
+                        <p className="text-foreground/70 font-medium line-clamp-3 mb-4">
+                          {release.content.substring(0, 200)}...
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-amber-100">
+                        <span className="flex items-center gap-2 text-sm text-foreground/70 font-medium">
+                          <Calendar className="w-4 h-4 text-[#8B5A3C]" />
+                          {new Date(release.createdAt).toLocaleDateString()}
+                        </span>
+                        {release.externalLink && (
+                          <a
+                            href={release.externalLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-[#8B5A3C] font-medium hover:gap-3 transition-all"
+                          >
+                            Read More
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-amber-100 text-sm text-foreground/70 font-medium">
-                    <div className="flex items-center gap-4">
-                      <span className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        {release.date}
-                      </span>
-                      <span className="text-[#8B5A3C] font-semibold">{release.source}</span>
-                    </div>
-                    <ExternalLink className="w-4 h-4 text-[#8B5A3C]" />
-                  </div>
-                </a>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

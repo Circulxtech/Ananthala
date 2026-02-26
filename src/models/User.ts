@@ -22,11 +22,11 @@ const UserSchema = new Schema<IUser>(
     },
     email: {
       type: String,
-      required: [true, "Please provide an email"],
-      unique: true,
       lowercase: true,
       trim: true,
       match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, "Please provide a valid email"],
+      sparse: true, // Allow null/missing values but unique when present
+      default: null,
     },
     password: {
       type: String,
