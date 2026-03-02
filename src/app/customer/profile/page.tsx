@@ -90,7 +90,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-[#8B5A3C]">Loading profile...</div>
+        <div className="text-foreground">Loading profile...</div>
       </div>
     )
   }
@@ -98,13 +98,13 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-3xl font-bold text-[#6D4530]">My Profile</h1>
-        <p className="text-[#8B5A3C]/70 mt-1">Manage your account information</p>
+        <h1 className="text-3xl font-bold text-foreground">My Profile</h1>
+        <p className="text-foreground mt-1">Manage your account information</p>
       </div>
 
       <Card className="border" style={{ borderColor: "#D9CFC7" }}>
         <CardHeader>
-          <CardTitle className="text-[#6D4530] flex items-center gap-2">
+          <CardTitle className="text-foreground flex items-center gap-2">
             <User className="h-5 w-5" />
             Personal Information
           </CardTitle>
@@ -112,70 +112,70 @@ export default function ProfilePage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fullname" className="text-[#6D4530]">
+              <Label htmlFor="fullname" className="text-foreground">
                 Full Name
               </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8B5A3C]/50" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground" />
                 <Input
                   id="fullname"
                   value={user?.fullname || ""}
                   disabled
-                  className="pl-10 border-[#D9CFC7] bg-gray-50 cursor-not-allowed text-[#6D4530]"
+                  className="pl-10 border-[#D9CFC7] bg-gray-50 cursor-not-allowed text-foreground"
                   title="Full name cannot be changed"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-[#6D4530]">
+              <Label htmlFor="email" className="text-foreground">
                 Email Address
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8B5A3C]/50" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground" />
                 <Input
                   id="email"
                   type="email"
                   value={user?.email || ""}
                   disabled
-                  className="pl-10 border-[#D9CFC7] bg-gray-50 cursor-not-allowed text-[#6D4530]"
+                  className="pl-10 border-[#D9CFC7] bg-gray-50 cursor-not-allowed text-foreground"
                   title="Email cannot be changed"
                 />
               </div>
-              <p className="text-xs text-[#8B5A3C]/60">Email cannot be changed</p>
+              <p className="text-xs text-foreground">Email cannot be changed</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-[#6D4530]">
+                <Label htmlFor="phone" className="text-foreground">
                 Phone Number
               </Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8B5A3C]/50" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground" />
                 <Input
                   id="phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="Enter your phone number"
-                  className="pl-10 border-[#D9CFC7] focus-visible:ring-[#8B5A3C]/30"
+                  className="pl-10 border-[#D9CFC7] focus-visible:ring-foreground"
                   disabled={!isEditing}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address" className="text-[#6D4530]">
+              <Label htmlFor="address" className="text-foreground">
                 Address
               </Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-[#8B5A3C]/50" />
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-foreground" />
                 <textarea
                   id="address"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Enter your address"
                   rows={3}
-                  className="w-full pl-10 pr-3 py-2 border border-[#D9CFC7] rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B5A3C]/30 bg-background text-foreground disabled:bg-gray-50 disabled:cursor-not-allowed"
+                  className="w-full pl-10 pr-3 py-2 border border-[#D9CFC7] rounded-md focus:outline-none focus:ring-2 focus:ring-foreground bg-background text-foreground disabled:bg-gray-50 disabled:cursor-not-allowed"
                   disabled={!isEditing}
                 />
               </div>
@@ -183,14 +183,14 @@ export default function ProfilePage() {
 
             <div className="flex gap-3">
               {isEditing ? (
-                <Button type="submit" className="flex-1 bg-[#8B5A3C] hover:bg-[#6D4530] text-white" disabled={saving}>
+                <Button type="submit" className="flex-1 bg-[#EED9C4] hover:bg-[#EED9C4]/80 text-foreground" disabled={saving}>
                   {saving ? "Saving..." : "Save Changes"}
                 </Button>
               ) : (
                 <Button
                   type="button"
                   onClick={handleEdit}
-                  className="flex-1 bg-[#8B5A3C] hover:bg-[#6D4530] text-white"
+                  className="flex-1 bg-[#EED9C4] hover:bg-[#EED9C4]/80 text-foreground"
                 >
                   <Edit2 className="h-4 w-4 mr-2" />
                   Edit

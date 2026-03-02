@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface ApiProductVariant {
   price: number
@@ -89,10 +89,20 @@ export function CategoryProductsGrid({ collection }: CategoryProductsGridProps) 
   }, [collection, products])
 
   if (isLoading) {
+    const skeletonItems = Array.from({ length: 8 }, (_, index) => index)
     return (
-      <div className="flex items-center justify-center py-10 text-foreground/70">
-        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        Loading products...
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,300px))] gap-x-8 gap-y-10 justify-center">
+        {skeletonItems.map((item) => (
+          <div
+            key={`skeleton-${item}`}
+            className="border border-[#EED9C4] p-4 bg-white"
+          >
+            <Skeleton className="mb-3 aspect-square w-full" />
+            <Skeleton className="mb-2 h-4 w-3/4 mx-auto" />
+            <Skeleton className="mb-3 h-4 w-1/2 mx-auto" />
+            <Skeleton className="h-9 w-full" />
+          </div>
+        ))}
       </div>
     )
   }

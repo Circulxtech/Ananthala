@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { ChevronLeft, ChevronRight, Check, Loader2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Check } from "lucide-react"
 import { useEffect, useState } from "react"
 import { getProductDetailById, type ProductDetail } from "@/data/product-details"
 import { type CartItem } from "@/components/cart/cart-drawer"
@@ -29,6 +29,7 @@ import { GraceLoungerProductTemplate } from "@/collections/grace/templates/Grace
 import { GraceHeadPillowProductTemplate } from "@/collections/grace/templates/GraceHeadPillowProductTemplate"
 import { SimpleProductConfigurator } from "@/components/product/simple-product-configurator"
 import { ProductConfigurator } from "@/components/product/product-configurator"
+import { ProductDetailSkeleton } from "@/components/sections/product-detail-skeleton"
 import {
   Accordion,
   AccordionContent,
@@ -190,18 +191,7 @@ export default function ProductDetailPage() {
   const productId = staticProduct ? numericId : null
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen">
-        <Header />
-        <main className="pt-16 flex items-center justify-center min-h-[60vh]">
-          <div className="text-center text-foreground">
-            <Loader2 className="mx-auto mb-4 h-6 w-6 animate-spin" />
-            Loading product details...
-          </div>
-        </main>
-        <Footer />
-      </div>
-    )
+    return <ProductDetailSkeleton />
   }
 
   if (!product) {

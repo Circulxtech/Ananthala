@@ -134,8 +134,8 @@ export default function Home() {
     if (name === "joy") return "/category/joy#shop"
     if (name === "bliss") return "/category/bliss#shop"
     if (name === "grace") return "/category/grace#shop"
-    if (name.includes("pillow") || name.includes("bedsheet")) return "/category/bliss"
-    return "/category/bliss"
+    if (name.includes("pillow") || name.includes("bedsheet")) return "/category/bliss#shop"
+    return "/category/bliss#shop"
   }
 
   const onNavigate = (productName: string) => {

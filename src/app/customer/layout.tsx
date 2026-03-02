@@ -6,6 +6,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { LayoutDashboard, ShoppingCart, Heart, Package, Lock, UserIcon, Menu, X, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 interface AuthenticatedUser {
   id: string
@@ -105,7 +106,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#F5F1ED] flex items-center justify-center">
-        <div className="text-[#8B5A3C] text-lg">Loading...</div>
+        <div className="text-foreground text-lg">Loading...</div>
       </div>
     )
   }
@@ -124,22 +125,19 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden text-[#8B5A3C] hover:bg-[#8B5A3C]/10"
+                className="lg:hidden text-foreground hover:bg-[#EED9C4]/60"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               >
                 {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
-              <Link
-                href="/"
-                className="text-[#8B5A3C] text-xl font-normal tracking-wider hover:text-[#6D4530] transition-colors"
-              >
-                ANANTHALA
+              <Link href="/" className="flex items-center">
+                <Image src="/logo.png" alt="Ananthala" width={170} height={68} className="h-14 w-auto" />
               </Link>
             </div>
             <div className="flex items-center gap-3">
               <div className="hidden sm:block text-right">
-                <div className="text-sm font-medium text-[#6D4530]">{getFirstName(user.fullname)}</div>
-                <div className="text-xs text-[#8B5A3C]/70">{user.email}</div>
+                <div className="text-sm font-medium text-foreground">{getFirstName(user.fullname)}</div>
+                <div className="text-xs text-foreground/70">{user.email}</div>
               </div>
               <div
                 className={`w-10 h-10 rounded-full bg-gradient-to-br ${getGradientColor(user.fullname)} flex items-center justify-center text-white font-semibold`}
@@ -166,7 +164,9 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                   key={item.href}
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    isActive ? "bg-[#8B5A3C] text-white" : "text-[#6D4530] hover:bg-[#8B5A3C]/10 hover:text-[#8B5A3C]"
+                    isActive
+                      ? "bg-[#EED9C4] text-foreground"
+                      : "text-foreground hover:bg-[#EED9C4]/60"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -176,7 +176,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
             })}
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#6D4530] hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-red-50 hover:text-red-600 transition-all duration-200"
             >
               <LogOut className="h-5 w-5" />
               <span className="font-medium">Logout</span>
@@ -203,8 +203,8 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                       onClick={() => setIsSidebarOpen(false)}
                       className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                         isActive
-                          ? "bg-[#8B5A3C] text-white"
-                          : "text-[#6D4530] hover:bg-[#8B5A3C]/10 hover:text-[#8B5A3C]"
+                          ? "bg-[#EED9C4] text-foreground"
+                          : "text-foreground hover:bg-[#EED9C4]/60"
                       }`}
                     >
                       <Icon className="h-5 w-5" />
@@ -214,7 +214,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                 })}
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#6D4530] hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-red-50 hover:text-red-600 transition-all duration-200"
                 >
                   <LogOut className="h-5 w-5" />
                   <span className="font-medium">Logout</span>

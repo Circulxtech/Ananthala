@@ -67,8 +67,8 @@ export default function CustomerDashboard() {
     <div className="space-y-6">
       {/* Welcome Section */}
       <div className="bg-white rounded-lg p-6 border" style={{ borderColor: "#D9CFC7" }}>
-        <h1 className="text-3xl font-bold text-[#6D4530] mb-2">Welcome back, {user?.fullname.split(" ")[0]}!</h1>
-        <p className="text-[#8B5A3C]/70">Here's an overview of your account and recent activity</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back, {user?.fullname.split(" ")[0]}!</h1>
+        <p className="text-foreground/70">Here's an overview of your account and recent activity</p>
       </div>
 
       {/* Stats Grid */}
@@ -80,8 +80,8 @@ export default function CustomerDashboard() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-[#8B5A3C]/70">{stat.title}</p>
-                    <h3 className="text-2xl font-bold text-[#6D4530] mt-2">{stat.value}</h3>
+                    <p className="text-sm font-medium text-foreground/70">{stat.title}</p>
+                    <h3 className="text-2xl font-bold text-foreground mt-2">{stat.value}</h3>
                   </div>
                   <div className={`${stat.bgColor} p-3 rounded-lg`}>
                     <Icon className={`h-6 w-6 ${stat.color}`} />
@@ -97,23 +97,23 @@ export default function CustomerDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="border" style={{ borderColor: "#D9CFC7" }}>
           <CardHeader>
-            <CardTitle className="text-[#6D4530] flex items-center gap-2">
+            <CardTitle className="text-foreground flex items-center gap-2">
               <User className="h-5 w-5" />
               Profile Information
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-[#8B5A3C]/70">Full Name</p>
-              <p className="text-[#6D4530] font-medium mt-1">{user?.fullname}</p>
+              <p className="text-sm font-medium text-foreground/70">Full Name</p>
+              <p className="text-foreground font-medium mt-1">{user?.fullname}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-[#8B5A3C]/70">Email Address</p>
-              <p className="text-[#6D4530] font-medium mt-1">{user?.email}</p>
+              <p className="text-sm font-medium text-foreground/70">Email Address</p>
+              <p className="text-foreground font-medium mt-1">{user?.email}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-[#8B5A3C]/70">Member Since</p>
-              <p className="text-[#6D4530] font-medium mt-1">
+              <p className="text-sm font-medium text-foreground/70">Member Since</p>
+              <p className="text-foreground font-medium mt-1">
                 {new Date().toLocaleDateString("en-US", {
                   month: "long",
                   year: "numeric",
@@ -125,7 +125,7 @@ export default function CustomerDashboard() {
 
         <Card className="border" style={{ borderColor: "#D9CFC7" }}>
           <CardHeader>
-            <CardTitle className="text-[#6D4530] flex items-center gap-2">
+            <CardTitle className="text-foreground flex items-center gap-2">
               <Clock className="h-5 w-5" />
               Recent Orders
             </CardTitle>
@@ -133,9 +133,9 @@ export default function CustomerDashboard() {
           <CardContent>
             {recentOrders.length === 0 ? (
               <div className="text-center py-8">
-                <Package className="h-12 w-12 text-[#8B5A3C]/30 mx-auto mb-3" />
-                <p className="text-[#8B5A3C]/70">No orders yet</p>
-                <p className="text-sm text-[#8B5A3C]/50 mt-1">Start shopping to see your orders here</p>
+                <Package className="h-12 w-12 text-foreground/30 mx-auto mb-3" />
+                <p className="text-foreground/70">No orders yet</p>
+                <p className="text-sm text-foreground/50 mt-1">Start shopping to see your orders here</p>
               </div>
             ) : (
               <div className="space-y-3">{/* Recent orders will be displayed here */}</div>
@@ -147,30 +147,30 @@ export default function CustomerDashboard() {
       {/* Quick Actions */}
       <Card className="border" style={{ borderColor: "#D9CFC7" }}>
         <CardHeader>
-          <CardTitle className="text-[#6D4530]">Quick Actions</CardTitle>
+          <CardTitle className="text-foreground">Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <a
               href="/customer/orders"
-              className="flex items-center gap-3 p-4 bg-[#F5F1ED] rounded-lg hover:bg-[#8B5A3C]/10 transition-colors"
+              className="flex items-center gap-3 p-4 bg-[#EED9C4] rounded-lg hover:bg-[#EED9C4]/80 transition-colors"
             >
-              <Package className="h-5 w-5 text-[#8B5A3C]" />
-              <span className="text-[#6D4530] font-medium">View Orders</span>
+              <Package className="h-5 w-5 text-foreground" />
+              <span className="text-foreground font-medium">View Orders</span>
             </a>
             <a
               href="/customer/wishlist"
-              className="flex items-center gap-3 p-4 bg-[#F5F1ED] rounded-lg hover:bg-[#8B5A3C]/10 transition-colors"
+              className="flex items-center gap-3 p-4 bg-[#EED9C4] rounded-lg hover:bg-[#EED9C4]/80 transition-colors"
             >
-              <Heart className="h-5 w-5 text-[#8B5A3C]" />
-              <span className="text-[#6D4530] font-medium">My Wishlist</span>
+              <Heart className="h-5 w-5 text-foreground" />
+              <span className="text-foreground font-medium">My Wishlist</span>
             </a>
             <a
               href="/customer/profile"
-              className="flex items-center gap-3 p-4 bg-[#F5F1ED] rounded-lg hover:bg-[#8B5A3C]/10 transition-colors"
+              className="flex items-center gap-3 p-4 bg-[#EED9C4] rounded-lg hover:bg-[#EED9C4]/80 transition-colors"
             >
-              <User className="h-5 w-5 text-[#8B5A3C]" />
-              <span className="text-[#6D4530] font-medium">Edit Profile</span>
+              <User className="h-5 w-5 text-foreground" />
+              <span className="text-foreground font-medium">Edit Profile</span>
             </a>
           </div>
         </CardContent>
