@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { type CartItem } from "@/components/cart/cart-drawer"
 import type { ProductDetail } from "@/data/product-details"
 import { fabricOptions } from "@/data/fabric"
+import { useColorConfigurator } from "@/hooks/use-color-cofigurator"
+import { ColorAwareImage } from "@/components/product/ColorAwareImage"
 
 interface ApiProductVariant {
   weight: number
@@ -25,6 +27,7 @@ interface ProductConfiguratorProps {
   variants?: ApiProductVariant[]
   onAddToCart: (item: CartItem) => void
   isAddingToCart: boolean
+  showColorConfigurator?: boolean
 }
 
 export function ProductConfigurator({
@@ -32,6 +35,7 @@ export function ProductConfigurator({
   variants = [],
   onAddToCart,
   isAddingToCart,
+  showColorConfigurator = true,
 }: ProductConfiguratorProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [useCustomDimensions, setUseCustomDimensions] = useState(false)
@@ -41,6 +45,14 @@ export function ProductConfigurator({
   const [selectedSize, setSelectedSize] = useState("")
   const [selectedFabric, setSelectedFabric] = useState("")
   const [quantity, setQuantity] = useState(1)
+
+  const {
+    selectedFabricId: colorFabricId,
+    selectedFabricColor,
+    isColorApplied,
+    setIsColorApplied,
+    handleFabricChange: handleColorChange,
+  } = useColorConfigurator()
 
   const productImages = product.images?.length ? product.images : ["/placeholder.svg"]
   const customSizeLabel = `${customLength || "-"}x${customWidth || "-"}x${customHeight || "-"} cm`
@@ -145,11 +157,13 @@ export function ProductConfigurator({
 
     const finalSize = useCustomDimensions ? customSizeLabel : selectedSize
     const item: CartItem = {
-      id: `${product.id}-${finalSize}-${Date.now()}`,
+      id: `${product.id}-${finalSize}-${colorFabricId || "default"}-${Date.now()}`,
       name: product.name,
       image: productImages[0],
       size: finalSize,
       fabric: selectedFabric || selectedVariant?.fabric || undefined,
+      productColor: selectedFabricColor?.name,
+      productColorHex: selectedFabricColor?.hex,
       quantity,
       price,
     }
@@ -163,14 +177,28 @@ export function ProductConfigurator({
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
-              <div className="relative aspect-square overflow-hidden">
-                <Image
-                  src={productImages[selectedImageIndex] || "/placeholder.svg"}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
+              <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-50">
+                {showColorConfigurator && colorFabricId ? (
+                  <ColorAwareImage
+                    src={productImages[selectedImageIndex] || "/placeholder.svg"}
+                    alt={product.name}
+                    fabricId={colorFabricId}
+                    fill
+                    className="object-cover"
+                    priority
+                    unoptimized
+                    onColorApplied={setIsColorApplied}
+                  />
+                ) : (
+                  <Image
+                    src={productImages[selectedImageIndex] || "/placeholder.svg"}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    priority
+                    unoptimized
+                  />
+                )}
               </div>
 
               {productImages.length > 1 && (
@@ -315,6 +343,53 @@ export function ProductConfigurator({
                         })}
                       </SelectContent>
                     </Select>
+                  </div>
+                )}
+
+                {/* Color Configurator for Product Colors */}
+                {showColorConfigurator && (
+                  <div>
+                    <label className="text-base font-medium text-foreground mb-2 block">Product Color</label>
+                    <Select value={colorFabricId || "original-color"} onValueChange={(value) => {
+                      if (value === "original-color") {
+                        handleColorChange("")
+                      } else {
+                        handleColorChange(value)
+                      }
+                    }}>
+                      <SelectTrigger className="w-full text-foreground">
+                        <SelectValue placeholder="Select color" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="original-color">
+                          <span className="flex items-center gap-2">
+                            <span>Original Color</span>
+                          </span>
+                        </SelectItem>
+                        {fabricOptions.map((fabric) => (
+                          <SelectItem key={fabric.id} value={fabric.id}>
+                            <span className="flex items-center gap-2">
+                              <img
+                                src={fabric.image}
+                                alt={fabric.name}
+                                className="h-5 w-5 rounded object-cover"
+                              />
+                              <span>{fabric.name}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {selectedFabricColor && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <div
+                          className="w-6 h-6 rounded border border-gray-200"
+                          style={{ backgroundColor: selectedFabricColor.hex }}
+                          title={selectedFabricColor.name}
+                        />
+                        <span className="text-sm text-foreground/70">{selectedFabricColor.name}</span>
+                      </div>
+                    )}
                   </div>
                 )}
 

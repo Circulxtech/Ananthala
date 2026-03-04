@@ -151,9 +151,27 @@ export default function CartPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-xl font-semibold text-foreground mb-2">{item.name}</h3>
-                        <div className="inline-block  px-3 py-1 text-base text-foreground">
-                          {item.fabric ? `Fabric: ${item.fabric}` : `Size: ${item.size}`}
+                        <h3 className="text-xl font-semibold text-foreground mb-2">
+                          {item.name}
+                          {item.productColor && (
+                            <span className="text-sm font-normal text-foreground/70 ml-2">({item.productColor})</span>
+                          )}
+                        </h3>
+                        <div className="space-y-2">
+                          <div className="inline-block px-3 py-1 text-base text-foreground">
+                            {item.fabric ? `Fabric: ${item.fabric}` : `Size: ${item.size}`}
+                          </div>
+                          {item.productColor && (
+                            <div className="flex items-center gap-2 px-3 py-1 text-base text-foreground">
+                              <span>Color:</span>
+                              <div
+                                className="w-4 h-4 rounded border border-gray-300"
+                                style={{ backgroundColor: item.productColorHex || "transparent" }}
+                                title={item.productColor}
+                              />
+                              <span>{item.productColor}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
 

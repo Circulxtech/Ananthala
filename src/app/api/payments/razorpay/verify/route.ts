@@ -13,6 +13,8 @@ interface CartItemPayload {
   price: number
   size?: string
   fabric?: string
+  productColor?: string
+  productColorHex?: string
 }
 
 export async function POST(request: Request) {
@@ -69,6 +71,8 @@ export async function POST(request: Request) {
           price: item.price,
           size: item.size,
           fabric: item.fabric,
+          productColor: item.productColor,
+          productColorHex: item.productColorHex,
         }))
       : []
 

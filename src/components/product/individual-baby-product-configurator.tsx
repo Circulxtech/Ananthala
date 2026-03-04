@@ -5,24 +5,29 @@ import { Loader2, IndianRupee, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useSimpleProduct } from "@/hooks/use-simple-product"
+import { useColorConfigurator } from "@/hooks/use-color-cofigurator"
+import { ColorAwareImage } from "@/components/product/ColorAwareImage"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
+import { fabricOptions } from "@/data/fabric"
 
 interface IndividualBabyProductConfiguratorProps {
   product: ProductDetail
   productId: number
   onAddToCart: (item: CartItem) => void
   isAddingToCart: boolean
+  showColorConfigurator?: boolean
 }
 
 /**
  * Individual Baby Product Configurator Component
- * Handles individual baby product customization (swaddles, etc.)
+ * Handles individual baby product customization (swaddles, etc.) with color configurator
  */
 export function IndividualBabyProductConfigurator({
   product,
   onAddToCart,
   isAddingToCart,
+  showColorConfigurator = true,
 }: IndividualBabyProductConfiguratorProps) {
   const {
     selectedSize,
@@ -32,12 +37,21 @@ export function IndividualBabyProductConfigurator({
     price,
   } = useSimpleProduct(product)
 
+  const {
+    selectedFabricId,
+    selectedFabricColor,
+    isColorApplied,
+    setIsColorApplied,
+    handleFabricChange,
+  } = useColorConfigurator()
+
   const handleAddToCart = () => {
     const cartItem: CartItem = {
       id: `${product.id}-${selectedSize}`,
       name: product.name,
       image: product.images[0],
       size: selectedSize,
+      fabric: selectedFabricId,
       quantity: 1,
       price,
     }
@@ -51,16 +65,32 @@ export function IndividualBabyProductConfigurator({
           <h3 className="text-xl font-medium text-foreground mb-6">{product.name}</h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
-              <div className="relative aspect-square overflow-hidden">
-                <Image
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
+              {/* Main Product Image with Color Transformation */}
+              <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-50">
+                {showColorConfigurator && selectedFabricId ? (
+                  <ColorAwareImage
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    fabricId={selectedFabricId}
+                    fill
+                    className="object-cover"
+                    priority
+                    unoptimized
+                    onColorApplied={setIsColorApplied}
+                  />
+                ) : (
+                  <Image
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    priority
+                    unoptimized
+                  />
+                )}
               </div>
 
+              {/* Thumbnail Gallery */}
               {product.images.length > 1 && (
                 <div className="grid grid-cols-5 gap-2">
                   {product.images.map((image: string, index: number) => (
@@ -68,7 +98,7 @@ export function IndividualBabyProductConfigurator({
                       key={index}
                       onClick={() => setSelectedImage(index)}
                       type="button"
-                      className={`relative aspect-square overflow-hidden border-2 transition-all cursor-pointer hover:opacity-80 ${
+                      className={`relative aspect-square overflow-hidden border-2 transition-all cursor-pointer hover:opacity-80 rounded ${
                         selectedImage === index
                           ? "border-[#EED9C4] opacity-100"
                           : "border-transparent opacity-60"
@@ -89,7 +119,7 @@ export function IndividualBabyProductConfigurator({
 
             <div>
               <h4 className="text-2xl font-medium text-foreground mb-4">Dimensions</h4>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
                   <label className="text-base font-medium text-foreground mb-2 block">Dimensions (in inches)</label>
                   <Select value={selectedSize} onValueChange={setSelectedSize}>
@@ -105,6 +135,53 @@ export function IndividualBabyProductConfigurator({
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Color Configurator Section */}
+                {showColorConfigurator && (
+                  <div>
+                    <label className="text-base font-medium text-foreground mb-2 block">Fabric Color</label>
+                    <Select value={selectedFabricId || "original-color"} onValueChange={(value) => {
+                      if (value === "original-color") {
+                        handleFabricChange("")
+                      } else {
+                        handleFabricChange(value)
+                      }
+                    }}>
+                      <SelectTrigger className="w-full text-foreground">
+                        <SelectValue placeholder="Select fabric color" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="original-color">
+                          <span className="flex items-center gap-2">
+                            <span>Original Color</span>
+                          </span>
+                        </SelectItem>
+                        {fabricOptions.map((fabric) => (
+                          <SelectItem key={fabric.id} value={fabric.id}>
+                            <span className="flex items-center gap-2">
+                              <img
+                                src={fabric.image}
+                                alt={fabric.name}
+                                className="h-5 w-5 rounded object-cover"
+                              />
+                              <span>{fabric.name}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {selectedFabricColor && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <div
+                          className="w-6 h-6 rounded border border-gray-200"
+                          style={{ backgroundColor: selectedFabricColor.hex }}
+                          title={selectedFabricColor.name}
+                        />
+                        <span className="text-sm text-foreground/70">{selectedFabricColor.name}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
