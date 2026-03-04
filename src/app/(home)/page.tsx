@@ -55,7 +55,7 @@ const testimonialVideos = [
     id: 1,
     name: "Jane Doe",
     video: "/testimonial1.mp4",
-    poster: "/testimonial1.jpg",
+    poster: "/testimoniail1.jpg",
   },
   {
     id: 2,
