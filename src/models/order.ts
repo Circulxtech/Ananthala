@@ -39,6 +39,8 @@ const orderSchema = new mongoose.Schema(
         price: Number,
         size: String,
         fabric: String,
+        productColor: String,
+        productColorHex: String,
       },
     ],
     subtotal: {

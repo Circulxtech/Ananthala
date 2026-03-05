@@ -12,6 +12,8 @@ export interface CartItem {
   image: string
   size: string
   fabric?: string
+  productColor?: string // Color selected from color configurator
+  productColorHex?: string // HEX value of color
   quantity: number
   price: number
 }
@@ -72,10 +74,26 @@ export function CartDrawer({ isOpen, onClose, cartItems = [] }: CartDrawerProps)
                       <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-serif text-black text-lg mb-2 leading-tight">{item.name}</h3>
+                      <h3 className="font-serif text-black text-lg mb-2 leading-tight">
+                        {item.name}
+                        {item.productColor && (
+                          <span className="text-sm font-normal text-gray-600 ml-1">({item.productColor})</span>
+                        )}
+                      </h3>
                       <p className="text-black text-sm mb-2">Size: {item.size}</p>
                       {item.fabric && (
                         <p className="text-black text-sm mb-2">Fabric: {item.fabric}</p>
+                      )}
+                      {item.productColor && (
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-black text-sm">Color:</span>
+                          <div
+                            className="w-4 h-4 rounded border border-gray-300"
+                            style={{ backgroundColor: item.productColorHex || "transparent" }}
+                            title={item.productColor}
+                          />
+                          <span className="text-black text-sm">{item.productColor}</span>
+                        </div>
                       )}
                       <p className="text-black text-sm">Qty: {item.quantity}</p>
                     </div>

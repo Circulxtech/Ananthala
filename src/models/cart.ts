@@ -1,0 +1,127 @@
+import mongoose from "mongoose"
+
+const cartItemSchema = new mongoose.Schema(
+  {
+    id: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: false,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    size: {
+      type: String,
+      required: false,
+    },
+    fabric: {
+      type: String,
+      required: false,
+    },
+    productColor: {
+      type: String,
+      required: false,
+      description: "Color name selected from color configurator",
+    },
+    productColorHex: {
+      type: String,
+      required: false,
+      description: "HEX value of the selected color",
+    },
+  },
+  { _id: true, timestamps: true }
+)
+
+const cartSchema = new mongoose.Schema(
+  {
+    cartId: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
+    },
+    userEmail: {
+      type: String,
+      required: false,
+    },
+    userName: {
+      type: String,
+      required: false,
+    },
+    userPhone: {
+      type: String,
+      required: false,
+    },
+    items: [cartItemSchema],
+    subtotal: {
+      type: Number,
+      default: 0,
+    },
+    shipping: {
+      type: Number,
+      default: 0,
+    },
+    discount: {
+      type: Number,
+      default: 0,
+    },
+    total: {
+      type: Number,
+      default: 0,
+    },
+    status: {
+      type: String,
+      enum: ["active", "abandoned", "converted_to_order"],
+      default: "active",
+    },
+    sessionId: {
+      type: String,
+      required: false,
+    },
+    ipAddress: {
+      type: String,
+      required: false,
+    },
+    userAgent: {
+      type: String,
+      required: false,
+    },
+    lastActivityAt: {
+      type: Date,
+      default: Date.now,
+    },
+    expiresAt: {
+      type: Date,
+      default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+      index: true,
+    },
+  },
+  { timestamps: true }
+)
+
+// Auto-delete carts after expiration
+cartSchema.index(
+  { expiresAt: 1 },
+  { expireAfterSeconds: 0 }
+)
+
+const Cart = mongoose.models.Cart || mongoose.model("Cart", cartSchema)
+
+export default Cart

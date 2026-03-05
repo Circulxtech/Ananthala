@@ -204,6 +204,8 @@ export default function CheckoutPage() {
                   price: item.price,
                   size: item.size,
                   fabric: item.fabric,
+                  productColor: item.productColor,
+                  productColorHex: item.productColorHex,
                 })),
                 subtotal,
                 shippingCost: shipping,
