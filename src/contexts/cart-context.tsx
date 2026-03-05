@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react"
 import { type CartItem } from "@/components/cart/cart-drawer"
+import { toast } from "@/hooks/use-toast"
 
 interface CartContextType {
   cartItems: CartItem[]
@@ -19,6 +20,32 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
 
   const normalizeItemName = (name: string) => name.replace(/\bGRACE\b/g, "Grace")
+  const getCartItemMergeKey = (item: CartItem) =>
+    [
+      normalizeItemName(item.name).trim().toLowerCase(),
+      (item.size || "").trim().toLowerCase(),
+      (item.fabric || "").trim().toLowerCase(),
+      String(item.price),
+    ].join("|")
+
+  const mergeDuplicateCartItems = (items: CartItem[]) => {
+    const merged = new Map<string, CartItem>()
+
+    items.forEach((item) => {
+      const normalizedItem = { ...item, name: normalizeItemName(item.name ?? "") }
+      const key = getCartItemMergeKey(normalizedItem)
+      const existing = merged.get(key)
+
+      if (existing) {
+        existing.quantity += normalizedItem.quantity
+        return
+      }
+
+      merged.set(key, { ...normalizedItem })
+    })
+
+    return Array.from(merged.values())
+  }
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -31,7 +58,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             const normalizedItems = parsed.map((item) =>
               item && typeof item === "object" ? { ...item, name: normalizeItemName(item.name ?? "") } : item
             )
-            setCartItems(normalizedItems)
+            setCartItems(mergeDuplicateCartItems(normalizedItems))
           }
         } catch (error) {
           console.error("Error loading cart from localStorage:", error)
@@ -48,20 +75,28 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [cartItems])
 
   const addToCart = (newItem: CartItem) => {
+    const normalizedItem = { ...newItem, name: normalizeItemName(newItem.name) }
+    const mergeKey = getCartItemMergeKey(normalizedItem)
+    const existingItem = cartItems.find((item) => getCartItemMergeKey(item) === mergeKey)
+
     setCartItems((prevItems) => {
-      const normalizedItem = { ...newItem, name: normalizeItemName(newItem.name) }
-      // Check if exact same product with same size exists
+      // Merge by product configuration instead of generated id.
       const existingItemIndex = prevItems.findIndex(
-        (item) => item.id === newItem.id
+        (item) => getCartItemMergeKey(item) === mergeKey
       )
       if (existingItemIndex >= 0) {
-        // Item exists, update quantity
         const updatedItems = [...prevItems]
         updatedItems[existingItemIndex].quantity += normalizedItem.quantity
-        return updatedItems
+        return mergeDuplicateCartItems(updatedItems)
       }
-      // New item, add to cart
-      return [...prevItems, normalizedItem]
+      return mergeDuplicateCartItems([...prevItems, normalizedItem])
+    })
+
+    toast({
+      title: existingItem ? "Cart updated" : "Added to cart",
+      description: existingItem
+        ? `${normalizedItem.name} quantity updated in your cart.`
+        : `${normalizedItem.name} has been added to your cart.`,
     })
   }
 
@@ -107,4 +142,3 @@ export function useCart() {
   }
   return context
 }
-

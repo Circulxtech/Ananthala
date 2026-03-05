@@ -17,7 +17,9 @@ export default function CartPage() {
         <Card className="border" style={{ borderColor: "#D9CFC7" }}>
           <CardContent className="py-12">
             <div className="text-center">
-              <ShoppingCart className="h-16 w-16 text-[#8B5A3C]/30 mx-auto mb-4" />
+              <div className="empty-cart-icon-wrap">
+                <ShoppingCart className="empty-cart-icon h-11 w-11 text-[#8B5A3C]/50" />
+              </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">Your cart is empty</h3>
               <p className="text-foreground mb-6">Add items to your cart to continue shopping</p>
               <a

@@ -64,7 +64,9 @@ export default function CartPage() {
         <Header />
         <main className="pt-16 min-h-[60vh] flex items-center justify-center">
           <div className="text-center max-w-md mx-auto px-4">
-            <ShoppingCart className="w-24 h-24 text-gray-300 mx-auto mb-6" />
+            <div className="empty-cart-icon-wrap">
+              <ShoppingCart className="empty-cart-icon w-12 h-12 text-[#8B5A3C]/50" />
+            </div>
             <h1 className="text-3xl font-serif text-foreground mb-4">Your Cart is Empty</h1>
             <p className="text-foreground mb-8">
               Looks like you haven't added anything to your cart yet.
@@ -280,4 +282,3 @@ export default function CartPage() {
     </div>
   )
 }
-

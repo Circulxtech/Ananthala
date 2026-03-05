@@ -58,7 +58,9 @@ export function CartDrawer({ isOpen, onClose, cartItems = [] }: CartDrawerProps)
           <div className="flex-1 overflow-y-auto p-6">
             {cartItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
-                <ShoppingBag className="h-16 w-16 text-gray-300 mb-4" />
+                <div className="empty-cart-icon-wrap">
+                  <ShoppingBag className="empty-cart-icon h-11 w-11 text-gray-400" />
+                </div>
                 <p className="text-gray-500 text-lg mb-2">Your cart is empty</p>
                 <p className="text-gray-400 text-sm">Add items to get started</p>
               </div>

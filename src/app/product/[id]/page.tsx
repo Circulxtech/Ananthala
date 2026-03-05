@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { ChevronLeft, ChevronRight, Check } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { getProductDetailById, type ProductDetail } from "@/data/product-details"
 import { type CartItem } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
@@ -29,7 +29,7 @@ import { GraceLoungerProductTemplate } from "@/collections/grace/templates/Grace
 import { GraceHeadPillowProductTemplate } from "@/collections/grace/templates/GraceHeadPillowProductTemplate"
 import { SimpleProductConfigurator } from "@/components/product/simple-product-configurator"
 import { ProductConfigurator } from "@/components/product/product-configurator"
-import { ProductDetailSkeleton } from "@/components/sections/product-detail-skeleton"
+import { ProductDetailQuoteLoader } from "@/components/sections/product-detail-quote-loader"
 import {
   Accordion,
   AccordionContent,
@@ -121,6 +121,7 @@ const mapApiProductToDetail = (product: ApiProduct): ProductDetail => {
 }
 
 export default function ProductDetailPage() {
+  const MIN_LOADER_MS = 900
   const params = useParams()
   const router = useRouter()
   const rawId = params.id as string
@@ -131,16 +132,21 @@ export default function ProductDetailPage() {
   const [apiProduct, setApiProduct] = useState<ProductDetail | null>(null)
   const [rawApiProduct, setRawApiProduct] = useState<ApiProduct | null>(null)
   const [isLoading, setIsLoading] = useState(!staticProduct)
+  const [showLoader, setShowLoader] = useState(!staticProduct)
+  const [contentVisible, setContentVisible] = useState(!!staticProduct)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<"features" | "specs">("features")
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   const { addToCart } = useCart()
+  const loadStartedAtRef = useRef<number>(Date.now())
 
   useEffect(() => {
     if (staticProduct) {
       setApiProduct(null)
       setRawApiProduct(null)
       setIsLoading(false)
+      setShowLoader(false)
+      setContentVisible(true)
       setLoadError(null)
       return
     }
@@ -149,7 +155,10 @@ export default function ProductDetailPage() {
 
     const fetchProduct = async () => {
       try {
+        loadStartedAtRef.current = Date.now()
         setIsLoading(true)
+        setShowLoader(true)
+        setContentVisible(false)
         setLoadError(null)
         const response = await fetch(`/api/products/${rawId}`)
         const data = await response.json()
@@ -187,11 +196,27 @@ export default function ProductDetailPage() {
     }
   }, [rawId, staticProduct])
 
+  useEffect(() => {
+    if (isLoading) {
+      return
+    }
+
+    const elapsed = Date.now() - loadStartedAtRef.current
+    const remaining = Math.max(0, MIN_LOADER_MS - elapsed)
+
+    const timer = window.setTimeout(() => {
+      setShowLoader(false)
+      window.requestAnimationFrame(() => setContentVisible(true))
+    }, remaining)
+
+    return () => window.clearTimeout(timer)
+  }, [isLoading, MIN_LOADER_MS])
+
   const product = staticProduct ?? apiProduct
   const productId = staticProduct ? numericId : null
 
-  if (isLoading) {
-    return <ProductDetailSkeleton />
+  if (showLoader) {
+    return <ProductDetailQuoteLoader />
   }
 
   if (!product) {
@@ -268,7 +293,7 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen bg-white transition-opacity duration-200 ${contentVisible ? "opacity-100" : "opacity-0"}`}>
       <Header />
       <main>
         {/* Breadcrumb */}

@@ -1,5 +1,5 @@
-import { ProductDetailSkeleton } from "@/components/sections/product-detail-skeleton"
+import { ProductDetailQuoteLoader } from "@/components/sections/product-detail-quote-loader"
 
 export default function Loading() {
-  return <ProductDetailSkeleton />
+  return <ProductDetailQuoteLoader />
 }
