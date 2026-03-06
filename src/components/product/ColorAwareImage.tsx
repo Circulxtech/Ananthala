@@ -2,33 +2,39 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
-import { applyColorTransform } from "@/lib/color-transform"
+import { applyColorTransform, applyRegionColorTransform } from "@/lib/color-transform"
 import { getFabricColor } from "@/data/fabric-colors"
+import { getFabricRegions } from "@/data/fabric-regions"
 
 interface ColorAwareImageProps {
   src: string
   alt: string
   fabricId?: string // Fabric ID to determine color
+  productId?: string | number // Product ID for region-based coloring
   fill?: boolean
   className?: string
   priority?: boolean
   unoptimized?: boolean
   onColorApplied?: (isApplied: boolean) => void
+  useRegionColoring?: boolean // If true, uses region-based selective coloring
 }
 
 /**
  * Color-Aware Image Component
  * Automatically applies color transformation based on selected fabric
+ * Supports both region-based (coordinates) and luminosity-based selective coloring
  */
 export function ColorAwareImage({
   src,
   alt,
   fabricId,
+  productId,
   fill,
   className,
   priority = false,
   unoptimized = false,
   onColorApplied,
+  useRegionColoring = true,
 }: ColorAwareImageProps) {
   const [transformedSrc, setTransformedSrc] = useState<string>(src)
   const [isTransforming, setIsTransforming] = useState(false)
@@ -49,11 +55,36 @@ export function ColorAwareImage({
 
     try {
       setIsTransforming(true)
-      const transformed = await applyColorTransform(src, {
-        hex: fabricColor.hex,
-        intensity: fabricColor.colorIntensity,
-        blendMode: fabricColor.blendMode,
-      })
+
+      let transformed: string
+
+      // Try region-based coloring first if productId is provided
+      if (useRegionColoring && productId) {
+        const regions = getFabricRegions(productId)
+        if (regions.length > 0) {
+          transformed = await applyRegionColorTransform(src, {
+            hex: fabricColor.hex,
+            intensity: fabricColor.colorIntensity,
+            blendMode: fabricColor.blendMode,
+            regions,
+          })
+        } else {
+          // Fallback to luminosity-based coloring if no regions defined
+          transformed = await applyColorTransform(src, {
+            hex: fabricColor.hex,
+            intensity: fabricColor.colorIntensity,
+            blendMode: fabricColor.blendMode,
+          })
+        }
+      } else {
+        // Use luminosity-based coloring as fallback
+        transformed = await applyColorTransform(src, {
+          hex: fabricColor.hex,
+          intensity: fabricColor.colorIntensity,
+          blendMode: fabricColor.blendMode,
+        })
+      }
+
       setTransformedSrc(transformed)
       onColorApplied?.(true)
     } catch (error) {
@@ -63,7 +94,7 @@ export function ColorAwareImage({
     } finally {
       setIsTransforming(false)
     }
-  }, [src, fabricId, onColorApplied])
+  }, [src, fabricId, productId, useRegionColoring, onColorApplied])
 
   // Apply color transformation whenever fabric changes
   useEffect(() => {
