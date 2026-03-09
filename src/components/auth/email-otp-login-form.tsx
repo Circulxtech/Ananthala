@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,8 +17,17 @@ export function EmailOTPLoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [maskedEmail, setMaskedEmail] = useState("")
+  const [redirectUrl, setRedirectUrl] = useState<string>("/")
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
+
+  useEffect(() => {
+    const redirect = searchParams.get("redirect")
+    if (redirect) {
+      setRedirectUrl(redirect)
+    }
+  }, [searchParams])
 
   const handleSendOTP = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -76,7 +86,7 @@ export function EmailOTPLoginForm() {
           description: "Login successful! Redirecting...",
         })
         setTimeout(() => {
-          router.push("/")
+          router.push(redirectUrl)
           router.refresh()
         }, 1000)
       } else {

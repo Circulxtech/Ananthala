@@ -21,6 +21,7 @@ export default function CheckoutPage() {
   const { cartItems, clearCart } = useCart()
   const [isProcessing, setIsProcessing] = useState(false)
   const [isAuthChecking, setIsAuthChecking] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [allStates, setAllStates] = useState<string[]>([])
   const [availableCities, setAvailableCities] = useState<string[]>([])
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -58,17 +59,22 @@ export default function CheckoutPage() {
   useEffect(() => {
     const ensureAuthenticated = async () => {
       try {
-        const response = await fetch("/api/auth/verify")
+        const response = await fetch("/api/auth/verify", {
+          credentials: "include",
+        })
         const data = await response.json()
         if (!data?.success) {
+          setIsAuthChecking(false)
           router.replace("/login?redirect=/checkout")
           return
         }
-      } catch (error) {
-        router.replace("/login?redirect=/checkout")
-        return
-      } finally {
+        // User is authenticated
+        setIsAuthenticated(true)
         setIsAuthChecking(false)
+      } catch (error) {
+        console.error("[Checkout] Auth check error:", error)
+        setIsAuthChecking(false)
+        router.replace("/login?redirect=/checkout")
       }
     }
 
@@ -248,6 +254,23 @@ export default function CheckoutPage() {
   }
 
   if (isAuthChecking) {
+    return (
+      <div className="min-h-screen bg-[#F5F1ED] font-roboto flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="inline-block animate-spin">
+              <div className="w-12 h-12 border-4 border-[#D9CFC7] border-t-[#8B5A3C] rounded-full"></div>
+            </div>
+            <p className="mt-4 text-[#6D4530] text-lg">Verifying your session...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
     return null
   }
 

@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,7 +19,17 @@ export function PasswordLoginForm({ isLoading: initialLoading = false }: Passwor
   const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(initialLoading)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
+  const [redirectUrl, setRedirectUrl] = useState<string>("/")
+
+  // Get redirect URL from query parameter
+  useEffect(() => {
+    const redirect = searchParams.get("redirect")
+    if (redirect) {
+      setRedirectUrl(redirect)
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -43,7 +54,7 @@ export function PasswordLoginForm({ isLoading: initialLoading = false }: Passwor
           description: "Login successful! Redirecting...",
         })
         setTimeout(() => {
-          router.push("/")
+          router.push(redirectUrl)
           router.refresh()
         }, 1000)
       } else {
