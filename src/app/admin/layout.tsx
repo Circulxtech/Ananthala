@@ -102,11 +102,7 @@ const menuItems = [
       },
     ],
   },
-  {
-    label: "Analytics",
-    href: "/admin/analytics",
-    icon: BarChart3,
-  },
+  
   {
     label: "Settings",
     href: "/admin/settings",

@@ -26,8 +26,8 @@ export const fabricColorMap: Record<string, FabricColor> = {
       s: 35,
       l: 67,
     },
-    colorIntensity: 0.6,
-    blendMode: "multiply",
+    colorIntensity: 0.75, // Increased for better fabric coloring
+    blendMode: "hue", // Use hue for natural fabric color shift
   },
   "gingham-blue": {
     id: "gingham-blue",
@@ -38,8 +38,8 @@ export const fabricColorMap: Record<string, FabricColor> = {
       s: 37,
       l: 48,
     },
-    colorIntensity: 0.65,
-    blendMode: "overlay",
+    colorIntensity: 0.8, // Increased for better fabric coloring
+    blendMode: "hue", // Use hue for natural fabric color shift
   },
   "gingham-pink": {
     id: "gingham-pink",
@@ -50,8 +50,8 @@ export const fabricColorMap: Record<string, FabricColor> = {
       s: 51,
       l: 66,
     },
-    colorIntensity: 0.6,
-    blendMode: "overlay",
+    colorIntensity: 0.75, // Increased for better fabric coloring
+    blendMode: "hue", // Use hue for natural fabric color shift
   },
 }
 
