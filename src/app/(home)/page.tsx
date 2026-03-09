@@ -134,7 +134,9 @@ export default function Home() {
     if (name === "joy") return "/category/joy#shop"
     if (name === "bliss") return "/category/bliss#shop"
     if (name === "grace") return "/category/grace#shop"
-    if (name.includes("pillow") || name.includes("bedsheet")) return "/category/bliss#shop"
+    if (name.includes("pillow") || name.includes("bedsheet") || name.includes("bedding") || name.includes("more")) {
+      return "/category/essentials#shop"
+    }
     return "/category/bliss#shop"
   }
 
@@ -246,12 +248,13 @@ export default function Home() {
                   >
                     {category.title}
                   </h2>
-                  <button
-                    className="px-6 py-3 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground text-base shadow-lg transition-all duration-200 hover:scale-105 cursor-default"
+                  <Link
+                    href="/#find-your-perfect-mattress"
+                    className="px-6 py-3 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground text-base shadow-lg transition-all duration-200 hover:scale-105"
                     style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
                   >
                     SHOP
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}

@@ -39,10 +39,10 @@ export function CategoryProductsGrid({ collection }: CategoryProductsGridProps) 
         // If collection is "joy", "bliss", or "grace", filter by category
         const normalizedCollection = collection.toLowerCase()
         const isCategoryCollection = ["joy", "bliss", "grace"].includes(normalizedCollection)
-        const apiUrl = isCategoryCollection 
+        const apiUrl = isCategoryCollection
           ? `/api/products?category=${normalizedCollection}&status=visible`
           : "/api/products?status=visible"
-        
+
         const response = await fetch(apiUrl)
         const data = await response.json()
 
@@ -74,13 +74,18 @@ export function CategoryProductsGrid({ collection }: CategoryProductsGridProps) 
   const displayProducts = useMemo(() => {
     const normalizedCollection = collection.toLowerCase()
     const isCategoryCollection = ["joy", "bliss", "grace"].includes(normalizedCollection)
-    
+
     // If it's a category collection (joy, bliss, grace), products are already filtered by category from API
     // Otherwise, filter by subCategory
     if (isCategoryCollection) {
       return products // Already filtered by category in API call
     }
-    
+
+    if (normalizedCollection === "essentials") {
+      const essentialsCategories = new Set(["bedsheet", "pillow", "bedding", "mattress"])
+      return products.filter((product) => essentialsCategories.has((product.category || "").toLowerCase()))
+    }
+
     const collectionMatches = products.filter(
       (product) => product.subCategory?.toLowerCase() === normalizedCollection,
     )
@@ -112,6 +117,14 @@ export function CategoryProductsGrid({ collection }: CategoryProductsGridProps) 
   }
 
   if (displayProducts.length === 0) {
+    const isEssentialsPage = collection.toLowerCase() === "essentials"
+    if (isEssentialsPage) {
+      return (
+        <div className="py-14 text-center text-lg font-semibold text-foreground animate-pulse">
+          Curating the best products for you!
+        </div>
+      )
+    }
     return <div className="py-10 text-center text-sm text-foreground/70">No products available.</div>
   }
 

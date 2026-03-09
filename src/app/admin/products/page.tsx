@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, RefreshCw, Trash2, Loader2 } from "lucide-react"
+import { Plus, RefreshCw, Trash2, Loader2, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import AddProductModal from "@/components/admin/add-product-modal"
@@ -23,6 +23,13 @@ interface Product {
     stock: number
   }>
   imageUrls: string[]
+  detailSections?: Array<{
+    title?: string
+    body?: string
+    imageUrl?: string
+    imageAlt?: string
+    imagePosition?: "left" | "right"
+  }>
   status: "visible" | "hidden"
   sellerName: string
   sellerEmail: string
@@ -35,6 +42,7 @@ export default function ProductManagementPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -94,6 +102,16 @@ export default function ProductManagementPage() {
       console.error("[v0] Error deleting product:", error)
       alert("Failed to delete product. Please try again.")
     }
+  }
+
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product)
+    setIsAddModalOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setIsAddModalOpen(false)
+    setEditingProduct(null)
   }
 
   const filteredProducts =
@@ -164,7 +182,10 @@ export default function ProductManagementPage() {
 
             <Button
               className="bg-black text-white hover:bg-black/90 font-medium"
-              onClick={() => setIsAddModalOpen(true)}
+              onClick={() => {
+                setEditingProduct(null)
+                setIsAddModalOpen(true)
+              }}
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Product
@@ -214,6 +235,14 @@ export default function ProductManagementPage() {
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="h-8 w-8 text-[#4A2F1F] hover:bg-[#F5F1ED] mr-1"
+                        onClick={() => handleEdit(product)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         className="h-8 w-8 text-red-500 hover:bg-red-50"
                         onClick={() => handleDelete(product._id)}
                       >
@@ -258,6 +287,14 @@ export default function ProductManagementPage() {
                 </div>
 
                 <div className="flex items-center justify-end pt-2 border-t border-[#D9CFC7]">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-[#4A2F1F] hover:bg-[#F5F1ED] mr-1"
+                    onClick={() => handleEdit(product)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -318,8 +355,10 @@ export default function ProductManagementPage() {
       {/* Add Product Modal */}
       <AddProductModal
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        onClose={handleModalClose}
         onProductAdded={fetchProducts}
+        mode={editingProduct ? "edit" : "create"}
+        productToEdit={editingProduct}
       />
     </div>
   )

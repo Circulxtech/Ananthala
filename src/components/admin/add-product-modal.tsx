@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Upload, Plus, Trash2, AlertCircle, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,21 +11,59 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { ProductFormData, ProductVariant, ProductDetailSectionInput } from "@/types/product"
 import { fabricOptions } from "@/data/fabric"
+import { toast } from "@/hooks/use-toast"
 
 interface AddProductModalProps {
   isOpen: boolean
   onClose: () => void
   onProductAdded?: () => void
+  mode?: "create" | "edit"
+  productToEdit?: EditableProduct | null
 }
 
 interface ProductImage {
   id: string
-  file: File
+  file?: File
   preview: string
+  existingUrl?: string
 }
 
-export default function AddProductModal({ isOpen, onClose, onProductAdded }: AddProductModalProps) {
-  const [formData, setFormData] = useState<ProductFormData>({
+interface EditableProduct {
+  _id: string
+  productTitle: string
+  description: string
+  units: string
+  sellerName: string
+  sellerEmail: string
+  location: string
+  category: string
+  subCategory?: string
+  imageUrls: string[]
+  variants: Array<{
+    variantId?: string
+    weight: number
+    dimensions?: {
+      length: number
+      width: number
+      height: number
+    }
+    length?: number
+    width?: number
+    height?: number
+    fabric?: string
+    price: number
+    stock: number
+  }>
+  detailSections?: Array<{
+    title?: string
+    body?: string
+    imageUrl?: string
+    imageAlt?: string
+    imagePosition?: "left" | "right"
+  }>
+}
+
+const createEmptyFormData = (): ProductFormData => ({
     productTitle: "",
     description: "",
     units: "",
@@ -49,9 +87,19 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
     detailSections: [],
   })
 
+export default function AddProductModal({
+  isOpen,
+  onClose,
+  onProductAdded,
+  mode = "create",
+  productToEdit = null,
+}: AddProductModalProps) {
+  const [formData, setFormData] = useState<ProductFormData>(createEmptyFormData())
+
   const [productImages, setProductImages] = useState<ProductImage[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const isEditMode = mode === "edit" && !!productToEdit
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -70,6 +118,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
         alert(`File ${file.name} size exceeds 25 MB`)
         return
       }
+      newImages.push({ id: crypto.randomUUID(), preview: "" })
 
       const reader = new FileReader()
       reader.onloadend = () => {
@@ -124,7 +173,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
       ...prev,
       detailSections: prev.detailSections.map((section) => {
         if (section.id !== sectionId) return section
-        if (section.imagePreview) {
+        if (section.imageFile && section.imagePreview) {
           URL.revokeObjectURL(section.imagePreview)
         }
         return {
@@ -189,7 +238,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
     setFormData((prev) => ({
       ...prev,
       detailSections: prev.detailSections.filter((section) => {
-        if (section.id === sectionId && section.imagePreview) {
+        if (section.id === sectionId && section.imageFile && section.imagePreview) {
           URL.revokeObjectURL(section.imagePreview)
         }
         return section.id !== sectionId
@@ -216,7 +265,7 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
           return {
             title: section.title.trim(),
             body: section.body.trim(),
-            imageUrl: "",
+            imageUrl: section.imageFile ? "" : section.imageUrl.trim(),
             imageAlt: section.imageAlt.trim(),
             imagePosition: section.imagePosition,
             imageKey,
@@ -233,6 +282,14 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
       formDataToSend.append("category", formData.category)
       formDataToSend.append("subCategory", formData.subCategory)
       formDataToSend.append("detailSections", JSON.stringify(cleanedDetailSections))
+      formDataToSend.append(
+        "existingImageUrls",
+        JSON.stringify(
+          productImages
+            .map((img) => img.existingUrl)
+            .filter((url): url is string => typeof url === "string" && !!url.trim()),
+        ),
+      )
       formData.detailSections.forEach((section) => {
         if (section.imageFile) {
           const imageKey = `detailSectionImage_${section.id}`
@@ -243,7 +300,9 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
       formDataToSend.append("variants", JSON.stringify(formData.variants))
 
       productImages.forEach((image, index) => {
-        formDataToSend.append(`image_${index}`, image.file)
+        if (image.file) {
+          formDataToSend.append(`image_${index}`, image.file)
+        }
       })
 
       console.log(
@@ -254,18 +313,23 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
         "variants",
       )
 
-      const response = await fetch("/api/products", {
-        method: "POST",
+      const endpoint = isEditMode ? `/api/products/${productToEdit._id}` : "/api/products"
+      const response = await fetch(endpoint, {
+        method: isEditMode ? "PUT" : "POST",
         body: formDataToSend,
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to create product")
+        throw new Error(data.message || (isEditMode ? "Failed to update product" : "Failed to create product"))
       }
 
-      console.log("[v0] Product created successfully:", data)
+      console.log(`[v0] Product ${isEditMode ? "updated" : "created"} successfully:`, data)
+      toast({
+        title: "Success",
+        description: isEditMode ? "Product updated successfully." : "Product added successfully.",
+      })
 
       if (onProductAdded) {
         onProductAdded()
@@ -273,8 +337,8 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
 
       handleCancel()
     } catch (error: any) {
-      console.error("[v0] Error creating product:", error)
-      setSubmitError(error.message || "Failed to create product. Please try again.")
+      console.error(`[v0] Error ${isEditMode ? "updating" : "creating"} product:`, error)
+      setSubmitError(error.message || `Failed to ${isEditMode ? "update" : "create"} product. Please try again.`)
     } finally {
       setIsSubmitting(false)
     }
@@ -282,44 +346,104 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
 
   const handleCancel = () => {
     formData.detailSections.forEach((section) => {
-      if (section.imagePreview) {
+      if (section.imageFile && section.imagePreview) {
         URL.revokeObjectURL(section.imagePreview)
       }
     })
-    setFormData({
-      productTitle: "",
-      description: "",
-      units: "",
-      sellerName: "",
-      sellerEmail: "",
-      location: "",
-      category: "",
-      subCategory: "",
-      variants: [
-        {
-          id: crypto.randomUUID(),
-          weight: "",
-          length: "",
-          width: "",
-          height: "",
-          fabric: "",
-          price: "",
-          stock: "",
-        },
-      ],
-      detailSections: [],
+    productImages.forEach((image) => {
+      if (image.file && image.preview) {
+        URL.revokeObjectURL(image.preview)
+      }
     })
+    setFormData(createEmptyFormData())
     setProductImages([])
     setSubmitError(null)
     onClose()
   }
 
+  useEffect(() => {
+    if (!isOpen) return
+
+    if (!isEditMode || !productToEdit) {
+      setFormData(createEmptyFormData())
+      setProductImages([])
+      setSubmitError(null)
+      return
+    }
+
+    const mappedVariants = (productToEdit.variants || []).map((variant) => {
+      const length = variant.dimensions?.length ?? variant.length ?? 0
+      const width = variant.dimensions?.width ?? variant.width ?? 0
+      const height = variant.dimensions?.height ?? variant.height ?? 0
+      return {
+        id: variant.variantId || crypto.randomUUID(),
+        weight: String(variant.weight ?? ""),
+        length: String(length || ""),
+        width: String(width || ""),
+        height: String(height || ""),
+        fabric: variant.fabric || "",
+        price: String(variant.price ?? ""),
+        stock: String(variant.stock ?? ""),
+      }
+    })
+
+    setFormData({
+      productTitle: productToEdit.productTitle || "",
+      description: productToEdit.description || "",
+      units: productToEdit.units || "",
+      sellerName: productToEdit.sellerName || "",
+      sellerEmail: productToEdit.sellerEmail || "",
+      location: productToEdit.location || "",
+      category: productToEdit.category || "",
+      subCategory: productToEdit.subCategory || "",
+      variants:
+        mappedVariants.length > 0
+          ? mappedVariants
+          : [
+              {
+                id: crypto.randomUUID(),
+                weight: "",
+                length: "",
+                width: "",
+                height: "",
+                fabric: "",
+                price: "",
+                stock: "",
+              },
+            ],
+      detailSections: (productToEdit.detailSections || []).map((section) => ({
+        id: crypto.randomUUID(),
+        title: section.title || "",
+        body: section.body || "",
+        imageUrl: section.imageUrl || "",
+        imageAlt: section.imageAlt || "",
+        imagePosition: section.imagePosition === "left" ? "left" : "right",
+        imageFile: null,
+        imagePreview: section.imageUrl || "",
+      })),
+    })
+
+    setProductImages(
+      (productToEdit.imageUrls || []).map((url) => ({
+        id: crypto.randomUUID(),
+        preview: url,
+        existingUrl: url,
+      })),
+    )
+    setSubmitError(null)
+  }, [isOpen, isEditMode, productToEdit])
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) handleCancel()
+      }}
+    >
       <DialogContent className="max-w-[95vw] w-full lg:max-w-7xl max-h-[95vh] overflow-y-auto p-4 sm:p-6 md:p-8 font-roboto">
         <DialogHeader>
           <DialogTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-[#6D4530]">
-            Add New Product
+            {isEditMode ? "Edit Product" : "Add New Product"}
           </DialogTitle>
           <p className="text-xs sm:text-sm text-[#8B5A3C]/70">
             Fill in the product details and add variants with different dimensions, weights, fabrics, and pricing
@@ -863,10 +987,10 @@ export default function AddProductModal({ isOpen, onClose, onProductAdded }: Add
               {isSubmitting ? (
                 <>
                   <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 mr-2 animate-spin" />
-                  Creating Product...
+                  {isEditMode ? "Updating Product..." : "Creating Product..."}
                 </>
               ) : (
-                "Add Product"
+                isEditMode ? "Update Product" : "Add Product"
               )}
             </Button>
           </div>
