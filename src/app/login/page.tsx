@@ -1,9 +1,7 @@
 "use client"
 import { useState } from "react"
 import Link from "next/link"
-import { PasswordLoginForm } from "@/components/auth/password-login-form"
-import { EmailOTPLoginForm } from "@/components/auth/email-otp-login-form"
-import { PhoneOTPLoginForm } from "@/components/auth/phone-otp-login-form"
+import { LoginFormsWrapper } from "@/components/auth/login-forms-wrapper"
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<"password" | "email-otp" | "phone-otp">("password")
@@ -54,11 +52,7 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <div className="transition-all duration-300">
-            {activeTab === "password" && <PasswordLoginForm />}
-            {activeTab === "email-otp" && <EmailOTPLoginForm />}
-            {activeTab === "phone-otp" && <PhoneOTPLoginForm />}
-          </div>
+          <LoginFormsWrapper activeTab={activeTab} />
 
           {/* Sign Up Link */}
           <p className="text-center mt-6 text-[#6D4530] text-sm md:text-base">
