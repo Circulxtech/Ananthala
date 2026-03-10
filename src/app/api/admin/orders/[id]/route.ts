@@ -32,7 +32,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const token = request.cookies.get("admin_token")?.value
 
@@ -45,9 +45,16 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     await connectDB()
 
     const { orderStatus, trackingNumber, notes, paymentStatus } = await request.json()
+
+    // Validate orderStatus
+    const validStatuses = ["pending", "processing", "shipped", "in-transit", "delivered", "cancelled"]
+    if (orderStatus && !validStatuses.includes(orderStatus)) {
+      return NextResponse.json({ error: "Invalid order status" }, { status: 400 })
+    }
 
     const updateData: Record<string, unknown> = {}
     if (orderStatus) updateData.orderStatus = orderStatus
@@ -55,16 +62,19 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     if (notes) updateData.notes = notes
     if (paymentStatus) updateData.paymentStatus = paymentStatus
 
+    // Build timeline entry
+    const timelineEntry = {
+      status: orderStatus || "unknown",
+      timestamp: new Date(),
+      description: notes || `Order status updated to ${orderStatus}`,
+    }
+
     const order = await Order.findByIdAndUpdate(
-      params.id,
+      id,
       {
         ...updateData,
         $push: {
-          orderTimeline: {
-            status: orderStatus,
-            timestamp: new Date(),
-            description: `Order status updated to ${orderStatus}`,
-          },
+          orderTimeline: timelineEntry,
         },
       },
       { new: true },

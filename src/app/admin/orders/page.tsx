@@ -3,13 +3,14 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Search, Filter, Eye, Download, MoreVertical, Truck, CheckCircle, Clock, Package } from "lucide-react"
+import { Search, Filter, Eye, Download, MoreVertical, Truck, CheckCircle, Clock, Package, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { IndianRupee } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { IndianRupee, Loader2 } from "lucide-react"
 
 interface OrderItem {
   productId: string
@@ -62,8 +63,14 @@ export default function OrderManagementPage() {
   const [filterStatus, setFilterStatus] = useState("all")
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  const [isStatusUpdateModalOpen, setIsStatusUpdateModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null)
   const [page, setPage] = useState(1)
+  const [newStatus, setNewStatus] = useState("")
+  const [trackingNumber, setTrackingNumber] = useState("")
+  const [updateNotes, setUpdateNotes] = useState("")
+  const [updateMessage, setUpdateMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
   useEffect(() => {
     fetchOrders()
@@ -88,6 +95,64 @@ export default function OrderManagementPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleUpdateStatus = async () => {
+    if (!selectedOrder || !newStatus) return
+
+    try {
+      setUpdatingOrderId(selectedOrder._id)
+      const response = await fetch(`/api/admin/orders/${selectedOrder._id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderStatus: newStatus,
+          trackingNumber: trackingNumber || undefined,
+          notes: updateNotes || undefined,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update order status")
+      }
+
+      const data = await response.json()
+      setUpdateMessage({ type: "success", text: "Order status updated successfully!" })
+      
+      // Update the selected order
+      setSelectedOrder(data.order)
+      
+      // Refresh orders list
+      await fetchOrders()
+      
+      // Reset form
+      setNewStatus("")
+      setTrackingNumber("")
+      setUpdateNotes("")
+      
+      // Close status update modal after a short delay
+      setTimeout(() => {
+        setIsStatusUpdateModalOpen(false)
+        setUpdateMessage(null)
+      }, 1500)
+    } catch (error) {
+      console.error("Failed to update order:", error)
+      setUpdateMessage({ type: "error", text: "Failed to update order status. Please try again." })
+    } finally {
+      setUpdatingOrderId(null)
+    }
+  }
+
+  const openStatusUpdateModal = (order: Order) => {
+    setSelectedOrder(order)
+    setNewStatus(order.orderStatus || "pending")
+    setTrackingNumber("")
+    setUpdateNotes("")
+    setUpdateMessage(null)
+    setIsStatusUpdateModalOpen(true)
   }
 
   const handleSearch = (e: React.FormEvent) => {
@@ -321,6 +386,10 @@ export default function OrderManagementPage() {
                               <Eye className="w-4 h-4 mr-2" />
                               View Details
                             </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openStatusUpdateModal(order)}>
+                              <Truck className="w-4 h-4 mr-2" />
+                              Update Status
+                            </DropdownMenuItem>
                             <DropdownMenuItem>
                               <Download className="w-4 h-4 mr-2" />
                               Download Invoice
@@ -505,6 +574,111 @@ export default function OrderManagementPage() {
                       (selectedOrder.orderStatus || "pending").slice(1)}
                   </p>
                 </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Status Update Modal */}
+      <Dialog open={isStatusUpdateModalOpen} onOpenChange={setIsStatusUpdateModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#6D4530]">Update Order Status</DialogTitle>
+          </DialogHeader>
+
+          {selectedOrder && (
+            <div className="space-y-4">
+              {/* Order ID Display */}
+              <div className="p-3 bg-[#F5F1ED] rounded-lg">
+                <p className="text-xs text-[#8B5A3C]/70 font-medium">Order ID</p>
+                <p className="font-mono text-sm font-semibold text-[#6D4530]">{selectedOrder.orderId}</p>
+              </div>
+
+              {/* Current Status Display */}
+              <div className="p-3 bg-[#F5F1ED] rounded-lg">
+                <p className="text-xs text-[#8B5A3C]/70 font-medium">Current Status</p>
+                <div className={`text-sm font-semibold mt-1 flex items-center gap-2 w-fit px-2 py-1 rounded ${getStatusColor(selectedOrder.orderStatus || "pending")}`}>
+                  {getStatusIcon(selectedOrder.orderStatus || "pending")}
+                  {(selectedOrder.orderStatus || "pending").charAt(0).toUpperCase() + (selectedOrder.orderStatus || "pending").slice(1)}
+                </div>
+              </div>
+
+              {/* Status Update Alert */}
+              {updateMessage && (
+                <Alert className={updateMessage.type === "success" ? "border-green-300 bg-green-50" : "border-red-300 bg-red-50"}>
+                  <AlertCircle className={`h-4 w-4 ${updateMessage.type === "success" ? "text-green-600" : "text-red-600"}`} />
+                  <AlertDescription className={updateMessage.type === "success" ? "text-green-700" : "text-red-700"}>
+                    {updateMessage.text}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* New Status Select */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#6D4530]">New Status</label>
+                <Select value={newStatus} onValueChange={setNewStatus}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select new status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="processing">Processing</SelectItem>
+                    <SelectItem value="shipped">Shipped</SelectItem>
+                    <SelectItem value="in-transit">In Transit</SelectItem>
+                    <SelectItem value="delivered">Delivered</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Tracking Number Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#6D4530]">Tracking Number (Optional)</label>
+                <Input
+                  placeholder="Enter tracking number"
+                  value={trackingNumber}
+                  onChange={(e) => setTrackingNumber(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Update Notes Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#6D4530]">Notes (Optional)</label>
+                <textarea
+                  placeholder="Add any notes about this status update..."
+                  value={updateNotes}
+                  onChange={(e) => setUpdateNotes(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md text-sm border-[#D9CFC7] focus:outline-none focus:ring-2 focus:ring-[#8B5A3C]/20"
+                  rows={3}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 justify-end pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsStatusUpdateModalOpen(false)}
+                  disabled={updatingOrderId === selectedOrder._id}
+                  className="border-[#D9CFC7]"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleUpdateStatus}
+                  disabled={!newStatus || updatingOrderId === selectedOrder._id}
+                  className="bg-[#8B5A3C] hover:bg-[#6D4530] text-white"
+                >
+                  {updatingOrderId === selectedOrder._id ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    "Update Status"
+                  )}
+                </Button>
               </div>
             </div>
           )}

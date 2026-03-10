@@ -10,7 +10,8 @@ const orderSchema = new mongoose.Schema(
     customerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: false,
+      required: true,
+      index: true, // Add index for faster queries
     },
     customerName: {
       type: String,

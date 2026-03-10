@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import crypto from "crypto"
+import mongoose from "mongoose"
 import { cookies } from "next/headers"
 import { verifyToken } from "@/lib/jwt"
 import connectDB from "@/lib/mongodb"
@@ -63,6 +64,9 @@ export async function POST(request: Request) {
 
     await connectDB()
 
+    // Convert userId string to MongoDB ObjectId
+    const customerId = new mongoose.Types.ObjectId(decoded.userId)
+
     const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`
     const orderItems = Array.isArray(items)
       ? (items as CartItemPayload[]).map((item) => ({
@@ -78,6 +82,7 @@ export async function POST(request: Request) {
 
     const order = await Order.create({
       orderId,
+      customerId: customerId, // Store the authenticated user's ObjectId
       customerName: `${customer?.firstName || ""} ${customer?.lastName || ""}`.trim(),
       customerEmail: customer?.email || "",
       customerPhone: customer?.phone || "",

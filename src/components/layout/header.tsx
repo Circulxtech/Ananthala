@@ -8,6 +8,7 @@ import { ShoppingCart, User, Menu, X, Search, LogOut, LayoutDashboard } from "lu
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/contexts/cart-context"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { SearchDropdown } from "@/components/search/search-dropdown"
 
 const menuItems = [
   { label: "About", href: "/about" },
@@ -79,20 +80,12 @@ export function Header() {
     return colors[index]
   }
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
-      setSearchQuery("")
-      setIsSearchOpen(false)
-    }
-  }
-
   const handleSearchIconClick = () => {
     setIsSearchOpen(!isSearchOpen)
-    if (isSearchOpen) {
-      setSearchQuery("")
-    }
+  }
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
   }
 
   return (
@@ -199,38 +192,11 @@ export function Header() {
           </div>
         </div>
 
-        {isSearchOpen && (
-          <div
-            className="absolute top-full left-0 right-0 bg-white border-b shadow-lg animate-in slide-in-from-top duration-300 z-40"
-            style={{ borderColor: "#D9CFC7" }}
-          >
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search products..."
-                    autoFocus
-                    className="w-full px-4 py-3 pl-12 pr-12 bg-white border rounded-md text-[#6D4530] placeholder:text-[#8B5A3C]/50 focus:outline-none focus:ring-2 focus:ring-[#8B5A3C]/30 transition-all"
-                    style={{ borderColor: "#D9CFC7" }}
-                  />
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8B5A3C]/50" />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => setSearchQuery("")}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B5A3C]/50 hover:text-[#6D4530] transition-colors"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  )}
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+      <SearchDropdown
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onSearch={handleSearch}
+      />
 
         {isMenuOpen && (
           <div

@@ -1,16 +1,16 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Cormorant_Garamond, Geist_Mono } from "next/font/google"
+import { Inter, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/contexts/cart-context"
 import { FixedSidebar } from "@/components/layout/fixed-sidebar"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
-const cormorantGaramond = Cormorant_Garamond({ 
+const inter = Inter({ 
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-cormorant-garamond",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-inter",
 })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
@@ -45,7 +45,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${cormorantGaramond.className} antialiased`} style={{ fontWeight: 300 }}>
+      <body className={`${inter.className} antialiased`}>
         <CartProvider>
           {children}
           <FixedSidebar />
