@@ -25,11 +25,7 @@ const menuItems = [
     href: "/customer/orders",
     icon: Package,
   },
-  {
-    label: "Wishlist",
-    href: "/customer/wishlist",
-    icon: Heart,
-  },
+ 
   {
     label: "Cart",
     href: "/customer/cart",

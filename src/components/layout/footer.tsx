@@ -68,6 +68,7 @@ export function Footer() {
           <div>
             <h4 className="mb-4 text-foreground font-semibold text-lg">CONTACT</h4>
             <ul className="space-y-3 text-foreground text-base">
+              
               <li>
                 <Link href="/dealer-enquiry" className="hover:text-amber-950 transition-colors font-medium">
                   Dealer Enquiry
@@ -108,6 +109,13 @@ export function Footer() {
               <li>
                 <Link href="/" className="hover:text-amber-950 transition-colors font-medium">
                   Home
+                </Link>
+              </li>
+
+
+              <li>
+                <Link href="/track-order" className="hover:text-amber-950 transition-colors font-medium">
+                  Track Order
                 </Link>
               </li>
               <li>
