@@ -91,20 +91,37 @@ export default function CartPage() {
     setUpdatingItems((prev) => new Set([...prev, itemId]))
 
     try {
-      const response = await fetch("/api/cart/save", {
+      const response = await fetch("/api/cart/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          action: "update_quantity",
           itemId,
           quantity: newQuantity,
         }),
       })
 
-      if (response.ok) {
-        await fetchCart()
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        if (data.cart.items.length === 0) {
+          setCartData({
+            cartId: "",
+            items: [],
+            subtotal: 0,
+            shipping: 0,
+            discount: 0,
+            total: 0,
+          })
+          toast({
+            description: "Cart is now empty",
+          })
+        } else {
+          setCartData(data.cart)
+        }
       } else {
         toast({
-          description: "Failed to update quantity",
+          description: data.error || "Failed to update quantity",
           variant: "destructive",
         })
       }
@@ -127,30 +144,43 @@ export default function CartPage() {
     setUpdatingItems((prev) => new Set([...prev, itemId]))
 
     try {
-      const response = await fetch("/api/cart/save", {
+      const response = await fetch("/api/cart/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          action: "remove_item",
           itemId,
-          quantity: 0,
         }),
       })
 
-      if (response.ok) {
-        await fetchCart()
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        if (data.cart.items.length === 0) {
+          setCartData({
+            cartId: "",
+            items: [],
+            subtotal: 0,
+            shipping: 0,
+            discount: 0,
+            total: 0,
+          })
+        } else {
+          setCartData(data.cart)
+        }
         toast({
           description: "Item removed from cart",
         })
       } else {
         toast({
-          description: "Failed to remove item",
+          description: data.error || "Failed to remove item",
           variant: "destructive",
         })
       }
     } catch (error) {
       console.error("Error removing item:", error)
       toast({
-        description: "Error removing item",
+        description: "Error removing item from cart",
         variant: "destructive",
       })
     } finally {
