@@ -1,79 +1,174 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Package, Heart, ShoppingCart, User, TrendingUp, Clock } from "lucide-react"
+import { Package, ShoppingCart, User, TrendingUp, Clock, ArrowRight } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useToast } from "@/hooks/use-toast"
 
 interface AuthenticatedUser {
   id: string
   fullname: string
   email: string
+  phone?: string
+  address?: string
+}
+
+interface Order {
+  _id: string
+  orderId: string
+  orderStatus: string
+  totalAmount: number
+  createdAt: string
+  items: Array<{ productName: string; quantity: number }>
+}
+
+interface CartItem {
+  id: string
+  name: string
+  quantity: number
+  price: number
+}
+
+interface DashboardStats {
+  totalOrders: number
+  totalSpent: number
+  cartItems: number
+  memberSince: string
 }
 
 export default function CustomerDashboard() {
   const [user, setUser] = useState<AuthenticatedUser | null>(null)
+  const [stats, setStats] = useState<DashboardStats>({
+    totalOrders: 0,
+    totalSpent: 0,
+    cartItems: 0,
+    memberSince: "",
+  })
+  const [recentOrders, setRecentOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
+  const { toast } = useToast()
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const loadDashboardData = async () => {
       try {
-        const response = await fetch("/api/auth/verify")
-        const data = await response.json()
-        if (data.success && data.user) {
-          setUser(data.user)
+        setLoading(true)
+
+        // Fetch user profile
+        const profileResponse = await fetch("/api/customer/profile")
+        const profileData = await profileResponse.json()
+
+        if (profileData.success && profileData.user) {
+          setUser(profileData.user)
+
+          // Format member since date
+          const memberSince = new Date().toLocaleDateString("en-US", {
+            month: "long",
+            year: "numeric",
+          })
+
+          // Fetch orders
+          const ordersResponse = await fetch("/api/customer/orders?page=1&limit=5")
+          const ordersData = await ordersResponse.json()
+
+          // Fetch cart
+          const cartResponse = await fetch(`/api/cart/get?userId=${profileData.user.id}`)
+          const cartData = await cartResponse.json()
+
+          // Calculate stats
+          const totalOrders = ordersData.stats?.totalOrders || 0
+          const totalSpent = ordersData.stats?.totalSpent || 0
+          const cartItemsCount = cartData.cart?.items?.length || 0
+
+          setStats({
+            totalOrders,
+            totalSpent,
+            cartItems: cartItemsCount,
+            memberSince,
+          })
+
+          // Set recent orders
+          if (ordersData.orders && Array.isArray(ordersData.orders)) {
+            setRecentOrders(ordersData.orders.slice(0, 3))
+          }
+        } else {
+          toast({
+            description: "Failed to load profile",
+            variant: "destructive",
+          })
         }
       } catch (error) {
-        console.error("Auth check failed:", error)
+        console.error("Error loading dashboard:", error)
+        toast({
+          description: "Failed to load dashboard data",
+          variant: "destructive",
+        })
+      } finally {
+        setLoading(false)
       }
     }
-    checkAuth()
-  }, [])
 
-  const stats = [
+    loadDashboardData()
+  }, [toast])
+
+  const statCards = [
     {
       title: "Total Orders",
-      value: "0",
+      value: stats.totalOrders.toString(),
       icon: Package,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
     },
     {
-      title: "Wishlist Items",
-      value: "0",
-      icon: Heart,
-      color: "text-pink-600",
-      bgColor: "bg-pink-50",
-    },
-    {
       title: "Cart Items",
-      value: "0",
+      value: stats.cartItems.toString(),
       icon: ShoppingCart,
       color: "text-green-600",
       bgColor: "bg-green-50",
     },
     {
       title: "Total Spent",
-      value: "₹0",
+      value: `₹${stats.totalSpent.toFixed(0)}`,
       icon: TrendingUp,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
     },
   ]
 
-  const recentOrders = [
-    // Placeholder for recent orders - will be populated from database
-  ]
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      pending: "bg-yellow-50 text-yellow-700",
+      processing: "bg-blue-50 text-blue-700",
+      shipped: "bg-purple-50 text-purple-700",
+      "in-transit": "bg-purple-50 text-purple-700",
+      delivered: "bg-green-50 text-green-700",
+      cancelled: "bg-red-50 text-red-700",
+    }
+    return colors[status] || "bg-gray-50 text-gray-700"
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-lg p-6 border" style={{ borderColor: "#D9CFC7" }}>
+          <p className="text-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
       <div className="bg-white rounded-lg p-6 border" style={{ borderColor: "#D9CFC7" }}>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back, {user?.fullname.split(" ")[0]}!</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          Welcome back, {user?.fullname.split(" ")[0]}!
+        </h1>
         <p className="text-foreground/70">Here's an overview of your account and recent activity</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, index) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {statCards.map((stat, index) => {
           const Icon = stat.icon
           return (
             <Card key={index} className="border" style={{ borderColor: "#D9CFC7" }}>
@@ -93,8 +188,9 @@ export default function CustomerDashboard() {
         })}
       </div>
 
-      {/* Profile Overview */}
+      {/* Profile & Orders Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Profile Information */}
         <Card className="border" style={{ borderColor: "#D9CFC7" }}>
           <CardHeader>
             <CardTitle className="text-foreground flex items-center gap-2">
@@ -109,20 +205,28 @@ export default function CustomerDashboard() {
             </div>
             <div>
               <p className="text-sm font-medium text-foreground/70">Email Address</p>
-              <p className="text-foreground font-medium mt-1">{user?.email}</p>
+              <p className="text-foreground font-medium mt-1 break-all">{user?.email}</p>
             </div>
+            {user?.phone && (
+              <div>
+                <p className="text-sm font-medium text-foreground/70">Phone</p>
+                <p className="text-foreground font-medium mt-1">{user.phone}</p>
+              </div>
+            )}
             <div>
               <p className="text-sm font-medium text-foreground/70">Member Since</p>
-              <p className="text-foreground font-medium mt-1">
-                {new Date().toLocaleDateString("en-US", {
-                  month: "long",
-                  year: "numeric",
-                })}
-              </p>
+              <p className="text-foreground font-medium mt-1">{stats.memberSince}</p>
             </div>
+            <a
+              href="/customer/profile"
+              className="inline-block mt-4 text-[#6D4530] hover:text-[#5A3A26] font-medium flex items-center gap-2"
+            >
+              Edit Profile <ArrowRight className="w-4 h-4" />
+            </a>
           </CardContent>
         </Card>
 
+        {/* Recent Orders */}
         <Card className="border" style={{ borderColor: "#D9CFC7" }}>
           <CardHeader>
             <CardTitle className="text-foreground flex items-center gap-2">
@@ -138,7 +242,29 @@ export default function CustomerDashboard() {
                 <p className="text-sm text-foreground/50 mt-1">Start shopping to see your orders here</p>
               </div>
             ) : (
-              <div className="space-y-3">{/* Recent orders will be displayed here */}</div>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {recentOrders.map((order) => (
+                  <div key={order._id} className="p-3 bg-[#F5F1ED] rounded-lg">
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-foreground text-sm break-all">{order.orderId}</p>
+                        <p className="text-xs text-foreground/70 mt-1">
+                          {order.items.length} item{order.items.length !== 1 ? "s" : ""}
+                        </p>
+                      </div>
+                      <span className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${getStatusColor(order.orderStatus)}`}>
+                        {order.orderStatus.replace("-", " ")}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-end mt-2 pt-2 border-t" style={{ borderColor: "#D9CFC7" }}>
+                      <p className="text-xs text-foreground/70">
+                        {new Date(order.createdAt).toLocaleDateString("en-IN")}
+                      </p>
+                      <p className="font-semibold text-foreground">₹{order.totalAmount.toFixed(2)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>
@@ -150,27 +276,20 @@ export default function CustomerDashboard() {
           <CardTitle className="text-foreground">Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <a
               href="/customer/orders"
               className="flex items-center gap-3 p-4 bg-[#EED9C4] rounded-lg hover:bg-[#EED9C4]/80 transition-colors"
             >
               <Package className="h-5 w-5 text-foreground" />
-              <span className="text-foreground font-medium">View Orders</span>
+              <span className="text-foreground font-medium">View All Orders</span>
             </a>
             <a
-              href="/customer/wishlist"
+              href="/customer/cart"
               className="flex items-center gap-3 p-4 bg-[#EED9C4] rounded-lg hover:bg-[#EED9C4]/80 transition-colors"
             >
-              <Heart className="h-5 w-5 text-foreground" />
-              <span className="text-foreground font-medium">My Wishlist</span>
-            </a>
-            <a
-              href="/customer/profile"
-              className="flex items-center gap-3 p-4 bg-[#EED9C4] rounded-lg hover:bg-[#EED9C4]/80 transition-colors"
-            >
-              <User className="h-5 w-5 text-foreground" />
-              <span className="text-foreground font-medium">Edit Profile</span>
+              <ShoppingCart className="h-5 w-5 text-foreground" />
+              <span className="text-foreground font-medium">View Cart</span>
             </a>
           </div>
         </CardContent>
