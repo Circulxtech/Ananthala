@@ -10,6 +10,8 @@ import { type CartItem } from "@/components/cart/cart-drawer"
 import type { ProductDetail } from "@/data/product-details"
 import { fabricOptions } from "@/data/fabric"
 import { useColorConfigurator } from "@/hooks/use-color-cofigurator"
+import { usePatternConfigurator } from "@/hooks/use-pattern-configurator"
+import { getAllFabricPatterns } from "@/data/fabric-patterns"
 import { ColorAwareImage } from "@/components/product/ColorAwareImage"
 
 interface ApiProductVariant {
@@ -53,6 +55,16 @@ export function ProductConfigurator({
     setIsColorApplied,
     handleFabricChange: handleColorChange,
   } = useColorConfigurator()
+
+  const {
+    selectedPatternId,
+    selectedPattern,
+    isPatternApplied,
+    setIsPatternApplied,
+    handlePatternChange,
+  } = usePatternConfigurator()
+
+  const allPatterns = getAllFabricPatterns()
 
   const productImages = product.images?.length ? product.images : ["/placeholder.svg"]
   const customSizeLabel = `${customLength || "-"}x${customWidth || "-"}x${customHeight || "-"} cm`
@@ -178,16 +190,18 @@ export function ProductConfigurator({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
               <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-50">
-                {showColorConfigurator && colorFabricId ? (
+                {showColorConfigurator && (colorFabricId || selectedPatternId !== "pattern-solid") ? (
                   <ColorAwareImage
                     src={productImages[selectedImageIndex] || "/placeholder.svg"}
                     alt={product.name}
                     fabricId={colorFabricId}
+                    patternId={selectedPatternId}
                     fill
                     className="object-cover"
                     priority
                     unoptimized
                     onColorApplied={setIsColorApplied}
+                    onPatternApplied={setIsPatternApplied}
                   />
                 ) : (
                   <Image
@@ -388,6 +402,50 @@ export function ProductConfigurator({
                           title={selectedFabricColor.name}
                         />
                         <span className="text-sm text-foreground/70">{selectedFabricColor.name}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Pattern Configurator */}
+                {showColorConfigurator && allPatterns.length > 0 && (
+                  <div>
+                    <label className="text-base font-medium text-foreground mb-2 block">Pattern</label>
+                    <Select value={selectedPatternId} onValueChange={handlePatternChange}>
+                      <SelectTrigger className="w-full text-foreground">
+                        <SelectValue placeholder="Select pattern" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {allPatterns.map((pattern) => (
+                          <SelectItem key={pattern.id} value={pattern.id}>
+                            <span className="flex items-center gap-2">
+                              <span className="inline-block w-4 h-4 rounded border border-gray-300" style={{
+                                background: pattern.type === "solid" 
+                                  ? "linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd), linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd)"
+                                  : pattern.type === "striped"
+                                  ? "repeating-linear-gradient(90deg, #333 0px, #333 2px, transparent 2px, transparent 6px)"
+                                  : pattern.type === "checkered"
+                                  ? "linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333), linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333)"
+                                  : "radial-gradient(circle, #333 2px, transparent 2px)",
+                                backgroundSize: pattern.type === "solid" 
+                                  ? "8px 8px"
+                                  : pattern.type === "striped"
+                                  ? "8px 4px"
+                                  : pattern.type === "checkered"
+                                  ? "8px 8px"
+                                  : "8px 8px",
+                                backgroundPosition: "0 0, 4px 4px"
+                              }} />
+                              <span>{pattern.name}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {selectedPattern && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="text-sm font-medium text-foreground/70">Selected:</span>
+                        <span className="text-sm text-foreground">{selectedPattern.name}</span>
                       </div>
                     )}
                   </div>

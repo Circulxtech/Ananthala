@@ -3,19 +3,24 @@
 import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { applyColorTransform, applyRegionColorTransform } from "@/lib/color-transform"
+import { applyPatternTransform, applyColorAndPatternTransform } from "@/lib/pattern-transform"
 import { getFabricColor } from "@/data/fabric-colors"
 import { getFabricRegions } from "@/data/fabric-regions"
+import { getFabricPattern } from "@/data/fabric-patterns"
+import type { FabricPattern } from "@/data/fabric-patterns"
 
 interface ColorAwareImageProps {
   src: string
   alt: string
   fabricId?: string // Fabric ID to determine color
+  patternId?: string // Pattern ID to determine pattern
   productId?: string | number // Product ID for region-based coloring
   fill?: boolean
   className?: string
   priority?: boolean
   unoptimized?: boolean
   onColorApplied?: (isApplied: boolean) => void
+  onPatternApplied?: (isApplied: boolean) => void
   useRegionColoring?: boolean // If true, uses region-based selective coloring
 }
 
@@ -28,78 +33,81 @@ export function ColorAwareImage({
   src,
   alt,
   fabricId,
+  patternId,
   productId,
   fill,
   className,
   priority = false,
   unoptimized = false,
   onColorApplied,
+  onPatternApplied,
   useRegionColoring = true,
 }: ColorAwareImageProps) {
   const [transformedSrc, setTransformedSrc] = useState<string>(src)
   const [isTransforming, setIsTransforming] = useState(false)
 
-  const applyFabricColor = useCallback(async () => {
-    if (!fabricId) {
-      setTransformedSrc(src)
-      onColorApplied?.(false)
-      return
-    }
-
-    const fabricColor = getFabricColor(fabricId)
-    if (!fabricColor) {
-      setTransformedSrc(src)
-      onColorApplied?.(false)
-      return
-    }
-
+  const applyFabricTransform = useCallback(async () => {
     try {
       setIsTransforming(true)
+      let transformed = src
+      let colorApplied = false
+      let patternApplied = false
 
-      let transformed: string
+      // Get color and pattern
+      const fabricColor = fabricId ? getFabricColor(fabricId) : null
+      const pattern = patternId ? getFabricPattern(patternId) : null
 
-      // Try region-based coloring first if productId is provided
-      if (useRegionColoring && productId) {
-        const regions = getFabricRegions(productId)
-        if (regions.length > 0) {
-          transformed = await applyRegionColorTransform(src, {
-            hex: fabricColor.hex,
-            intensity: fabricColor.colorIntensity,
-            blendMode: fabricColor.blendMode,
-            regions,
-          })
+      // Apply color if available
+      if (fabricColor) {
+        if (useRegionColoring && productId) {
+          const regions = getFabricRegions(productId)
+          if (regions.length > 0) {
+            transformed = await applyRegionColorTransform(src, {
+              hex: fabricColor.hex,
+              intensity: fabricColor.colorIntensity,
+              blendMode: fabricColor.blendMode,
+              regions,
+            })
+          } else {
+            transformed = await applyColorTransform(src, {
+              hex: fabricColor.hex,
+              intensity: fabricColor.colorIntensity,
+              blendMode: fabricColor.blendMode,
+            })
+          }
         } else {
-          // Fallback to luminosity-based coloring if no regions defined
           transformed = await applyColorTransform(src, {
             hex: fabricColor.hex,
             intensity: fabricColor.colorIntensity,
             blendMode: fabricColor.blendMode,
           })
         }
-      } else {
-        // Use luminosity-based coloring as fallback
-        transformed = await applyColorTransform(src, {
-          hex: fabricColor.hex,
-          intensity: fabricColor.colorIntensity,
-          blendMode: fabricColor.blendMode,
-        })
+        colorApplied = true
+      }
+
+      // Apply pattern if available and not solid
+      if (pattern && pattern.type !== "solid") {
+        transformed = await applyPatternTransform(transformed, { pattern })
+        patternApplied = true
       }
 
       setTransformedSrc(transformed)
-      onColorApplied?.(true)
+      onColorApplied?.(colorApplied)
+      onPatternApplied?.(patternApplied)
     } catch (error) {
-      console.error("[v0] Color transform failed:", error)
+      console.error("[v0] Transform failed:", error)
       setTransformedSrc(src)
       onColorApplied?.(false)
+      onPatternApplied?.(false)
     } finally {
       setIsTransforming(false)
     }
-  }, [src, fabricId, productId, useRegionColoring, onColorApplied])
+  }, [src, fabricId, patternId, productId, useRegionColoring, onColorApplied, onPatternApplied])
 
-  // Apply color transformation whenever fabric changes
+  // Apply transformation whenever fabric or pattern changes
   useEffect(() => {
-    applyFabricColor()
-  }, [applyFabricColor])
+    applyFabricTransform()
+  }, [applyFabricTransform])
 
   return (
     <Image
