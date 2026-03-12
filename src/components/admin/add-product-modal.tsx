@@ -319,10 +319,21 @@ export default function AddProductModal({
         body: formDataToSend,
       })
 
-      const data = await response.json()
+      const contentType = response.headers.get("content-type") ?? ""
+      let data: any = null
+      if (contentType.includes("application/json")) {
+        try {
+          data = await response.json()
+        } catch {
+          data = null
+        }
+      } else {
+        const text = await response.text().catch(() => "")
+        data = text ? { message: text } : null
+      }
 
       if (!response.ok) {
-        throw new Error(data.message || (isEditMode ? "Failed to update product" : "Failed to create product"))
+        throw new Error(data?.message || (isEditMode ? "Failed to update product" : "Failed to create product"))
       }
 
       console.log(`[v0] Product ${isEditMode ? "updated" : "created"} successfully:`, data)

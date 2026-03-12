@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { del } from "@vercel/blob"
+import { del, put } from "@vercel/blob"
 import connectDB from "@/lib/mongodb"
 import Product from "@/models/Product"
 import mongoose from "mongoose"
@@ -139,5 +139,276 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   } catch (error: any) {
     console.error("[PRODUCT_UPDATE_ERROR]", error)
     return NextResponse.json({ success: false, message: error.message || "Failed to update product" }, { status: 500 })
+  }
+}
+
+// PUT - Update product by ID
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
+
+    console.log("[v0] PUT request received for product:", id)
+
+    if (!isValidObjectId(id)) {
+      return NextResponse.json({ success: false, message: "Invalid product ID format" }, { status: 400 })
+    }
+
+    const formData = await request.formData()
+
+    const productTitle = (formData.get("productTitle") as string) ?? ""
+    const description = (formData.get("description") as string) ?? ""
+    const units = (formData.get("units") as string) ?? ""
+    const sellerName = (formData.get("sellerName") as string) ?? ""
+    const sellerEmail = (formData.get("sellerEmail") as string) ?? ""
+    const location = (formData.get("location") as string) ?? ""
+    const category = (formData.get("category") as string) ?? ""
+    const subCategory = (formData.get("subCategory") as string) ?? ""
+    const variantsJson = (formData.get("variants") as string) ?? ""
+    const detailSectionsJson = (formData.get("detailSections") as string) ?? ""
+    const existingImageUrlsJson = (formData.get("existingImageUrls") as string) ?? "[]"
+
+    if (
+      !productTitle ||
+      !description ||
+      !units ||
+      !sellerName ||
+      !sellerEmail ||
+      !location ||
+      !category ||
+      !variantsJson
+    ) {
+      const missingFields = []
+      if (!productTitle) missingFields.push("productTitle")
+      if (!description) missingFields.push("description")
+      if (!units) missingFields.push("units")
+      if (!sellerName) missingFields.push("sellerName")
+      if (!sellerEmail) missingFields.push("sellerEmail")
+      if (!location) missingFields.push("location")
+      if (!category) missingFields.push("category")
+      if (!variantsJson) missingFields.push("variants")
+
+      return NextResponse.json(
+        { success: false, message: `Missing required fields: ${missingFields.join(", ")}` },
+        { status: 400 },
+      )
+    }
+
+    const categoryLower = category.toLowerCase()
+    if (
+      categoryLower !== "mattress" &&
+      categoryLower !== "pillow" &&
+      categoryLower !== "bedding" &&
+      categoryLower !== "bedsheet" &&
+      categoryLower !== "joy" &&
+      categoryLower !== "bliss" &&
+      categoryLower !== "grace"
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Category must be either joy, bliss, grace, mattress, pillow, bedding, or bedsheet" },
+        { status: 400 },
+      )
+    }
+
+    let variants
+    try {
+      variants = JSON.parse(variantsJson)
+    } catch {
+      return NextResponse.json({ success: false, message: "Invalid variants data format" }, { status: 400 })
+    }
+
+    if (!Array.isArray(variants) || variants.length === 0) {
+      return NextResponse.json({ success: false, message: "At least one variant is required" }, { status: 400 })
+    }
+
+    let detailSections: Array<{
+      title: string
+      body: string
+      imageUrl?: string
+      imageAlt?: string
+      imagePosition?: "left" | "right"
+      imageKey?: string
+    }> = []
+
+    if (detailSectionsJson) {
+      try {
+        const parsed = JSON.parse(detailSectionsJson)
+        if (Array.isArray(parsed)) {
+          detailSections = parsed
+            .map((section) => ({
+              title: typeof section.title === "string" ? section.title.trim() : "",
+              body: typeof section.body === "string" ? section.body.trim() : "",
+              imageUrl: typeof section.imageUrl === "string" ? section.imageUrl.trim() : "",
+              imageAlt: typeof section.imageAlt === "string" ? section.imageAlt.trim() : "",
+              imagePosition: section.imagePosition === "left" || section.imagePosition === "right" ? section.imagePosition : undefined,
+              imageKey: typeof section.imageKey === "string" ? section.imageKey : undefined,
+            }))
+            .filter((section) => section.title || section.body || section.imageUrl || section.imageKey)
+        }
+      } catch {
+        return NextResponse.json({ success: false, message: "Invalid detail sections data format" }, { status: 400 })
+      }
+    }
+
+    const processedVariants = variants.map((variant, index) => {
+      const weight = Number.parseFloat(variant.weight)
+      const length = Number.parseFloat(variant.length)
+      const width = Number.parseFloat(variant.width)
+      const height = Number.parseFloat(variant.height)
+      const fabric = variant.fabric?.trim()
+      const price = Number.parseFloat(variant.price)
+      const stock = Number.parseInt(variant.stock, 10)
+
+      if (isNaN(weight) || isNaN(length) || isNaN(width) || isNaN(height) || isNaN(price) || isNaN(stock)) {
+        throw new Error(`Variant ${index + 1} has invalid numeric values. Please check all fields.`)
+      }
+
+      if (!fabric) {
+        throw new Error(`Variant ${index + 1} requires a fabric selection.`)
+      }
+
+      if (weight <= 0 || length <= 0 || width <= 0 || height <= 0 || price <= 0 || stock < 0) {
+        throw new Error(`Variant ${index + 1} has values that are too small or negative.`)
+      }
+
+      return {
+        variantId: variant.id,
+        weight,
+        length,
+        width,
+        height,
+        fabric,
+        price,
+        stock,
+      }
+    })
+
+    let existingImageUrls: string[] = []
+    try {
+      const parsed = JSON.parse(existingImageUrlsJson)
+      if (Array.isArray(parsed)) {
+        existingImageUrls = parsed.filter((url) => typeof url === "string" && !!url.trim())
+      }
+    } catch {
+      existingImageUrls = []
+    }
+
+    const newImageFiles: File[] = []
+    for (const [key, value] of formData.entries()) {
+      if (key.startsWith("image_") && value instanceof File) {
+        newImageFiles.push(value)
+      }
+    }
+
+    if (existingImageUrls.length + newImageFiles.length === 0) {
+      return NextResponse.json({ success: false, message: "At least one product image is required" }, { status: 400 })
+    }
+
+    if (existingImageUrls.length + newImageFiles.length > 6) {
+      return NextResponse.json({ success: false, message: "Maximum 6 images allowed" }, { status: 400 })
+    }
+
+    const needsUploads = newImageFiles.length > 0 || detailSections.some((section) => section.imageKey)
+    if (needsUploads && !process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Image storage is not configured. Please add BLOB_READ_WRITE_TOKEN to your environment variables.",
+        },
+        { status: 500 },
+      )
+    }
+
+    const uploadedImageUrls = await Promise.all(
+      newImageFiles.map(async (file, index) => {
+        const timestamp = Date.now()
+        const filename = `products/${sellerEmail}/${timestamp}_${index}_${file.name}`
+
+        const blob = await put(filename, file, {
+          access: "public",
+          addRandomSuffix: true,
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        })
+
+        return blob.url
+      }),
+    )
+
+    if (detailSections.length > 0) {
+      await Promise.all(
+        detailSections.map(async (section) => {
+          if (!section.imageKey) return
+          const file = formData.get(section.imageKey)
+          if (!(file instanceof File)) return
+
+          const timestamp = Date.now()
+          const filename = `products/${sellerEmail}/detail-sections/${timestamp}_${file.name}`
+
+          const blob = await put(filename, file, {
+            access: "public",
+            addRandomSuffix: true,
+            token: process.env.BLOB_READ_WRITE_TOKEN,
+          })
+
+          section.imageUrl = blob.url
+        }),
+      )
+    }
+
+    detailSections = detailSections.map(({ imageKey, ...rest }) => rest)
+
+    await connectDB()
+
+    const existingProduct = await Product.findById(id).lean()
+    if (!existingProduct) {
+      return NextResponse.json({ success: false, message: "Product not found" }, { status: 404 })
+    }
+
+    const nextImageUrls = [...existingImageUrls, ...uploadedImageUrls]
+
+    const product = await Product.findByIdAndUpdate(
+      id,
+      {
+        productTitle,
+        description,
+        units,
+        sellerName,
+        sellerEmail: sellerEmail.toLowerCase(),
+        location,
+        category: categoryLower,
+        subCategory: subCategory || undefined,
+        imageUrls: nextImageUrls,
+        variants: processedVariants,
+        detailSections,
+      },
+      { new: true, runValidators: true },
+    )
+
+    const removedImageUrls = existingProduct.imageUrls.filter((url: string) => !nextImageUrls.includes(url))
+    if (removedImageUrls.length > 0 && process.env.BLOB_READ_WRITE_TOKEN) {
+      await Promise.all(
+        removedImageUrls.map(async (imageUrl) => {
+          try {
+            await del(imageUrl)
+          } catch (deleteError) {
+            console.error(`[v0] Error deleting removed image ${imageUrl}:`, deleteError)
+          }
+        }),
+      )
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Product updated successfully",
+        product,
+      },
+      { status: 200 },
+    )
+  } catch (error: any) {
+    console.error("[PRODUCT_UPDATE_ERROR]", error)
+    return NextResponse.json(
+      { success: false, message: error.message || "Failed to update product" },
+      { status: 500 },
+    )
   }
 }
