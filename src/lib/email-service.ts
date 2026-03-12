@@ -628,7 +628,14 @@ export async function sendOrderCancellationEmail(
   orderData: OrderCancellationData,
 ): Promise<boolean> {
   try {
+    console.log(`[v0] Starting order cancellation email process for order: ${orderData.orderId}`)
+    
     const transporter = await getEmailTransporter()
+    
+    if (!transporter) {
+      console.error(`[v0] Email transporter not configured for cancellation email`)
+      return false
+    }
 
     const itemsHTML = orderData.items
       .map(
@@ -997,11 +1004,24 @@ Thank you for choosing Ananthala.
       `,
     }
 
-    await transporter.sendMail(mailOptions)
-    console.log(`[v0] Order cancellation email sent to ${orderData.customerEmail}`)
+    console.log(`[v0] Sending cancellation email to ${orderData.customerEmail}`, {
+      orderId: orderData.orderId,
+      customerName: orderData.customerName,
+      itemsCount: orderData.items.length,
+    })
+    
+    const info = await transporter.sendMail(mailOptions)
+    console.log(`[v0] Order cancellation email sent successfully to ${orderData.customerEmail}`, {
+      messageId: info.messageId,
+      orderId: orderData.orderId,
+    })
     return true
   } catch (error) {
-    console.error(`[v0] Failed to send order cancellation email: ${error}`)
+    console.error(`[v0] Failed to send order cancellation email:`, {
+      error: error instanceof Error ? error.message : String(error),
+      orderId: orderData.orderId,
+      customerEmail: orderData.customerEmail,
+    })
     return false
   }
 }
