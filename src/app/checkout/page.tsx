@@ -227,7 +227,8 @@ export default function CheckoutPage() {
             }
 
             clearCart()
-            router.push("/checkout/success")
+            const orderId = verifyData.orderId
+            router.push(`/checkout/success?orderId=${orderId}`)
           } catch (error: any) {
             setErrorMessage(error?.message || "Payment verification failed.")
             setIsProcessing(false)

@@ -139,17 +139,20 @@ export default function OrdersPage() {
 
     setIsCancelling(true)
     try {
-      const response = await fetch(`/api/customer/orders/${selectedOrder._id}/cancel`, {
+      const response = await fetch(`/api/customer/orders/cancel`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
+        body: JSON.stringify({
+          orderId: selectedOrder._id,
+        }),
       })
 
       const data = await response.json()
 
-      if (response.ok) {
+      if (response.ok && data.success) {
         toast({
           description: "Order cancelled successfully",
         })
@@ -163,7 +166,7 @@ export default function OrdersPage() {
         })
       }
     } catch (error) {
-      console.error("Cancel order error:", error)
+      console.error("[v0] Cancel order error:", error)
       toast({
         description: "Failed to cancel order. Please try again.",
         variant: "destructive",

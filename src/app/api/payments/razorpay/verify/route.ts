@@ -5,6 +5,7 @@ import { cookies } from "next/headers"
 import { verifyToken } from "@/lib/jwt"
 import connectDB from "@/lib/mongodb"
 import Order from "@/models/order"
+import { sendOrderConfirmationEmail } from "@/lib/email-service"
 
 export const runtime = "nodejs"
 
@@ -112,6 +113,25 @@ export async function POST(request: Request) {
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
     })
+
+    // Send order confirmation email
+    try {
+      const emailSent = await sendOrderConfirmationEmail({
+        orderId: order.orderId,
+        customerName: order.customerName,
+        customerEmail: order.customerEmail,
+        items: order.items,
+        subtotal: order.subtotal,
+        discount: order.discount,
+        shippingCost: order.shippingCost,
+        totalAmount: order.totalAmount,
+        shippingAddress: order.shippingAddress,
+      })
+      console.log(`[v0] Order confirmation email ${emailSent ? "sent" : "failed to send"} for order ${order.orderId}`)
+    } catch (emailError) {
+      console.error(`[v0] Error sending order confirmation email: ${emailError}`)
+      // Don't fail the order creation if email fails - it's not critical
+    }
 
     return NextResponse.json({ success: true, orderId: order.orderId }, { status: 200 })
   } catch (error: any) {
