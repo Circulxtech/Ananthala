@@ -486,23 +486,23 @@ export async function sendOrderConfirmationEmail(
             <!-- Summary -->
             <div class="summary-box">
               <div class="summary-row">
-                <span class="summary-label">Subtotal</span>
+                <span class="summary-label">Subtotal : </span>
                 <span>₹${order.subtotal.toFixed(2)}</span>
               </div>
               ${
                 order.discount > 0
                   ? `<div class="summary-row discount">
-                <span class="summary-label">Discount</span>
+                <span class="summary-label">Discount: </span>
                 <span>-₹${order.discount.toFixed(2)}</span>
               </div>`
                   : ""
               }
               <div class="summary-row">
-                <span class="summary-label">Shipping</span>
+                <span class="summary-label">Shipping : </span>
                 <span>₹${order.shippingCost.toFixed(2)}</span>
               </div>
               <div class="summary-row total">
-                <span class="summary-label">Total Amount</span>
+                <span class="summary-label">Total Amount : </span>
                 <span>₹${order.totalAmount.toFixed(2)}</span>
               </div>
             </div>
