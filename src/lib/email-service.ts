@@ -91,7 +91,7 @@ export async function sendOrderConfirmationEmail(
       )
       .join("")
 
-    const trackOrderUrl = `${process.env.NEXT_PUBLIC_APP_URL }/track-order`
+    const trackOrderUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/track-order`
 
     const htmlContent = `
     <!DOCTYPE html>
@@ -486,23 +486,23 @@ export async function sendOrderConfirmationEmail(
             <!-- Summary -->
             <div class="summary-box">
               <div class="summary-row">
-                <span class="summary-label">Subtotal : </span>
+                <span class="summary-label">Subtotal</span>
                 <span>₹${order.subtotal.toFixed(2)}</span>
               </div>
               ${
                 order.discount > 0
                   ? `<div class="summary-row discount">
-                <span class="summary-label">Discount: </span>
+                <span class="summary-label">Discount</span>
                 <span>-₹${order.discount.toFixed(2)}</span>
               </div>`
                   : ""
               }
               <div class="summary-row">
-                <span class="summary-label">Shipping : </span>
+                <span class="summary-label">Shipping</span>
                 <span>₹${order.shippingCost.toFixed(2)}</span>
               </div>
               <div class="summary-row total">
-                <span class="summary-label">Total Amount : </span>
+                <span class="summary-label">Total Amount</span>
                 <span>₹${order.totalAmount.toFixed(2)}</span>
               </div>
             </div>
@@ -595,6 +595,757 @@ Thank you for choosing Ananthala!
     return true
   } catch (error) {
     console.error(`[v0] Failed to send order confirmation email: ${error}`)
+    return false
+  }
+}
+
+interface OrderCancellationData {
+  orderId: string
+  customerName: string
+  customerEmail: string
+  items: Array<{
+    productName: string
+    quantity: number
+    price: number
+    size?: string
+    fabric?: string
+    productColor?: string
+  }>
+  subtotal: number
+  discount: number
+  shippingCost: number
+  totalAmount: number
+  shippingAddress?: {
+    fullAddress?: string
+    city?: string
+    state?: string
+    zipCode?: string
+    country?: string
+  }
+}
+
+export async function sendOrderCancellationEmail(
+  orderData: OrderCancellationData,
+): Promise<boolean> {
+  try {
+    const transporter = await getEmailTransporter()
+
+    const itemsHTML = orderData.items
+      .map(
+        (item) => `
+      <tr>
+        <td>
+          <div class="item-name">${item.productName}</div>
+          ${
+            item.size || item.fabric || item.productColor
+              ? `<div class="item-specs">
+              ${[item.size, item.fabric, item.productColor].filter(Boolean).join(" • ")}
+            </div>`
+              : ""
+          }
+        </td>
+        <td style="text-align: center;">${item.quantity}</td>
+        <td class="text-right">₹${item.price.toFixed(2)}</td>
+        <td class="text-right font-medium">₹${(item.price * item.quantity).toFixed(2)}</td>
+      </tr>
+    `,
+      )
+      .join("")
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Order Cancellation - Ananthala</title>
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+          line-height: 1.5;
+          color: #4a4a4a;
+          background-color: #f9f7f4;
+          padding: 16px;
+        }
+        .wrapper {
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        .container {
+          background-color: #ffffff;
+          border: 1px solid #e8ddd5;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .header {
+          background: linear-gradient(135deg, #d9534f 0%, #c9302c 100%);
+          color: white;
+          padding: 32px 24px;
+          text-align: center;
+        }
+        .header-logo {
+          font-size: 28px;
+          font-weight: 700;
+          letter-spacing: -0.5px;
+          margin-bottom: 8px;
+        }
+        .header-subtitle {
+          font-size: 13px;
+          opacity: 0.9;
+          letter-spacing: 0.3px;
+        }
+        .content {
+          padding: 32px 24px;
+        }
+        .greeting {
+          font-size: 18px;
+          font-weight: 600;
+          color: #6d4530;
+          margin-bottom: 6px;
+        }
+        .intro-text {
+          color: #8b5a3c;
+          font-size: 14px;
+          margin-bottom: 24px;
+          line-height: 1.6;
+        }
+        .order-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+          margin-bottom: 28px;
+        }
+        .order-card {
+          background: linear-gradient(135deg, #fafaf8 0%, #f5f1ed 100%);
+          border: 1px solid #e8ddd5;
+          border-radius: 8px;
+          padding: 14px;
+          text-align: center;
+        }
+        .order-card-label {
+          color: #8b5a3c;
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.4px;
+          margin-bottom: 6px;
+        }
+        .order-card-value {
+          color: #6d4530;
+          font-size: 14px;
+          font-weight: 600;
+          word-break: break-all;
+        }
+        .summary-box {
+          background: linear-gradient(135deg, #fafaf8 0%, #f5f1ed 100%);
+          border: 1px solid #e8ddd5;
+          border-radius: 8px;
+          padding: 16px;
+          margin: 24px 0;
+        }
+        .summary-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 0;
+          font-size: 13px;
+          color: #6d4530;
+        }
+        .summary-label {
+          color: #8b5a3c;
+          font-weight: 500;
+        }
+        .summary-row.total {
+          border-top: 2px solid #d9cfc7;
+          border-bottom: 2px solid #d9cfc7;
+          padding: 12px 0;
+          font-size: 15px;
+          font-weight: 700;
+          color: #6d4530;
+        }
+        .items-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 20px;
+          font-size: 13px;
+        }
+        .items-table thead tr {
+          background: linear-gradient(135deg, #eed9c4 0%, #e6cbb9 100%);
+        }
+        .items-table th {
+          padding: 10px 12px;
+          text-align: left;
+          font-weight: 600;
+          color: #6d4530;
+          font-size: 12px;
+          text-transform: uppercase;
+        }
+        .items-table td {
+          padding: 10px 12px;
+          border-bottom: 1px solid #ede9e3;
+          color: #6d4530;
+        }
+        .item-name {
+          font-weight: 600;
+          margin-bottom: 3px;
+        }
+        .item-specs {
+          color: #8b5a3c;
+          font-size: 11px;
+          margin-top: 3px;
+        }
+        .text-right {
+          text-align: right;
+        }
+        .font-medium {
+          font-weight: 600;
+        }
+        .notice-box {
+          background-color: #ffe6e6;
+          border-left: 4px solid #d9534f;
+          border-radius: 6px;
+          padding: 16px;
+          margin-bottom: 20px;
+        }
+        .notice-title {
+          font-weight: 600;
+          color: #c9302c;
+          font-size: 13px;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+          margin-bottom: 8px;
+        }
+        .notice-text {
+          color: #8b5a3c;
+          font-size: 13px;
+          line-height: 1.6;
+        }
+        .footer {
+          background-color: #f5f1ed;
+          padding: 24px;
+          text-align: center;
+          border-top: 1px solid #e8ddd5;
+        }
+        .footer-text {
+          color: #8b5a3c;
+          font-size: 12px;
+          margin-bottom: 12px;
+        }
+        .contact-info {
+          font-size: 12px;
+          color: #6d4530;
+          margin-bottom: 16px;
+        }
+        .footer-link {
+          color: #6d4530;
+          text-decoration: none;
+          font-size: 12px;
+          margin: 0 10px;
+          font-weight: 500;
+          display: inline-block;
+        }
+        @media (max-width: 480px) {
+          .order-grid {
+            grid-template-columns: 1fr;
+          }
+          .header {
+            padding: 24px 16px;
+          }
+          .content {
+            padding: 20px 16px;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="wrapper">
+        <div class="container">
+          <div class="header">
+            <div class="header-logo">🏠 Ananthala</div>
+            <div class="header-subtitle">Order Cancelled</div>
+          </div>
+
+          <div class="content">
+            <p class="greeting">Hello ${orderData.customerName},</p>
+            <p class="intro-text">Your order has been successfully cancelled. Below are the details of your cancelled order.</p>
+
+            <div class="order-grid">
+              <div class="order-card">
+                <div class="order-card-label">Order ID</div>
+                <div class="order-card-value">${orderData.orderId}</div>
+              </div>
+              <div class="order-card">
+                <div class="order-card-label">Status</div>
+                <div class="order-card-value" style="color: #d9534f;">Cancelled</div>
+              </div>
+            </div>
+
+            <div class="notice-box">
+              <div class="notice-title">Refund Information</div>
+              <div class="notice-text">
+                If payment was made, your refund will be processed back to your original payment method within 5-7 business days. Please check your bank account for the refund.
+              </div>
+            </div>
+
+            <div style="font-size: 14px; font-weight: 700; color: #6d4530; margin-bottom: 12px; text-transform: uppercase;">Cancelled Items</div>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th style="width: 45%;">Product</th>
+                  <th style="width: 15%; text-align: center;">Qty</th>
+                  <th style="width: 20%; text-align: right;">Price</th>
+                  <th style="width: 20%; text-align: right;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsHTML}
+              </tbody>
+            </table>
+
+            <div class="summary-box">
+              <div class="summary-row">
+                <span class="summary-label">Subtotal</span>
+                <span>₹${orderData.subtotal.toFixed(2)}</span>
+              </div>
+              ${
+                orderData.discount > 0
+                  ? `<div class="summary-row">
+                <span class="summary-label">Discount</span>
+                <span>₹${orderData.discount.toFixed(2)}</span>
+              </div>`
+                  : ""
+              }
+              <div class="summary-row">
+                <span class="summary-label">Shipping</span>
+                <span>₹${orderData.shippingCost.toFixed(2)}</span>
+              </div>
+              <div class="summary-row total">
+                <span class="summary-label">Total Amount</span>
+                <span>₹${orderData.totalAmount.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div class="notice-box">
+              <div class="notice-title">What Happens Next?</div>
+              <div class="notice-text">
+                • Your order status has been updated to "Cancelled"<br>
+                • Refund will be processed within 5-7 business days<br>
+                • You can contact us if you have any questions<br>
+                • Feel free to place a new order anytime
+              </div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <p class="footer-text">Questions about your cancellation?</p>
+            <div class="contact-info">
+              <strong>Email:</strong> qualprodsllp@gmail.com<br>
+              <strong>Phone:</strong> +91 9071799966
+            </div>
+            <div style="margin: 16px 0;">
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/contact-us" class="footer-link">Contact Support</a>
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/policy-privacy" class="footer-link">Privacy Policy</a>
+            </div>
+            <div style="color: #b0a595; font-size: 11px; margin-top: 16px; padding-top: 12px; border-top: 1px solid #e8ddd5;">
+              © 2026 Ananthala. All rights reserved.<br>
+              This is an automated email. Please do not reply directly.
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+    `
+
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || "noreply@ananthala.com",
+      to: orderData.customerEmail,
+      subject: `Order Cancelled - ${orderData.orderId} | Ananthala`,
+      html: htmlContent,
+      text: `
+Order Cancellation Confirmation
+
+Hello ${orderData.customerName},
+
+Your order has been successfully cancelled.
+
+Order ID: ${orderData.orderId}
+Status: Cancelled
+
+Cancelled Items:
+${orderData.items.map((item) => `- ${item.productName} x${item.quantity}: ₹${(item.price * item.quantity).toFixed(2)}`).join("\n")}
+
+Subtotal: ₹${orderData.subtotal.toFixed(2)}
+${orderData.discount > 0 ? `Discount: ₹${orderData.discount.toFixed(2)}\n` : ""}Shipping: ₹${orderData.shippingCost.toFixed(2)}
+Total Amount: ₹${orderData.totalAmount.toFixed(2)}
+
+REFUND INFORMATION:
+Your refund will be processed back to your original payment method within 5-7 business days.
+
+If you have any questions, please contact us at:
+Email: qualprodsllp@gmail.com
+Phone: +91 9071799966
+
+We hope to see you again soon!
+Thank you for choosing Ananthala.
+      `,
+    }
+
+    await transporter.sendMail(mailOptions)
+    console.log(`[v0] Order cancellation email sent to ${orderData.customerEmail}`)
+    return true
+  } catch (error) {
+    console.error(`[v0] Failed to send order cancellation email: ${error}`)
+    return false
+  }
+}
+
+interface OrderStatusUpdateData {
+  orderId: string
+  customerName: string
+  customerEmail: string
+  newStatus: string
+  trackingNumber?: string
+  notes?: string
+  totalAmount: number
+}
+
+export async function sendOrderStatusUpdateEmail(
+  statusData: OrderStatusUpdateData,
+): Promise<boolean> {
+  try {
+    const transporter = await getEmailTransporter()
+
+    const getStatusColor = (status: string) => {
+      const statusColors: Record<string, { color: string; bg: string; icon: string }> = {
+        processing: { color: "#0066cc", bg: "#e6f2ff", icon: "⏳" },
+        shipped: { color: "#ff9900", bg: "#fff4e6", icon: "📦" },
+        "in-transit": { color: "#ff9900", bg: "#fff4e6", icon: "🚚" },
+        delivered: { color: "#28a745", bg: "#e6ffe6", icon: "✓" },
+        cancelled: { color: "#d9534f", bg: "#ffe6e6", icon: "✕" },
+      }
+      return statusColors[status] || { color: "#666", bg: "#f5f5f5", icon: "•" }
+    }
+
+    const statusInfo = getStatusColor(statusData.newStatus)
+    const displayStatus =
+      statusData.newStatus === "in-transit"
+        ? "In Transit"
+        : statusData.newStatus.charAt(0).toUpperCase() + statusData.newStatus.slice(1)
+
+    const getStatusMessage = (status: string) => {
+      const messages: Record<string, string> = {
+        processing: "We are preparing your order and it will be shipped soon.",
+        shipped: "Your order has been shipped! You can now track your package.",
+        "in-transit": "Your order is on its way to you!",
+        delivered: "Your order has been successfully delivered!",
+        cancelled: "Your order has been cancelled. A refund will be processed shortly.",
+      }
+      return messages[status] || "Your order status has been updated."
+    }
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Order Status Update - Ananthala</title>
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+          line-height: 1.5;
+          color: #4a4a4a;
+          background-color: #f9f7f4;
+          padding: 16px;
+        }
+        .wrapper {
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        .container {
+          background-color: #ffffff;
+          border: 1px solid #e8ddd5;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .header {
+          background: linear-gradient(135deg, #6d4530 0%, #8b5a3c 100%);
+          color: white;
+          padding: 32px 24px;
+          text-align: center;
+        }
+        .header-logo {
+          font-size: 28px;
+          font-weight: 700;
+          letter-spacing: -0.5px;
+          margin-bottom: 8px;
+        }
+        .content {
+          padding: 32px 24px;
+        }
+        .status-box {
+          background: ${statusInfo.bg};
+          border: 2px solid ${statusInfo.color};
+          border-radius: 12px;
+          padding: 24px;
+          text-align: center;
+          margin-bottom: 28px;
+        }
+        .status-icon {
+          font-size: 48px;
+          margin-bottom: 12px;
+        }
+        .status-title {
+          font-size: 24px;
+          font-weight: 700;
+          color: ${statusInfo.color};
+          margin-bottom: 8px;
+        }
+        .status-message {
+          color: #6d4530;
+          font-size: 14px;
+          line-height: 1.6;
+        }
+        .order-info {
+          background: linear-gradient(135deg, #fafaf8 0%, #f5f1ed 100%);
+          border: 1px solid #e8ddd5;
+          border-radius: 8px;
+          padding: 20px;
+          margin-bottom: 24px;
+        }
+        .info-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 0;
+          border-bottom: 1px solid #ede9e3;
+        }
+        .info-row:last-child {
+          border-bottom: none;
+        }
+        .info-label {
+          color: #8b5a3c;
+          font-weight: 600;
+          font-size: 13px;
+        }
+        .info-value {
+          color: #6d4530;
+          font-weight: 600;
+          text-align: right;
+        }
+        .tracking-section {
+          background: linear-gradient(135deg, #fafaf8 0%, #f5f1ed 100%);
+          border: 1px solid #e8ddd5;
+          border-radius: 8px;
+          padding: 20px;
+          margin-bottom: 24px;
+        }
+        .section-title {
+          font-weight: 600;
+          color: #6d4530;
+          font-size: 14px;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+          margin-bottom: 12px;
+        }
+        .tracking-number {
+          font-family: monospace;
+          font-size: 16px;
+          font-weight: 700;
+          color: #6d4530;
+          word-break: break-all;
+        }
+        .button-container {
+          text-align: center;
+          margin: 24px 0;
+        }
+        .cta-button {
+          display: inline-block;
+          background: linear-gradient(135deg, #6d4530 0%, #5a3a26 100%);
+          color: white;
+          padding: 12px 32px;
+          border-radius: 6px;
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 14px;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 4px rgba(109, 69, 48, 0.2);
+        }
+        .cta-button:hover {
+          background: linear-gradient(135deg, #5a3a26 0%, #4a2a1a 100%);
+          box-shadow: 0 4px 8px rgba(109, 69, 48, 0.3);
+        }
+        .notes-section {
+          background: linear-gradient(135deg, #fafaf8 0%, #f5f1ed 100%);
+          border: 1px solid #e8ddd5;
+          border-radius: 8px;
+          padding: 16px;
+          margin-bottom: 24px;
+          font-size: 13px;
+          line-height: 1.6;
+          color: #8b5a3c;
+        }
+        .footer {
+          background-color: #f5f1ed;
+          padding: 24px;
+          text-align: center;
+          border-top: 1px solid #e8ddd5;
+        }
+        .footer-text {
+          color: #8b5a3c;
+          font-size: 12px;
+          margin-bottom: 12px;
+        }
+        .contact-info {
+          font-size: 12px;
+          color: #6d4530;
+          margin-bottom: 16px;
+        }
+        @media (max-width: 480px) {
+          .header {
+            padding: 24px 16px;
+          }
+          .content {
+            padding: 20px 16px;
+          }
+          .status-box {
+            padding: 16px;
+          }
+          .status-icon {
+            font-size: 36px;
+          }
+          .status-title {
+            font-size: 18px;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="wrapper">
+        <div class="container">
+          <div class="header">
+            <div class="header-logo">🏠 Ananthala</div>
+          </div>
+
+          <div class="content">
+            <p style="font-size: 16px; font-weight: 600; color: #6d4530; margin-bottom: 12px;">Hi ${statusData.customerName},</p>
+            <p style="color: #8b5a3c; font-size: 14px; margin-bottom: 24px; line-height: 1.6;">Your order status has been updated. See the details below:</p>
+
+            <div class="status-box">
+              <div class="status-icon">${statusInfo.icon}</div>
+              <div class="status-title">${displayStatus}</div>
+              <div class="status-message">${getStatusMessage(statusData.newStatus)}</div>
+            </div>
+
+            <div class="order-info">
+              <div class="info-row">
+                <span class="info-label">Order ID</span>
+                <span class="info-value" style="font-family: monospace;">${statusData.orderId}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Current Status</span>
+                <span class="info-value">${displayStatus}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Order Total</span>
+                <span class="info-value">₹${statusData.totalAmount.toFixed(2)}</span>
+              </div>
+            </div>
+
+            ${
+              statusData.trackingNumber
+                ? `
+            <div class="tracking-section">
+              <div class="section-title">Tracking Number</div>
+              <div class="tracking-number">${statusData.trackingNumber}</div>
+              <p style="color: #8b5a3c; font-size: 12px; margin-top: 8px;">Use this number to track your package with the courier.</p>
+            </div>
+            `
+                : ""
+            }
+
+            ${
+              statusData.notes
+                ? `
+            <div class="notes-section">
+              <strong style="color: #6d4530;">Additional Information:</strong><br>
+              ${statusData.notes}
+            </div>
+            `
+                : ""
+            }
+
+            <div class="button-container">
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/customer/orders?orderId=${statusData.orderId}" class="cta-button">View Order Details</a>
+            </div>
+          </div>
+
+          <div class="footer">
+            <p class="footer-text">Need help? We're here for you!</p>
+            <div class="contact-info">
+              <strong>Email:</strong> qualprodsllp@gmail.com<br>
+              <strong>Phone:</strong> +91 9071799966
+            </div>
+            <div style="color: #b0a595; font-size: 11px; margin-top: 16px; padding-top: 12px; border-top: 1px solid #e8ddd5;">
+              © 2026 Ananthala. All rights reserved.<br>
+              This is an automated email. Please do not reply directly.
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+    `
+
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || "noreply@ananthala.com",
+      to: statusData.customerEmail,
+      subject: `Order Status Update: ${displayStatus} - ${statusData.orderId} | Ananthala`,
+      html: htmlContent,
+      text: `
+Order Status Update
+
+Hello ${statusData.customerName},
+
+Your order status has been updated to: ${displayStatus}
+
+Order ID: ${statusData.orderId}
+New Status: ${displayStatus}
+Order Total: ₹${statusData.totalAmount.toFixed(2)}
+
+${statusData.trackingNumber ? `Tracking Number: ${statusData.trackingNumber}\n` : ""}
+${statusData.notes ? `Additional Information: ${statusData.notes}\n` : ""}
+
+Message: ${getStatusMessage(statusData.newStatus)}
+
+View your order details: ${process.env.NEXT_PUBLIC_APP_URL}/customer/orders?orderId=${statusData.orderId}
+
+If you have any questions, please contact us at:
+Email: qualprodsllp@gmail.com
+Phone: +91 9071799966
+
+Thank you for choosing Ananthala!
+      `,
+    }
+
+    await transporter.sendMail(mailOptions)
+    console.log(`[v0] Order status update email sent to ${statusData.customerEmail}`)
+    return true
+  } catch (error) {
+    console.error(`[v0] Failed to send order status update email: ${error}`)
     return false
   }
 }

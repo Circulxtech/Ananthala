@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { jwtVerify } from "@/lib/jwt"
 import { connectDB } from "@/lib/mongodb"
 import Order from "@/models/order"
+import { sendOrderStatusUpdateEmail } from "@/lib/email-service"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -82,6 +83,26 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 })
+    }
+
+    // Send status update email if orderStatus was changed
+    if (orderStatus) {
+      try {
+        console.log(`[v0] Sending status update email for order ${order.orderId}`)
+        const emailSent = await sendOrderStatusUpdateEmail({
+          orderId: order.orderId,
+          customerName: order.customerName,
+          customerEmail: order.customerEmail,
+          newStatus: orderStatus,
+          trackingNumber: trackingNumber || order.trackingNumber,
+          notes: notes || undefined,
+          totalAmount: order.totalAmount,
+        })
+        console.log(`[v0] Status update email ${emailSent ? "sent" : "failed to send"} for order ${order.orderId}`)
+      } catch (emailError) {
+        console.error(`[v0] Error sending status update email: ${emailError}`)
+        // Don't fail the API call if email fails - order update is complete
+      }
     }
 
     return NextResponse.json({ order }, { status: 200 })
