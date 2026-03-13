@@ -22,6 +22,7 @@ import {
   Image,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 const googleSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -308,17 +309,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="hidden sm:block text-right">
-                  <div className="text-sm font-medium text-[#6D4530]">{getFirstName(admin.fullname)}</div>
-                  <div className="text-xs text-[#8B5A3C]/70">{admin.email}</div>
-                </div>
-                <div
-                  className={`w-10 h-10 rounded-full bg-gradient-to-br ${getGradientColor(admin.fullname)} flex items-center justify-center text-white font-semibold`}
-                >
-                  {getFirstName(admin.fullname).charAt(0).toUpperCase()}
-                </div>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-[#8B5A3C] hover:bg-[#8B5A3C]/10 transition-colors relative"
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-full bg-gradient-to-br ${getGradientColor(admin.fullname)} flex items-center justify-center text-white font-semibold cursor-pointer`}
+                    >
+                      {getFirstName(admin.fullname).charAt(0).toUpperCase()}
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5 text-sm text-[#6D4530]">
+                    <div className="font-semibold">{getFirstName(admin.fullname)}</div>
+                    <div className="text-xs text-[#8B5A3C]/70 truncate">{admin.email}</div>
+                  </div>
+                  <DropdownMenuItem asChild className="text-[#6D4530] cursor-pointer">
+                    <Link href="/admin/dashboard">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-[#6D4530] cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </header>
@@ -330,13 +351,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <nav className="p-4 space-y-1">
               {menuItems.map((item) => renderMenuItem(item, false))}
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#6D4530] hover:bg-red-50 hover:text-red-600 transition-all duration-200"
-              >
-                <LogOut className="h-5 w-5" />
-                <span className="font-medium">Logout</span>
-              </button>
             </nav>
           </aside>
 
@@ -349,13 +363,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               >
                 <nav className="p-4 space-y-1">
                   {menuItems.map((item) => renderMenuItem(item, true))}
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#6D4530] hover:bg-red-50 hover:text-red-600 transition-all duration-200"
-                  >
-                    <LogOut className="h-5 w-5" />
-                    <span className="font-medium">Logout</span>
-                  </button>
                 </nav>
               </aside>
             </>

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { LayoutDashboard, ShoppingCart, Heart, Package, Lock, UserIcon, Menu, X, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
 
 interface AuthenticatedUser {
@@ -130,17 +131,37 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                 <Image src="/logo.png" alt="Ananthala" width={170} height={68} className="h-14 w-auto" />
               </Link>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:block text-right">
-                <div className="text-sm font-medium text-foreground">{getFirstName(user.fullname)}</div>
-                <div className="text-xs text-foreground/70">{user.email}</div>
-              </div>
-              <div
-                className={`w-10 h-10 rounded-full bg-gradient-to-br ${getGradientColor(user.fullname)} flex items-center justify-center text-white font-semibold`}
-              >
-                {getFirstName(user.fullname).charAt(0).toUpperCase()}
-              </div>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-foreground hover:bg-[#EED9C4]/60 transition-colors relative"
+                >
+                  <div
+                    className={`w-10 h-10 rounded-full bg-gradient-to-br ${getGradientColor(user.fullname)} flex items-center justify-center text-white font-semibold cursor-pointer`}
+                  >
+                    {getFirstName(user.fullname).charAt(0).toUpperCase()}
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5 text-sm text-foreground">
+                  <div className="font-semibold">{getFirstName(user.fullname)}</div>
+                  <div className="text-xs text-foreground/70 truncate">{user.email}</div>
+                </div>
+                <DropdownMenuItem asChild className="text-foreground cursor-pointer">
+                  <Link href="/customer/dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout} className="text-foreground cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
@@ -170,13 +191,6 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                 </Link>
               )
             })}
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-red-50 hover:text-red-600 transition-all duration-200"
-            >
-              <LogOut className="h-5 w-5" />
-              <span className="font-medium">Logout</span>
-            </button>
           </nav>
         </aside>
 
@@ -208,13 +222,6 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                     </Link>
                   )
                 })}
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-red-50 hover:text-red-600 transition-all duration-200"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span className="font-medium">Logout</span>
-                </button>
               </nav>
             </aside>
           </>
