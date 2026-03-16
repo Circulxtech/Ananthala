@@ -1,4 +1,4 @@
-import { Header } from "@/components/layout/header"
+ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import Image from "next/image"
 import { Heart, Eye, Award, Leaf } from "lucide-react"
@@ -8,7 +8,7 @@ const values = [
     icon: Heart,
     title: "Customer_first",
     description:
-      "Your comfort,satisfaction are at the heartof everything we do.We listen,adapt and continuously improve to serve you better.",
+      "Your comfort, satisfaction are at the heartof everything we do.We listen,adapt and continuously improve to serve you better.",
   },
   {
     icon: Leaf,
