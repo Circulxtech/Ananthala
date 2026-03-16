@@ -4,6 +4,7 @@ import { useSimpleProduct } from "@/hooks/use-simple-product"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
 import Image from "next/image"
+import { MagnifyImage } from "@/components/product/MagnifyImage"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, Loader2, IndianRupee } from "lucide-react"
 
@@ -53,15 +54,12 @@ export function SimpleProductConfigurator({
       <div>
         {/* Main Image */}
         <div className="mb-4" style={{ backgroundColor: colors.bg50 }}>
-          <div className="relative w-full aspect-square">
-            <Image
-              src={product.images[selectedImage]}
-              alt={product.name}
-              fill
-              className="object-cover"
-              unoptimized
-            />
-          </div>
+          <MagnifyImage
+            src={product.images[selectedImage]}
+            alt={product.name}
+            className="w-full"
+            imgClassName="h-full"
+          />
         </div>
         
         {/* Thumbnail Gallery */}

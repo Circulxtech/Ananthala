@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import { MagnifyImage } from "@/components/product/MagnifyImage"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
@@ -237,14 +238,10 @@ export function KidsHamperConfigurator({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Side - Images */}
               <div className="space-y-4">
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={getProductImages("mattress")[selectedImageIndices.mattress] || "/productmattress.jpg"}
-                    alt="JOY Mattress"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                <MagnifyImage
+                  src={getProductImages("mattress")[selectedImageIndices.mattress] || "/productmattress.jpg"}
+                  alt="JOY Mattress"
+                />
                 
                 {/* Thumbnail Gallery */}
                 {getProductImages("mattress").length > 1 && (
@@ -378,14 +375,10 @@ export function KidsHamperConfigurator({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Side - Images */}
               <div className="space-y-4">
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={getProductImages("pillows")[selectedImageIndices.pillows] || "/pillow.jpg"}
-                    alt="JOY Pillows"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                <MagnifyImage
+                  src={getProductImages("pillows")[selectedImageIndices.pillows] || "/pillow.jpg"}
+                  alt="JOY Pillows"
+                />
                 
                 {/* Thumbnail Gallery */}
                 {getProductImages("pillows").length > 1 && (

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import { MagnifyImage } from "@/components/product/MagnifyImage"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
@@ -161,14 +162,10 @@ export function MattressConfigurator({
             {/* Left Side - Images */}
             <div className="space-y-4">
               {/* Main Image */}
-              <div className="relative aspect-square overflow-hidden">
-                <Image
-                  src={getProductImages()[selectedImageIndex] || "/productmattress.jpg"}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
+              <MagnifyImage
+                src={getProductImages()[selectedImageIndex] || "/productmattress.jpg"}
+                alt={product.name}
+              />
               
               {/* Thumbnail Gallery */}
               {getProductImages().length > 1 && (

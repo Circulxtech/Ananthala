@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useSimpleProduct } from "@/hooks/use-simple-product"
 import { useColorConfigurator } from "@/hooks/use-color-cofigurator"
-import { ColorAwareImage } from "@/components/product/ColorAwareImage"
+import { MagnifyImage } from "@/components/product/MagnifyImage"
+import { ColorAwareMagnifyImage } from "@/components/product/ColorAwareMagnifyImage"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
 import { fabricOptions } from "@/data/fabric"
@@ -66,29 +67,21 @@ export function IndividualBabyProductConfigurator({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
               {/* Main Product Image with Color Transformation */}
-              <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-50">
-                {showColorConfigurator && selectedFabricId ? (
-                  <ColorAwareImage
-                    src={product.images[selectedImage]}
-                    alt={product.name}
-                    fabricId={selectedFabricId}
-                    fill
-                    className="object-cover"
-                    priority
-                    unoptimized
-                    onColorApplied={setIsColorApplied}
-                  />
-                ) : (
-                  <Image
-                    src={product.images[selectedImage]}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    priority
-                    unoptimized
-                  />
-                )}
-              </div>
+              {showColorConfigurator && selectedFabricId ? (
+                <ColorAwareMagnifyImage
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  fabricId={selectedFabricId}
+                  className="rounded-lg bg-gray-50"
+                  onColorApplied={setIsColorApplied}
+                />
+              ) : (
+                <MagnifyImage
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  className="rounded-lg bg-gray-50"
+                />
+              )}
 
               {/* Thumbnail Gallery */}
               {product.images.length > 1 && (

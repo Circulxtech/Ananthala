@@ -12,7 +12,8 @@ import { fabricOptions } from "@/data/fabric"
 import { useColorConfigurator } from "@/hooks/use-color-cofigurator"
 import { usePatternConfigurator } from "@/hooks/use-pattern-configurator"
 import { getAllFabricPatterns } from "@/data/fabric-patterns"
-import { ColorAwareImage } from "@/components/product/ColorAwareImage"
+import { MagnifyImage } from "@/components/product/MagnifyImage"
+import { ColorAwareMagnifyImage } from "@/components/product/ColorAwareMagnifyImage"
 
 interface ApiProductVariant {
   weight: number
@@ -189,31 +190,23 @@ export function ProductConfigurator({
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
-              <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-50">
-                {showColorConfigurator && (colorFabricId || selectedPatternId !== "pattern-solid") ? (
-                  <ColorAwareImage
-                    src={productImages[selectedImageIndex] || "/placeholder.svg"}
-                    alt={product.name}
-                    fabricId={colorFabricId}
-                    patternId={selectedPatternId}
-                    fill
-                    className="object-cover"
-                    priority
-                    unoptimized
-                    onColorApplied={setIsColorApplied}
-                    onPatternApplied={setIsPatternApplied}
-                  />
-                ) : (
-                  <Image
-                    src={productImages[selectedImageIndex] || "/placeholder.svg"}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    priority
-                    unoptimized
-                  />
-                )}
-              </div>
+              {showColorConfigurator && (colorFabricId || selectedPatternId !== "pattern-solid") ? (
+                <ColorAwareMagnifyImage
+                  src={productImages[selectedImageIndex] || "/placeholder.svg"}
+                  alt={product.name}
+                  fabricId={colorFabricId}
+                  patternId={selectedPatternId}
+                  className="rounded-lg bg-gray-50"
+                  onColorApplied={setIsColorApplied}
+                  onPatternApplied={setIsPatternApplied}
+                />
+              ) : (
+                <MagnifyImage
+                  src={productImages[selectedImageIndex] || "/placeholder.svg"}
+                  alt={product.name}
+                  className="rounded-lg bg-gray-50"
+                />
+              )}
 
               {productImages.length > 1 && (
                 <div className="grid grid-cols-5 gap-2">

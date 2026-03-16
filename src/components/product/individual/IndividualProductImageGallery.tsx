@@ -4,6 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import type { ProductDetail } from "@/data/product-details"
+import { MagnifyImage } from "@/components/product/MagnifyImage"
 
 interface IndividualProductImageGalleryProps {
   product: ProductDetail
@@ -39,12 +40,11 @@ export function IndividualProductImageGallery({
     <div className="space-y-4">
       {/* Main Image */}
       <div className="relative aspect-square overflow-hidden rounded-lg">
-        <Image
+        <MagnifyImage
           src={currentImages[selectedImageIndex]}
           alt={product.name}
-          fill
-          className="object-cover"
-          priority
+          className="h-full w-full"
+          imgClassName="h-full"
         />
         
         {/* Navigation Arrows */}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
+import { MagnifyImage } from "@/components/product/MagnifyImage"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
@@ -342,14 +343,10 @@ export function BabyHamperConfigurator({
               {/* Left Side - Images */}
               <div className="space-y-4">
                 {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={getProductImages("mattress")[selectedImageIndices.mattress] || "/productmattress.jpg"}
-                    alt="JOY Mattress"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                <MagnifyImage
+                  src={getProductImages("mattress")[selectedImageIndices.mattress] || "/productmattress.jpg"}
+                  alt="JOY Mattress"
+                />
                 
                 {/* Thumbnail Gallery */}
                 {getProductImages("mattress").length > 1 && (
@@ -405,14 +402,10 @@ export function BabyHamperConfigurator({
               {/* Left Side - Images */}
               <div className="space-y-4">
                 {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={getProductImages("topper")[selectedImageIndices.topper] || "/topper.jpg"}
-                    alt="JOY Topper"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                <MagnifyImage
+                  src={getProductImages("topper")[selectedImageIndices.topper] || "/topper.jpg"}
+                  alt="JOY Topper"
+                />
                 
                 {/* Thumbnail Gallery */}
                 {getProductImages("topper").length > 1 && (
@@ -466,14 +459,10 @@ export function BabyHamperConfigurator({
               {/* Left Side - Images */}
               <div className="space-y-4">
                 {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={getProductImages("lounger")[selectedImageIndices.lounger] || "/lounger.jpg"}
-                    alt="JOY Lounger"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                <MagnifyImage
+                  src={getProductImages("lounger")[selectedImageIndices.lounger] || "/lounger.jpg"}
+                  alt="JOY Lounger"
+                />
                 
                 {/* Thumbnail Gallery */}
                 {getProductImages("lounger").length > 1 && (
@@ -527,14 +516,10 @@ export function BabyHamperConfigurator({
               {/* Left Side - Images */}
               <div className="space-y-4">
                 {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={getProductImages("head-pillow")[selectedImageIndices["head-pillow"]] || "/pillow.jpg"}
-                    alt="JOY Head Pillow"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                <MagnifyImage
+                  src={getProductImages("head-pillow")[selectedImageIndices["head-pillow"]] || "/pillow.jpg"}
+                  alt="JOY Head Pillow"
+                />
                 
                 {/* Thumbnail Gallery */}
                 {getProductImages("head-pillow").length > 1 && (
@@ -588,14 +573,10 @@ export function BabyHamperConfigurator({
               {/* Left Side - Images */}
               <div className="space-y-4">
                 {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={getProductImages("pillow-bumpers")[selectedImageIndices["pillow-bumpers"]] || "/bumpers.jpg"}
-                    alt="JOY Pillow Bumpers"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                <MagnifyImage
+                  src={getProductImages("pillow-bumpers")[selectedImageIndices["pillow-bumpers"]] || "/bumpers.jpg"}
+                  alt="JOY Pillow Bumpers"
+                />
                 
                 {/* Thumbnail Gallery */}
                 {getProductImages("pillow-bumpers").length > 1 && (
