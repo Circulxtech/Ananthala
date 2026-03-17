@@ -75,7 +75,7 @@ const testimonialVideos: TestimonialVideo[] = [
 
 interface KidsHamperProductTemplateProps {
   product: ProductDetail
-  productId: number
+  productId?: number
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
@@ -352,7 +352,7 @@ export function KidsHamperProductTemplate({
       </section>
 
       {/* What Our Customers Also Bought Section */}
-      <CustomersAlsoBought currentProductId={productId} />
+      {typeof productId === "number" && <CustomersAlsoBought currentProductId={productId} />}
 
       {/* Customer Testimonials Video Carousel Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">

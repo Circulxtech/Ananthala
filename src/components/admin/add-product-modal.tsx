@@ -9,7 +9,13 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import type { ProductFormData, ProductVariant, ProductDetailSectionInput } from "@/types/product"
+import type {
+  ProductFormData,
+  ProductVariant,
+  ProductDetailSectionInput,
+  HamperItemInput,
+  HamperItemVariantInput,
+} from "@/types/product"
 import { fabricOptions } from "@/data/fabric"
 import { toast } from "@/hooks/use-toast"
 
@@ -30,6 +36,7 @@ interface ProductImage {
 
 interface EditableProduct {
   _id: string
+  productType?: "single" | "hamper"
   productTitle: string
   description: string
   units: string
@@ -39,6 +46,8 @@ interface EditableProduct {
   category: string
   subCategory?: string
   imageUrls: string[]
+  hamperPrice?: number
+  hamperFabric?: string
   variants: Array<{
     variantId?: string
     weight: number
@@ -61,9 +70,23 @@ interface EditableProduct {
     imageAlt?: string
     imagePosition?: "left" | "right"
   }>
+  hamperItems?: Array<{
+    name?: string
+    imageUrls?: string[]
+    variants?: Array<{
+      weight?: number
+      length?: number
+      width?: number
+      height?: number
+      fabric?: string
+      price?: number
+      stock?: number
+    }>
+  }>
 }
 
 const createEmptyFormData = (): ProductFormData => ({
+    productType: "single",
     productTitle: "",
     description: "",
     units: "",
@@ -72,6 +95,8 @@ const createEmptyFormData = (): ProductFormData => ({
     location: "",
     category: "",
     subCategory: "", // Will be removed from form, kept for backward compatibility
+    hamperPrice: "",
+    hamperFabric: "",
     variants: [
       {
         id: crypto.randomUUID(),
@@ -85,6 +110,7 @@ const createEmptyFormData = (): ProductFormData => ({
       },
     ],
     detailSections: [],
+    hamperItems: [],
   })
 
 export default function AddProductModal({
@@ -106,11 +132,12 @@ export default function AddProductModal({
     if (!files) return
 
     const newImages: ProductImage[] = []
+    const maxImages = formData.productType === "hamper" ? 1 : 6
 
     Array.from(files).forEach((file) => {
       // Check if we've reached the max limit
-      if (productImages.length + newImages.length >= 6) {
-        alert("Maximum 6 images allowed")
+      if (productImages.length + newImages.length >= maxImages) {
+        alert(`Maximum ${maxImages} image${maxImages === 1 ? "" : "s"} allowed`)
         return
       }
 
@@ -185,6 +212,66 @@ export default function AddProductModal({
     }))
   }
 
+  const handleHamperItemChange = (itemId: string, field: keyof HamperItemInput, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      hamperItems: prev.hamperItems.map((item) => (item.id === itemId ? { ...item, [field]: value } : item)),
+    }))
+  }
+
+  const handleHamperItemVariantChange = (
+    itemId: string,
+    variantId: string,
+    field: keyof HamperItemVariantInput,
+    value: string,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      hamperItems: prev.hamperItems.map((item) => {
+        if (item.id !== itemId) return item
+        const nextVariants = (item.variants || []).map((variant) =>
+          variant.id === variantId ? { ...variant, [field]: value } : variant,
+        )
+        return { ...item, variants: nextVariants }
+      }),
+    }))
+  }
+
+  const handleHamperItemImageChange = (itemId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    const nextFiles = Array.from(files).filter((file) => {
+      if (file.size > 25 * 1024 * 1024) {
+        alert(`File ${file.name} size exceeds 25 MB`)
+        return false
+      }
+      return true
+    })
+
+    setFormData((prev) => ({
+      ...prev,
+      hamperItems: prev.hamperItems.map((item) => {
+        if (item.id !== itemId) return item
+        const existingFiles = item.imageFiles || []
+        const existingPreviews = item.imagePreviews || []
+        const existingUrls = item.imageUrls || []
+        const availableSlots = Math.max(0, 6 - (existingFiles.length + existingUrls.length))
+        const filesToAdd = nextFiles.slice(0, availableSlots)
+        const previewsToAdd = filesToAdd.map((file) => URL.createObjectURL(file))
+
+        return {
+          ...item,
+          imageFiles: [...existingFiles, ...filesToAdd],
+          imagePreviews: [...existingPreviews, ...previewsToAdd],
+        }
+      }),
+    }))
+
+    // Reset input so picking the same file again triggers onChange
+    e.target.value = ""
+  }
+
   const addVariant = () => {
     setFormData((prev) => ({
       ...prev,
@@ -223,6 +310,68 @@ export default function AddProductModal({
     }))
   }
 
+  const addHamperItem = () => {
+    setFormData((prev) => ({
+      ...prev,
+      hamperItems: [
+        ...prev.hamperItems,
+        {
+          id: crypto.randomUUID(),
+          name: "",
+          imageUrls: [],
+          imageFiles: [],
+          imagePreviews: [],
+          variants: [
+            {
+              id: crypto.randomUUID(),
+              weight: "",
+              length: "",
+              width: "",
+              height: "",
+              stock: "",
+            },
+          ],
+        },
+      ],
+    }))
+  }
+
+  const addHamperItemVariant = (itemId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      hamperItems: prev.hamperItems.map((item) => {
+        if (item.id !== itemId) return item
+        const nextVariants = [
+          ...(item.variants || []),
+          {
+            id: crypto.randomUUID(),
+            weight: "",
+            length: "",
+            width: "",
+            height: "",
+            stock: "",
+          },
+        ]
+        return { ...item, variants: nextVariants }
+      }),
+    }))
+  }
+
+  const removeHamperItemVariant = (itemId: string, variantId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      hamperItems: prev.hamperItems.map((item) => {
+        if (item.id !== itemId) return item
+        if ((item.variants || []).length <= 1) {
+          alert("At least one variant is required for each hamper item")
+          return item
+        }
+        const nextVariants = (item.variants || []).filter((variant) => variant.id !== variantId)
+        return { ...item, variants: nextVariants }
+      }),
+    }))
+  }
+
   const removeVariant = (variantId: string) => {
     if (formData.variants.length === 1) {
       alert("At least one variant is required")
@@ -246,12 +395,30 @@ export default function AddProductModal({
     }))
   }
 
+  const removeHamperItem = (itemId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      hamperItems: prev.hamperItems.filter((item) => {
+        if (item.id === itemId && item.imagePreviews) {
+          item.imagePreviews.forEach((preview) => URL.revokeObjectURL(preview))
+        }
+        return item.id !== itemId
+      }),
+    }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setSubmitError(null)
 
-    if (productImages.length === 0) {
+    if (formData.productType === "hamper" && formData.hamperItems.length === 0) {
+      setSubmitError("Please add at least one hamper item")
+      setIsSubmitting(false)
+      return
+    }
+
+    if (formData.productType === "single" && productImages.length === 0) {
       setSubmitError("Please upload at least one product image")
       setIsSubmitting(false)
       return
@@ -273,6 +440,31 @@ export default function AddProductModal({
         })
         .filter((section) => section.title || section.body || section.imageUrl || section.imageKey)
 
+      const cleanedHamperItems = formData.hamperItems
+        .map((item) => {
+          const imageKeys = (item.imageFiles || []).map((_, index) => `hamperItemImage_${item.id}_${index}`)
+          return {
+            name: item.name.trim(),
+            imageUrls: item.imageUrls || [],
+            imageKeys,
+            variants: (item.variants || []).map((variant) => ({
+              weight: variant.weight,
+              length: variant.length,
+              width: variant.width,
+              height: variant.height,
+              stock: variant.stock,
+            })),
+          }
+        })
+        .filter(
+          (item) =>
+            item.name ||
+            (item.imageUrls && item.imageUrls.length > 0) ||
+            (item.imageKeys && item.imageKeys.length > 0) ||
+            (item.variants && item.variants.length > 0),
+        )
+
+      formDataToSend.append("productType", formData.productType)
       formDataToSend.append("productTitle", formData.productTitle)
       formDataToSend.append("description", formData.description)
       formDataToSend.append("units", formData.units)
@@ -281,15 +473,16 @@ export default function AddProductModal({
       formDataToSend.append("location", formData.location)
       formDataToSend.append("category", formData.category)
       formDataToSend.append("subCategory", formData.subCategory)
+      if (formData.productType === "hamper") {
+        formDataToSend.append("hamperPrice", String(formData.hamperPrice || ""))
+        formDataToSend.append("hamperFabric", String(formData.hamperFabric || ""))
+      }
       formDataToSend.append("detailSections", JSON.stringify(cleanedDetailSections))
-      formDataToSend.append(
-        "existingImageUrls",
-        JSON.stringify(
-          productImages
-            .map((img) => img.existingUrl)
-            .filter((url): url is string => typeof url === "string" && !!url.trim()),
-        ),
-      )
+      formDataToSend.append("hamperItems", JSON.stringify(cleanedHamperItems))
+      const existingImageUrls = productImages
+        .map((img) => img.existingUrl)
+        .filter((url): url is string => typeof url === "string" && !!url.trim())
+      formDataToSend.append("existingImageUrls", JSON.stringify(existingImageUrls))
       formData.detailSections.forEach((section) => {
         if (section.imageFile) {
           const imageKey = `detailSectionImage_${section.id}`
@@ -297,12 +490,22 @@ export default function AddProductModal({
         }
       })
 
-      formDataToSend.append("variants", JSON.stringify(formData.variants))
+      formData.hamperItems.forEach((item) => {
+        if (!item.imageFiles || item.imageFiles.length === 0) return
+        item.imageFiles.forEach((file, index) => {
+          const imageKey = `hamperItemImage_${item.id}_${index}`
+          formDataToSend.append(imageKey, file)
+        })
+      })
 
+      const variantsToSend = formData.productType === "hamper" ? [] : formData.variants
+      formDataToSend.append("variants", JSON.stringify(variantsToSend))
+
+      // For hampers, we use a single cover image (image_0). For singles, up to 6 images (image_0..image_5).
       productImages.forEach((image, index) => {
-        if (image.file) {
-          formDataToSend.append(`image_${index}`, image.file)
-        }
+        if (!image.file) return
+        if (formData.productType === "hamper" && index > 0) return
+        formDataToSend.append(`image_${index}`, image.file)
       })
 
       console.log(
@@ -361,6 +564,11 @@ export default function AddProductModal({
         URL.revokeObjectURL(section.imagePreview)
       }
     })
+    formData.hamperItems.forEach((item) => {
+      if (item.imagePreviews && item.imagePreviews.length > 0) {
+        item.imagePreviews.forEach((preview) => URL.revokeObjectURL(preview))
+      }
+    })
     productImages.forEach((image) => {
       if (image.file && image.preview) {
         URL.revokeObjectURL(image.preview)
@@ -399,6 +607,7 @@ export default function AddProductModal({
     })
 
     setFormData({
+      productType: productToEdit.productType === "hamper" ? "hamper" : "single",
       productTitle: productToEdit.productTitle || "",
       description: productToEdit.description || "",
       units: productToEdit.units || "",
@@ -407,6 +616,8 @@ export default function AddProductModal({
       location: productToEdit.location || "",
       category: productToEdit.category || "",
       subCategory: productToEdit.subCategory || "",
+      hamperPrice: productToEdit.productType === "hamper" ? String(productToEdit.hamperPrice ?? "") : "",
+      hamperFabric: productToEdit.productType === "hamper" ? String(productToEdit.hamperFabric ?? "") : "",
       variants:
         mappedVariants.length > 0
           ? mappedVariants
@@ -432,6 +643,21 @@ export default function AddProductModal({
         imageFile: null,
         imagePreview: section.imageUrl || "",
       })),
+      hamperItems: (productToEdit.hamperItems || []).map((item) => ({
+        id: crypto.randomUUID(),
+        name: item.name || "",
+        imageUrls: item.imageUrls || [],
+        imageFiles: [],
+        imagePreviews: [],
+        variants: (item.variants || []).map((variant) => ({
+          id: crypto.randomUUID(),
+          weight: String(variant.weight ?? ""),
+          length: String(variant.length ?? ""),
+          width: String(variant.width ?? ""),
+          height: String(variant.height ?? ""),
+          stock: String(variant.stock ?? ""),
+        })),
+      })),
     })
 
     setProductImages(
@@ -443,6 +669,13 @@ export default function AddProductModal({
     )
     setSubmitError(null)
   }, [isOpen, isEditMode, productToEdit])
+
+  useEffect(() => {
+    if (formData.productType !== "hamper") return
+    // Keep a single cover image for hampers (if any); remove extras.
+    if (productImages.length <= 1) return
+    setProductImages((prev) => prev.slice(0, 1))
+  }, [formData.productType, productImages.length])
 
   return (
     <Dialog
@@ -463,7 +696,7 @@ export default function AddProductModal({
 
         {/* Important Notice */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 flex gap-2 sm:gap-3">
-          <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 shrink-0 mt-0.5" />
           <div className="text-xs sm:text-sm text-blue-900">
             <strong>Important!</strong> Please verify the seller detail address that you used in your profile
             management. (Products are linked to your seller account through the email)
@@ -473,7 +706,7 @@ export default function AddProductModal({
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 font-roboto">
           {submitError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 flex gap-2 sm:gap-3">
-              <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 shrink-0 mt-0.5" />
               <div className="text-xs sm:text-sm text-red-900">{submitError}</div>
             </div>
           )}
@@ -527,62 +760,127 @@ export default function AddProductModal({
                   required
                 />
               </div>
-            </div>
 
-            {/* Product Images */}
-            <div className="space-y-4 sm:space-y-5">
-              <div className="flex items-center justify-between border-b border-[#D9CFC7] pb-2">
-                <h3 className="text-base sm:text-lg font-semibold text-[#6D4530]">Product Images</h3>
-                <span className="text-xs sm:text-sm text-[#8B5A3C]/70">{productImages.length}/6 images</span>
+              <div className="space-y-2">
+                <Label htmlFor="productType" className="text-sm sm:text-base text-[#6D4530]">
+                  Product Type*
+                </Label>
+                <Select value={formData.productType} onValueChange={(value) => handleInputChange("productType", value)}>
+                  <SelectTrigger id="productType" className="border-[#D9CFC7] h-11 sm:h-12">
+                    <SelectValue placeholder="Select product type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="single">Single</SelectItem>
+                    <SelectItem value="hamper">Hamper (Bundle)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                {productImages.length < 6 && (
-                  <label
-                    htmlFor="imageUpload"
-                    className="border-2 border-dashed border-[#D9CFC7] rounded-lg aspect-square flex flex-col items-center justify-center cursor-pointer hover:border-[#8B5A3C] hover:bg-[#F5F1ED]/50 transition-colors"
-                  >
-                    <Upload className="h-6 w-6 sm:h-8 sm:w-8 text-[#8B5A3C]/50 mb-2" />
-                    <p className="text-[10px] sm:text-xs font-medium text-[#8B5A3C] text-center px-1">
-                      Click to Upload
-                    </p>
-                    <p className="text-[9px] sm:text-[10px] text-[#8B5A3C]/70 mt-1">(Max 25 Mb)</p>
-                    <input
-                      id="imageUpload"
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={handleImageUpload}
+              {formData.productType === "hamper" && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="hamperPrice" className="text-sm sm:text-base text-[#6D4530]">
+                      Hamper Price (₹)*
+                    </Label>
+                    <Input
+                      id="hamperPrice"
+                      type="number"
+                      step="0.01"
+                      placeholder="Enter total hamper price"
+                      value={formData.hamperPrice || ""}
+                      onChange={(e) => handleInputChange("hamperPrice", e.target.value)}
+                      className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
+                      required
                     />
-                  </label>
-                )}
-
-                {productImages.map((image) => (
-                  <div key={image.id} className="relative aspect-square group">
-                    <img
-                      src={image.preview || "/placeholder.svg"}
-                      alt="Product preview"
-                      className="w-full h-full object-cover rounded-lg border border-[#D9CFC7]"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImage(image.id)}
-                      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 sm:p-1.5 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                      aria-label="Remove image"
-                    >
-                      <X className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </button>
                   </div>
-                ))}
-              </div>
 
-              {productImages.length === 0 && (
-                <p className="text-xs text-[#8B5A3C]/70 text-center mt-2">
-                  Add up to 6 product images. Click the upload box above to select images.
-                </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="hamperFabric" className="text-sm sm:text-base text-[#6D4530]">
+                      Hamper Fabric*
+                    </Label>
+                    <Select
+                      value={formData.hamperFabric || ""}
+                      onValueChange={(value) => handleInputChange("hamperFabric", value)}
+                    >
+                      <SelectTrigger id="hamperFabric" className="border-[#D9CFC7] h-11 sm:h-12">
+                        <SelectValue placeholder="Select fabric" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border-[#D9CFC7]">
+                        {fabricOptions.map((fabric) => (
+                          <SelectItem key={fabric.id} value={fabric.id} className="flex items-center gap-2">
+                            <div className="flex items-center gap-2">
+                              <img
+                                src={fabric.image || "/placeholder.svg"}
+                                alt={fabric.name}
+                                className="h-4 w-4 rounded object-cover"
+                              />
+                              <span>{fabric.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               )}
             </div>
+
+            {/* Product Images / Hamper Cover Image */}
+            {(formData.productType === "single" || formData.productType === "hamper") && (
+              <div className="space-y-4 sm:space-y-5">
+                <div className="flex items-center justify-between border-b border-[#D9CFC7] pb-2">
+                  <h3 className="text-base sm:text-lg font-semibold text-[#6D4530]">
+                    {formData.productType === "hamper" ? "Hamper Cover Image" : "Product Images"}
+                  </h3>
+                  <span className="text-xs sm:text-sm text-[#8B5A3C]/70">
+                    {productImages.length}/{formData.productType === "hamper" ? 1 : 6} images
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                  {productImages.length < (formData.productType === "hamper" ? 1 : 6) && (
+                    <label
+                      htmlFor="imageUpload"
+                      className="border-2 border-dashed border-[#D9CFC7] rounded-lg aspect-square flex flex-col items-center justify-center cursor-pointer hover:border-[#8B5A3C] hover:bg-[#F5F1ED]/50 transition-colors"
+                    >
+                      <Upload className="h-6 w-6 sm:h-8 sm:w-8 text-[#8B5A3C]/50 mb-2" />
+                      <p className="text-[10px] sm:text-xs font-medium text-[#8B5A3C] text-center px-1">
+                        Click to Upload
+                      </p>
+                      <p className="text-[9px] sm:text-[10px] text-[#8B5A3C]/70 mt-1">(Max 25 Mb)</p>
+                      <input
+                        id="imageUpload"
+                        type="file"
+                        accept="image/*"
+                        multiple={formData.productType !== "hamper"}
+                        className="hidden"
+                        onChange={handleImageUpload}
+                      />
+                    </label>
+                  )}
+
+                  {productImages.map((image) => (
+                    <div key={image.id} className="relative aspect-square group">
+                      <img
+                        src={image.preview || "/placeholder.svg"}
+                        alt="Product preview"
+                        className="w-full h-full object-cover rounded-lg border border-[#D9CFC7]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(image.id)}
+                        className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 sm:p-1.5 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        aria-label="Remove image"
+                      >
+                        <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                
+              </div>
+            )}
           </div>
 
           {/* Detail Sections */}
@@ -718,7 +1016,325 @@ export default function AddProductModal({
             )}
           </div>
 
+          {/* Hamper Items */}
+          {formData.productType === "hamper" && (
+            <div className="space-y-4 sm:space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#D9CFC7] pb-2">
+                <div>
+                  <h3 className="text-base sm:text-lg font-semibold text-[#6D4530]">Hamper Items</h3>
+                  <p className="text-xs sm:text-sm text-[#8B5A3C]/70">Add the items included in this hamper</p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={addHamperItem}
+                  className="bg-[#6D4530] hover:bg-[#8B5A3C] text-white w-full sm:w-auto"
+                  size="sm"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Item
+                </Button>
+              </div>
+
+              {formData.hamperItems.length === 0 ? (
+                <div className="border border-dashed border-[#D9CFC7] rounded-lg p-6 text-center text-sm text-[#8B5A3C]/70">
+                  No hamper items yet. Click "Add Item" to include products in this hamper.
+                </div>
+              ) : (
+                <div className="space-y-4 sm:space-y-5">
+                  {formData.hamperItems.map((item, index) => (
+                    <div
+                      key={item.id}
+                      className="border border-[#D9CFC7] rounded-lg p-4 sm:p-5 space-y-4 bg-[#F5F1ED]/30"
+                    >
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm sm:text-base font-semibold text-[#6D4530]">Item {index + 1}</h4>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeHamperItem(item.id)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          <span className="hidden sm:inline">Remove</span>
+                        </Button>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`hamper-name-${item.id}`} className="text-sm text-[#6D4530]">
+                            Item Name*
+                          </Label>
+                          <Input
+                            id={`hamper-name-${item.id}`}
+                            placeholder="e.g., Baby Shampoo"
+                            value={item.name}
+                            onChange={(e) => handleHamperItemChange(item.id, "name", e.target.value)}
+                            className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-sm text-[#6D4530]">Variant Options*</Label>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => addHamperItemVariant(item.id)}
+                            className="text-[#6D4530] hover:bg-[#F5F1ED]"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Variant
+                          </Button>
+                        </div>
+
+                        {(item.variants || []).length === 0 ? (
+                          <div className="border border-dashed border-[#D9CFC7] rounded-lg p-4 text-center text-xs text-[#8B5A3C]/70">
+                            Add at least one variant option for this hamper item.
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {(item.variants || []).map((variant, variantIndex) => (
+                              <div
+                                key={variant.id}
+                                className="border border-[#D9CFC7] rounded-lg p-3 bg-white space-y-3"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <p className="text-xs font-semibold text-[#6D4530]">
+                                    Variant {variantIndex + 1}
+                                  </p>
+                                  {(item.variants || []).length > 1 && (
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => removeHamperItemVariant(item.id, variant.id)}
+                                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-1" />
+                                      Remove
+                                    </Button>
+                                  )}
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                  <div className="space-y-2">
+                                    <Label
+                                      htmlFor={`hamper-variant-weight-${variant.id}`}
+                                      className="text-xs text-[#6D4530]"
+                                    >
+                                      Weight (kg)*
+                                    </Label>
+                                    <Input
+                                      id={`hamper-variant-weight-${variant.id}`}
+                                      type="number"
+                                      step="0.01"
+                                      placeholder="e.g., 2.5"
+                                      value={variant.weight}
+                                      onChange={(e) =>
+                                        handleHamperItemVariantChange(item.id, variant.id, "weight", e.target.value)
+                                      }
+                                      className="h-10 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-sm font-semibold"
+                                      required
+                                    />
+                                  </div>
+
+                                  <div className="space-y-2">
+                                    <Label
+                                      htmlFor={`hamper-variant-length-${variant.id}`}
+                                      className="text-xs text-[#6D4530]"
+                                    >
+                                      Length (cm)*
+                                    </Label>
+                                    <Input
+                                      id={`hamper-variant-length-${variant.id}`}
+                                      type="number"
+                                      step="0.1"
+                                      value={variant.length}
+                                      onChange={(e) =>
+                                        handleHamperItemVariantChange(item.id, variant.id, "length", e.target.value)
+                                      }
+                                      className="h-10 bg-white border-[#D9CFC7] text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-sm font-semibold"
+                                      required
+                                    />
+                                  </div>
+
+                                  <div className="space-y-2">
+                                    <Label
+                                      htmlFor={`hamper-variant-width-${variant.id}`}
+                                      className="text-xs text-[#6D4530]"
+                                    >
+                                      Width (cm)*
+                                    </Label>
+                                    <Input
+                                      id={`hamper-variant-width-${variant.id}`}
+                                      type="number"
+                                      step="0.1"
+                                      value={variant.width}
+                                      onChange={(e) =>
+                                        handleHamperItemVariantChange(item.id, variant.id, "width", e.target.value)
+                                      }
+                                      className="h-10 bg-white border-[#D9CFC7] text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-sm font-semibold"
+                                      required
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                  <div className="space-y-2">
+                                    <Label
+                                      htmlFor={`hamper-variant-height-${variant.id}`}
+                                      className="text-xs text-[#6D4530]"
+                                    >
+                                      Height (cm)*
+                                    </Label>
+                                    <Input
+                                      id={`hamper-variant-height-${variant.id}`}
+                                      type="number"
+                                      step="0.1"
+                                      value={variant.height}
+                                      onChange={(e) =>
+                                        handleHamperItemVariantChange(item.id, variant.id, "height", e.target.value)
+                                      }
+                                      className="h-10 bg-white border-[#D9CFC7] text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-sm font-semibold"
+                                      required
+                                    />
+                                  </div>
+
+                                  <div className="space-y-2">
+                                    {/* Fabric and price are product-level for hampers */}
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                  <div className="space-y-2">
+                                    <Label
+                                      htmlFor={`hamper-variant-stock-${variant.id}`}
+                                      className="text-xs text-[#6D4530]"
+                                    >
+                                      Stock*
+                                    </Label>
+                                    <Input
+                                      id={`hamper-variant-stock-${variant.id}`}
+                                      type="number"
+                                      placeholder="e.g., 50"
+                                      value={variant.stock}
+                                      onChange={(e) =>
+                                        handleHamperItemVariantChange(item.id, variant.id, "stock", e.target.value)
+                                      }
+                                      className="h-10 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-sm font-semibold"
+                                      required
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor={`hamper-image-${item.id}`} className="text-sm text-[#6D4530]">
+                            Item Images*
+                          </Label>
+                          <span className="text-xs text-[#8B5A3C]/70">
+                            {(item.imageUrls?.length || 0) + (item.imageFiles?.length || 0)}/6
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {(item.imageFiles?.length || 0) + (item.imageUrls?.length || 0) < 6 && (
+                            <label
+                              htmlFor={`hamper-image-${item.id}`}
+                              className="border-2 border-dashed border-[#D9CFC7] rounded-lg aspect-square flex flex-col items-center justify-center cursor-pointer hover:border-[#8B5A3C] hover:bg-[#F5F1ED]/50 transition-colors"
+                            >
+                              <Upload className="h-6 w-6 sm:h-8 sm:w-8 text-[#8B5A3C]/50 mb-2" />
+                              <p className="text-[10px] sm:text-xs font-medium text-[#8B5A3C] text-center px-1">
+                                Click to Upload
+                              </p>
+                              <p className="text-[9px] sm:text-[10px] text-[#8B5A3C]/70 mt-1">(Max 25 Mb)</p>
+                              <input
+                                id={`hamper-image-${item.id}`}
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                className="hidden"
+                                onChange={(e) => handleHamperItemImageChange(item.id, e)}
+                              />
+                            </label>
+                          )}
+
+                          {(item.imageUrls || []).map((url, imageIndex) => (
+                            <div key={`${item.id}-existing-${imageIndex}`} className="relative aspect-square group">
+                              <img
+                                src={url || "/placeholder.svg"}
+                                alt={item.name || "Hamper item"}
+                                className="w-full h-full object-cover rounded-lg border border-[#D9CFC7]"
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    hamperItems: prev.hamperItems.map((entry) => {
+                                      if (entry.id !== item.id) return entry
+                                      const nextUrls = (entry.imageUrls || []).filter((_, idx) => idx !== imageIndex)
+                                      return { ...entry, imageUrls: nextUrls }
+                                    }),
+                                  }))
+                                }
+                                className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                aria-label="Remove image"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+
+                          {(item.imagePreviews || []).map((preview, imageIndex) => (
+                            <div key={`${item.id}-preview-${imageIndex}`} className="relative aspect-square group">
+                              <img
+                                src={preview}
+                                alt={item.name || "Hamper item"}
+                                className="w-full h-full object-cover rounded-lg border border-[#D9CFC7]"
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    hamperItems: prev.hamperItems.map((entry) => {
+                                      if (entry.id !== item.id) return entry
+                                      const nextFiles = (entry.imageFiles || []).filter((_, idx) => idx !== imageIndex)
+                                      const nextPreviews = (entry.imagePreviews || []).filter((_, idx) => idx !== imageIndex)
+                                      if (entry.imagePreviews?.[imageIndex]) {
+                                        URL.revokeObjectURL(entry.imagePreviews[imageIndex]!)
+                                      }
+                                      return { ...entry, imageFiles: nextFiles, imagePreviews: nextPreviews }
+                                    }),
+                                  }))
+                                }
+                                className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                aria-label="Remove image"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Product Variants */}
+          {formData.productType === "single" && (
           <div className="space-y-4 sm:space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#D9CFC7] pb-2">
               <div>
@@ -841,7 +1457,7 @@ export default function AddProductModal({
                                 <img
                                   src={fabric.image || "/placeholder.svg"}
                                   alt={fabric.name}
-                                  className="h-6 w-6 rounded object-cover"
+                                  className="h-4 w-4 rounded object-cover"
                                 />
                                 <span>{fabric.name}</span>
                               </div>
@@ -895,6 +1511,7 @@ export default function AddProductModal({
               ))}
             </div>
           </div>
+          )}
 
           {/* Seller Information */}
           <div className="space-y-4 sm:space-y-5">

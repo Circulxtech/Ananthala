@@ -8,9 +8,11 @@ import AddProductModal from "@/components/admin/add-product-modal"
 
 interface Product {
   _id: string
+  productType?: "single" | "hamper"
   productTitle: string
   category: string
   subCategory: string
+  hamperPrice?: number
   variants: Array<{
     variantId: string
     weight: number
@@ -21,6 +23,17 @@ interface Product {
     }
     price: number
     stock: number
+  }>
+  hamperItems?: Array<{
+    name?: string
+    imageUrls?: string[]
+    variants?: Array<{
+      weight?: number
+      length?: number
+      width?: number
+      height?: number
+      stock?: number
+    }>
   }>
   imageUrls: string[]
   detailSections?: Array<{
@@ -127,9 +140,23 @@ export default function ProductManagementPage() {
   }, [selectedCategory])
 
   const getProductStats = (product: Product) => {
+    const isHamper = product.productType === "hamper"
+    if (isHamper) {
+      const hamperItems = Array.isArray(product.hamperItems) ? product.hamperItems : []
+      const variantsCount = hamperItems.reduce((sum, item) => sum + ((item.variants || []).length || 0), 0)
+      const totalStock = hamperItems.reduce(
+        (sum, item) =>
+          sum + (item.variants || []).reduce((innerSum, v) => innerSum + (Number(v.stock) || 0), 0),
+        0,
+      )
+      const basePrice = Number(product.hamperPrice) || 0
+      return { totalStock, basePrice, variantsCount }
+    }
+
+    const variantsCount = product.variants.length
     const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0)
     const basePrice = product.variants.length > 0 ? product.variants[0].price : 0
-    return { totalStock, basePrice }
+    return { totalStock, basePrice, variantsCount }
   }
 
   if (isLoading) {
@@ -209,7 +236,7 @@ export default function ProductManagementPage() {
             </thead>
             <tbody>
               {paginatedProducts.map((product) => {
-                const { totalStock, basePrice } = getProductStats(product)
+                const { totalStock, basePrice, variantsCount } = getProductStats(product)
                 return (
                   <tr key={product._id} className="border-b border-[#D9CFC7] hover:bg-[#F5F1ED]/50">
                     <td className="py-4 px-4">
@@ -228,7 +255,7 @@ export default function ProductManagementPage() {
                         )}
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-[#4A2F1F] font-medium">{product.variants.length}</td>
+                    <td className="py-4 px-4 text-[#4A2F1F] font-medium">{variantsCount}</td>
                     <td className="py-4 px-4 text-[#4A2F1F] font-medium">{totalStock}</td>
                     <td className="py-4 px-4 text-[#4A2F1F] font-semibold">₹{basePrice.toLocaleString()}</td>
                     <td className="py-4 px-4">
@@ -259,7 +286,7 @@ export default function ProductManagementPage() {
         {/* Mobile/Tablet Card View */}
         <div className="lg:hidden space-y-4">
           {paginatedProducts.map((product) => {
-            const { totalStock, basePrice } = getProductStats(product)
+            const { totalStock, basePrice, variantsCount } = getProductStats(product)
             return (
               <div key={product._id} className="border border-[#D9CFC7] rounded-lg p-4 space-y-3">
                 <div className="flex gap-3">
@@ -271,7 +298,7 @@ export default function ProductManagementPage() {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-[#4A2F1F] truncate">{product.productTitle}</h3>
                     <p className="text-sm text-[#6D4530] font-medium capitalize">{product.category}</p>
-                    <p className="text-sm text-[#6D4530]">{product.variants.length} variants</p>
+                    <p className="text-sm text-[#6D4530]">{variantsCount} variants</p>
                   </div>
                 </div>
 

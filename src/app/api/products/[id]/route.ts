@@ -6,6 +6,11 @@ import mongoose from "mongoose"
 
 export const runtime = "nodejs"
 
+function isFileLike(value: unknown): value is File {
+  if (!value || typeof value !== "object") return false
+  return typeof (value as any).arrayBuffer === "function"
+}
+
 // Helper function to validate MongoDB ObjectId
 function isValidObjectId(id: string): boolean {
   return mongoose.Types.ObjectId.isValid(id)
@@ -70,8 +75,12 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     }
 
     // Delete associated images from Vercel Blob
-    console.log(`[v0] Deleting ${product.imageUrls.length} images from Vercel Blob...`)
-    for (const imageUrl of product.imageUrls) {
+    const hamperImageUrls = Array.isArray(product.hamperItems)
+      ? product.hamperItems.flatMap((item: any) => item.imageUrls || [])
+      : []
+    const allImageUrls = [...product.imageUrls, ...hamperImageUrls]
+    console.log(`[v0] Deleting ${allImageUrls.length} images from Vercel Blob...`)
+    for (const imageUrl of allImageUrls) {
       try {
         await del(imageUrl)
         console.log(`[v0] Deleted image: ${imageUrl}`)
@@ -155,6 +164,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     const formData = await request.formData()
 
+    const productTypeRaw = (formData.get("productType") as string) ?? "single"
+    let productType = productTypeRaw.toLowerCase()
     const productTitle = (formData.get("productTitle") as string) ?? ""
     const description = (formData.get("description") as string) ?? ""
     const units = (formData.get("units") as string) ?? ""
@@ -166,6 +177,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const variantsJson = (formData.get("variants") as string) ?? ""
     const detailSectionsJson = (formData.get("detailSections") as string) ?? ""
     const existingImageUrlsJson = (formData.get("existingImageUrls") as string) ?? "[]"
+    const hamperItemsJson = (formData.get("hamperItems") as string) ?? ""
+    const hamperPriceRaw = formData.get("hamperPrice") as string | null
+    const hamperFabric = (formData.get("hamperFabric") as string | null) ?? ""
 
     if (
       !productTitle ||
@@ -174,8 +188,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       !sellerName ||
       !sellerEmail ||
       !location ||
-      !category ||
-      !variantsJson
+      !category
     ) {
       const missingFields = []
       if (!productTitle) missingFields.push("productTitle")
@@ -185,7 +198,6 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       if (!sellerEmail) missingFields.push("sellerEmail")
       if (!location) missingFields.push("location")
       if (!category) missingFields.push("category")
-      if (!variantsJson) missingFields.push("variants")
 
       return NextResponse.json(
         { success: false, message: `Missing required fields: ${missingFields.join(", ")}` },
@@ -209,15 +221,88 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       )
     }
 
-    let variants
-    try {
-      variants = JSON.parse(variantsJson)
-    } catch {
-      return NextResponse.json({ success: false, message: "Invalid variants data format" }, { status: 400 })
+    let variants: any[] = []
+    if (variantsJson) {
+      try {
+        variants = JSON.parse(variantsJson)
+      } catch {
+        return NextResponse.json({ success: false, message: "Invalid variants data format" }, { status: 400 })
+      }
     }
 
-    if (!Array.isArray(variants) || variants.length === 0) {
+    let hamperItems: Array<{
+      name: string
+      imageUrls?: string[]
+      imageKeys?: string[]
+      variants?: Array<{
+        weight?: number | string
+        length?: number | string
+        width?: number | string
+        height?: number | string
+        fabric?: string
+        price?: number | string
+        stock?: number | string
+      }>
+    }> = []
+
+    if (hamperItemsJson) {
+      try {
+        const parsed = JSON.parse(hamperItemsJson)
+        if (Array.isArray(parsed)) {
+          hamperItems = parsed
+            .map((item) => ({
+              name: typeof item.name === "string" ? item.name.trim() : "",
+              imageUrls: Array.isArray(item.imageUrls)
+                ? item.imageUrls.filter((url: unknown) => typeof url === "string" && url.trim())
+                : [],
+              imageKeys: Array.isArray(item.imageKeys)
+                ? item.imageKeys.filter((key: unknown) => typeof key === "string" && key.trim())
+                : [],
+              variants: Array.isArray(item.variants) ? item.variants : [],
+            }))
+            .filter(
+              (item) =>
+                item.name ||
+                (item.imageUrls && item.imageUrls.length > 0) ||
+                (item.imageKeys && item.imageKeys.length > 0) ||
+                (item.variants && item.variants.length > 0),
+            )
+        }
+      } catch {
+        return NextResponse.json({ success: false, message: "Invalid hamper items data format" }, { status: 400 })
+      }
+    }
+
+    if (productType === "hamper" && hamperItems.length === 0) {
+      return NextResponse.json({ success: false, message: "At least one hamper item is required" }, { status: 400 })
+    }
+
+    if (productType === "single" && hamperItems.length > 0) {
+      productType = "hamper"
+    }
+
+    if (productType !== "single" && productType !== "hamper") {
+      return NextResponse.json(
+        { success: false, message: "Product type must be either single or hamper" },
+        { status: 400 },
+      )
+    }
+
+    if (productType === "single" && (!Array.isArray(variants) || variants.length === 0)) {
       return NextResponse.json({ success: false, message: "At least one variant is required" }, { status: 400 })
+    }
+
+    const hamperPrice =
+      productType === "hamper" && hamperPriceRaw !== null && hamperPriceRaw !== ""
+        ? Number.parseFloat(String(hamperPriceRaw))
+        : undefined
+    if (productType === "hamper") {
+      if (!hamperFabric || !hamperFabric.trim()) {
+        return NextResponse.json({ success: false, message: "Hamper fabric is required" }, { status: 400 })
+      }
+      if (!hamperPrice || !Number.isFinite(hamperPrice) || hamperPrice <= 0) {
+        return NextResponse.json({ success: false, message: "Hamper price is required" }, { status: 400 })
+      }
     }
 
     let detailSections: Array<{
@@ -249,38 +334,41 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       }
     }
 
-    const processedVariants = variants.map((variant, index) => {
-      const weight = Number.parseFloat(variant.weight)
-      const length = Number.parseFloat(variant.length)
-      const width = Number.parseFloat(variant.width)
-      const height = Number.parseFloat(variant.height)
-      const fabric = variant.fabric?.trim()
-      const price = Number.parseFloat(variant.price)
-      const stock = Number.parseInt(variant.stock, 10)
+    const processedVariants =
+      productType === "single"
+        ? variants.map((variant, index) => {
+            const weight = Number.parseFloat(variant.weight)
+            const length = Number.parseFloat(variant.length)
+            const width = Number.parseFloat(variant.width)
+            const height = Number.parseFloat(variant.height)
+            const fabric = variant.fabric?.trim()
+            const price = Number.parseFloat(variant.price)
+            const stock = Number.parseInt(variant.stock, 10)
 
-      if (isNaN(weight) || isNaN(length) || isNaN(width) || isNaN(height) || isNaN(price) || isNaN(stock)) {
-        throw new Error(`Variant ${index + 1} has invalid numeric values. Please check all fields.`)
-      }
+            if (isNaN(weight) || isNaN(length) || isNaN(width) || isNaN(height) || isNaN(price) || isNaN(stock)) {
+              throw new Error(`Variant ${index + 1} has invalid numeric values. Please check all fields.`)
+            }
 
-      if (!fabric) {
-        throw new Error(`Variant ${index + 1} requires a fabric selection.`)
-      }
+            if (!fabric) {
+              throw new Error(`Variant ${index + 1} requires a fabric selection.`)
+            }
 
-      if (weight <= 0 || length <= 0 || width <= 0 || height <= 0 || price <= 0 || stock < 0) {
-        throw new Error(`Variant ${index + 1} has values that are too small or negative.`)
-      }
+            if (weight <= 0 || length <= 0 || width <= 0 || height <= 0 || price <= 0 || stock < 0) {
+              throw new Error(`Variant ${index + 1} has values that are too small or negative.`)
+            }
 
-      return {
-        variantId: variant.id,
-        weight,
-        length,
-        width,
-        height,
-        fabric,
-        price,
-        stock,
-      }
-    })
+            return {
+              variantId: variant.id,
+              weight,
+              length,
+              width,
+              height,
+              fabric,
+              price,
+              stock,
+            }
+          })
+        : []
 
     let existingImageUrls: string[] = []
     try {
@@ -294,12 +382,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     const newImageFiles: File[] = []
     for (const [key, value] of formData.entries()) {
-      if (key.startsWith("image_") && value instanceof File) {
-        newImageFiles.push(value)
+      if (key.startsWith("image_") && isFileLike(value)) {
+        newImageFiles.push(value as File)
       }
     }
 
-    if (existingImageUrls.length + newImageFiles.length === 0) {
+    if (productType === "single" && existingImageUrls.length + newImageFiles.length === 0) {
       return NextResponse.json({ success: false, message: "At least one product image is required" }, { status: 400 })
     }
 
@@ -307,7 +395,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ success: false, message: "Maximum 6 images allowed" }, { status: 400 })
     }
 
-    const needsUploads = newImageFiles.length > 0 || detailSections.some((section) => section.imageKey)
+    const needsUploads =
+      newImageFiles.length > 0 ||
+      detailSections.some((section) => section.imageKey) ||
+      hamperItems.some((item) => Array.isArray(item.imageKeys) && item.imageKeys.length > 0)
     if (needsUploads && !process.env.BLOB_READ_WRITE_TOKEN) {
       return NextResponse.json(
         {
@@ -338,10 +429,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         detailSections.map(async (section) => {
           if (!section.imageKey) return
           const file = formData.get(section.imageKey)
-          if (!(file instanceof File)) return
+          if (!isFileLike(file)) return
 
           const timestamp = Date.now()
-          const filename = `products/${sellerEmail}/detail-sections/${timestamp}_${file.name}`
+          const filename = `products/${sellerEmail}/detail-sections/${timestamp}_${(file as any).name ?? "image"}`
 
           const blob = await put(filename, file, {
             access: "public",
@@ -356,6 +447,82 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     detailSections = detailSections.map(({ imageKey, ...rest }) => rest)
 
+    if (hamperItems.length > 0) {
+      await Promise.all(
+        hamperItems.map(async (item) => {
+          if (!Array.isArray(item.imageKeys) || item.imageKeys.length === 0) return
+          if (!Array.isArray(item.imageUrls)) item.imageUrls = []
+
+          await Promise.all(
+            item.imageKeys.map(async (imageKey) => {
+              const file = formData.get(imageKey)
+              if (!isFileLike(file)) return
+
+              const timestamp = Date.now()
+              const filename = `products/${sellerEmail}/hamper-items/${timestamp}_${(file as any).name ?? "image"}`
+
+              const blob = await put(filename, file, {
+                access: "public",
+                addRandomSuffix: true,
+                token: process.env.BLOB_READ_WRITE_TOKEN,
+              })
+
+              item.imageUrls?.push(blob.url)
+            }),
+          )
+        }),
+      )
+    }
+
+    const processedHamperItems = hamperItems.map((item, index) => {
+      if (!item.name) {
+        throw new Error(`Hamper item ${index + 1} requires a name.`)
+      }
+      const imageUrls = Array.isArray(item.imageUrls) ? item.imageUrls : []
+      if (productType === "hamper" && imageUrls.length === 0) {
+        throw new Error(`Hamper item ${index + 1} requires at least one image.`)
+      }
+
+      const rawVariants = Array.isArray(item.variants) ? item.variants : []
+      if (productType === "hamper" && rawVariants.length === 0) {
+        throw new Error(`Hamper item ${index + 1} must include at least one variant option.`)
+      }
+
+      const variants = rawVariants.map((variant, variantIndex) => {
+        const weight = Number.parseFloat(String(variant.weight ?? ""))
+        const length = Number.parseFloat(String(variant.length ?? ""))
+        const width = Number.parseFloat(String(variant.width ?? ""))
+        const height = Number.parseFloat(String(variant.height ?? ""))
+        const stock = Number.parseInt(String(variant.stock ?? "0"), 10)
+
+        if (isNaN(weight) || isNaN(length) || isNaN(width) || isNaN(height) || isNaN(stock)) {
+          throw new Error(
+            `Hamper item ${index + 1} variant ${variantIndex + 1} has invalid numeric values.`,
+          )
+        }
+
+        if (weight <= 0 || length <= 0 || width <= 0 || height <= 0 || stock < 0) {
+          throw new Error(
+            `Hamper item ${index + 1} variant ${variantIndex + 1} has values that are too small or negative.`,
+          )
+        }
+
+        return {
+          weight,
+          length,
+          width,
+          height,
+          stock,
+        }
+      })
+
+      return {
+        name: item.name,
+        imageUrls,
+        variants,
+      }
+    })
+
     await connectDB()
 
     const existingProduct = await Product.findById(id).lean()
@@ -368,6 +535,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const product = await Product.findByIdAndUpdate(
       id,
       {
+        productType,
         productTitle,
         description,
         units,
@@ -379,21 +547,33 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         imageUrls: nextImageUrls,
         variants: processedVariants,
         detailSections,
+        hamperItems: productType === "hamper" ? processedHamperItems : [],
+        hamperPrice: productType === "hamper" ? hamperPrice : undefined,
+        hamperFabric: productType === "hamper" ? hamperFabric.trim() : undefined,
       },
       { new: true, runValidators: true },
     )
 
+    const previousHamperImageUrls = Array.isArray(existingProduct.hamperItems)
+      ? existingProduct.hamperItems.flatMap((item: any) => item.imageUrls || []).filter(Boolean)
+      : []
+    const nextHamperImageUrls = processedHamperItems.flatMap((item) => item.imageUrls || []).filter(Boolean)
+    const removedHamperImageUrls = previousHamperImageUrls.filter((url: string) => !nextHamperImageUrls.includes(url))
+
     const removedImageUrls = existingProduct.imageUrls.filter((url: string) => !nextImageUrls.includes(url))
-    if (removedImageUrls.length > 0 && process.env.BLOB_READ_WRITE_TOKEN) {
-      await Promise.all(
-        removedImageUrls.map(async (imageUrl) => {
-          try {
-            await del(imageUrl)
-          } catch (deleteError) {
-            console.error(`[v0] Error deleting removed image ${imageUrl}:`, deleteError)
-          }
-        }),
-      )
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const urlsToDelete = [...removedImageUrls, ...removedHamperImageUrls]
+      if (urlsToDelete.length > 0) {
+        await Promise.all(
+          urlsToDelete.map(async (imageUrl) => {
+            try {
+              await del(imageUrl)
+            } catch (deleteError) {
+              console.error(`[v0] Error deleting removed image ${imageUrl}:`, deleteError)
+            }
+          }),
+        )
+      }
     }
 
     return NextResponse.json(

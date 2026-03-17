@@ -12,11 +12,13 @@ interface ApiProductVariant {
 
 interface ApiProduct {
   _id: string
+  productType?: "single" | "hamper"
   productTitle: string
   category: string
   subCategory?: string
   imageUrls: string[]
   variants: ApiProductVariant[]
+  hamperPrice?: number
   status: "visible" | "hidden"
 }
 
@@ -134,11 +136,16 @@ export function CategoryProductsGrid({ collection }: CategoryProductsGridProps) 
       className="grid grid-cols-[repeat(auto-fit,minmax(230px,300px))] gap-x-8 gap-y-10 justify-center"
     >
       {displayProducts.map((product) => {
-        const minPrice = product.variants.reduce(
-          (currentMin, variant) => Math.min(currentMin, variant.price),
-          Number.POSITIVE_INFINITY,
-        )
-        const startingPrice = Number.isFinite(minPrice) ? minPrice : 0
+        const startingPrice =
+          product.productType === "hamper" && typeof product.hamperPrice === "number" && Number.isFinite(product.hamperPrice)
+            ? product.hamperPrice
+            : (() => {
+                const minPrice = product.variants.reduce(
+                  (currentMin, variant) => Math.min(currentMin, variant.price),
+                  Number.POSITIVE_INFINITY,
+                )
+                return Number.isFinite(minPrice) ? minPrice : 0
+              })()
 
         return (
           <div

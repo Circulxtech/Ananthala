@@ -1,3 +1,5 @@
+export type ProductType = "single" | "hamper"
+
 export interface ProductVariant {
   id: string
   weight: string // in kg
@@ -21,7 +23,27 @@ export interface ProductDetailSectionInput {
   imageKey?: string
 }
 
+export interface HamperItemInput {
+  id: string
+  name: string
+  imageUrls: string[]
+  imageFiles?: File[]
+  imagePreviews?: string[]
+  imageKeys?: string[]
+  variants?: HamperItemVariantInput[]
+}
+
+export interface HamperItemVariantInput {
+  id: string
+  weight: string
+  length: string
+  width: string
+  height: string
+  stock: string
+}
+
 export interface ProductFormData {
+  productType: ProductType
   productTitle: string
   description: string
   units: string
@@ -30,12 +52,16 @@ export interface ProductFormData {
   location: string
   category: string
   subCategory: string
+  hamperPrice?: string
+  hamperFabric?: string
   variants: ProductVariant[]
   detailSections: ProductDetailSectionInput[]
+  hamperItems: HamperItemInput[]
 }
 
 export interface ProductWithVariants {
   id: number
+  productType?: ProductType
   name: string
   category: string
   status: "visible" | "hidden"
@@ -48,4 +74,9 @@ export interface ProductWithVariants {
   subCategory?: string
   variants: ProductVariant[]
   detailSections?: Omit<ProductDetailSectionInput, "id">[]
+  hamperItems?: Array<
+    Omit<HamperItemInput, "id" | "imageFile" | "imagePreview" | "imageKey"> & {
+      variants?: Omit<HamperItemVariantInput, "id">[]
+    }
+  >
 }

@@ -19,7 +19,22 @@ export interface IProductDetailSection {
   imagePosition?: "left" | "right"
 }
 
+export interface IHamperItem {
+  name: string
+  imageUrls: string[]
+  variants: IHamperItemVariant[]
+}
+
+export interface IHamperItemVariant {
+  weight: number
+  length: number
+  width: number
+  height: number
+  stock: number
+}
+
 export interface IProduct {
+  productType: "single" | "hamper"
   productTitle: string
   description: string
   units: string
@@ -31,6 +46,9 @@ export interface IProduct {
   imageUrls: string[] // Array of Vercel Blob URLs
   variants: IProductVariant[]
   detailSections?: IProductDetailSection[]
+  hamperItems?: IHamperItem[]
+  hamperPrice?: number
+  hamperFabric?: string
   status: "visible" | "hidden"
   createdAt: Date
   updatedAt: Date
@@ -111,8 +129,76 @@ const ProductDetailSectionSchema = new Schema<IProductDetailSection>(
   { _id: false },
 )
 
+const HamperItemSchema = new Schema<IHamperItem>(
+  {
+    name: {
+      type: String,
+      required: [true, "Hamper item name is required"],
+      trim: true,
+      maxlength: [200, "Hamper item name cannot exceed 200 characters"],
+    },
+    imageUrls: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: (v: string[]) => Array.isArray(v) && v.length > 0 && v.length <= 6,
+        message: "Hamper items must have between 1 and 6 images",
+      },
+    },
+    variants: {
+      type: [
+        new Schema<IHamperItemVariant>(
+          {
+            weight: {
+              type: Number,
+              required: [true, "Hamper item variant weight is required"],
+              min: [0, "Weight must be positive"],
+            },
+            length: {
+              type: Number,
+              required: [true, "Hamper item variant length is required"],
+              min: [0, "Length must be positive"],
+            },
+            width: {
+              type: Number,
+              required: [true, "Hamper item variant width is required"],
+              min: [0, "Width must be positive"],
+            },
+            height: {
+              type: Number,
+              required: [true, "Hamper item variant height is required"],
+              min: [0, "Height must be positive"],
+            },
+            stock: {
+              type: Number,
+              required: [true, "Hamper item variant stock is required"],
+              min: [0, "Hamper item variant stock must be positive"],
+              default: 0,
+            },
+          },
+          { _id: false },
+        ),
+      ],
+      required: [true, "Hamper item variants are required"],
+      validate: {
+        validator: (v: IHamperItemVariant[]) => Array.isArray(v) && v.length > 0,
+        message: "At least one hamper item variant is required",
+      },
+    },
+  },
+  { _id: false },
+)
+
 const ProductSchema = new Schema<IProduct>(
   {
+    productType: {
+      type: String,
+      enum: {
+        values: ["single", "hamper"],
+        message: "{VALUE} is not a valid product type",
+      },
+      default: "single",
+    },
     productTitle: {
       type: String,
       required: [true, "Product title is required"],
@@ -163,23 +249,64 @@ const ProductSchema = new Schema<IProduct>(
     },
     imageUrls: {
       type: [String],
-      required: [true, "At least one product image is required"],
+      default: [],
       validate: {
-        validator: (v: string[]) => v && v.length > 0 && v.length <= 6,
+        validator: function (this: IProduct, v: string[]) {
+          if (this.productType === "hamper") {
+            return Array.isArray(v) && v.length <= 6
+          }
+          return Array.isArray(v) && v.length > 0 && v.length <= 6
+        },
         message: "Must have between 1 and 6 product images",
       },
     },
     variants: {
       type: [ProductVariantSchema],
-      required: [true, "At least one variant is required"],
+      default: [],
       validate: {
-        validator: (v: IProductVariant[]) => v && v.length > 0,
+        validator: function (this: IProduct, v: IProductVariant[]) {
+          if (this.productType === "hamper") return true
+          return Array.isArray(v) && v.length > 0
+        },
         message: "At least one product variant is required",
       },
     },
     detailSections: {
       type: [ProductDetailSectionSchema],
       default: [],
+    },
+    hamperItems: {
+      type: [HamperItemSchema],
+      default: [],
+      validate: {
+        validator: function (this: IProduct, v: IHamperItem[]) {
+          if (this.productType !== "hamper") return true
+          return Array.isArray(v) && v.length > 0
+        },
+        message: "At least one hamper item is required for hamper products",
+      },
+    },
+    hamperPrice: {
+      type: Number,
+      min: [0, "Hamper price must be positive"],
+      validate: {
+        validator: function (this: IProduct, v: number) {
+          if (this.productType !== "hamper") return true
+          return typeof v === "number" && Number.isFinite(v) && v > 0
+        },
+        message: "Hamper price is required for hamper products",
+      },
+    },
+    hamperFabric: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: function (this: IProduct, v: string) {
+          if (this.productType !== "hamper") return true
+          return typeof v === "string" && v.trim().length > 0
+        },
+        message: "Hamper fabric is required for hamper products",
+      },
     },
     status: {
       type: String,
