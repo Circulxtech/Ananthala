@@ -185,9 +185,28 @@ export function ProductConfigurator({
       price,
     }
     
-    // Store the item and show complementary products modal
-    setPendingCartItem(item)
-    setShowComplementaryModal(true)
+    // Check if product has complementary items available
+    try {
+      setIsLoadingComplementary(true)
+      const response = await fetch(`/api/products/${product.id}/complementary`)
+      const data = await response.json()
+      
+      // Only show modal if there are complementary products available
+      if (data.success && data.complementaryProducts && data.complementaryProducts.length > 0) {
+        // Has complementary products - show modal for selection
+        setPendingCartItem(item)
+        setShowComplementaryModal(true)
+      } else {
+        // No complementary products - add directly to cart without modal
+        onAddToCart(item)
+      }
+    } catch (error) {
+      console.error("[v0] Error checking complementary products:", error)
+      // On error, add directly to cart without waiting
+      onAddToCart(item)
+    } finally {
+      setIsLoadingComplementary(false)
+    }
   }
 
   const handleComplementaryProductsConfirm = async (selectedComplementaryIds: string[]) => {
