@@ -1,5 +1,28 @@
 import mongoose from "mongoose"
 
+const complementaryItemSchema = new mongoose.Schema(
+  {
+    id: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: false,
+    },
+    price: {
+      type: Number,
+      default: 0,
+      description: "Should always be 0 for free items",
+    },
+  },
+  { _id: true }
+)
+
 const cartItemSchema = new mongoose.Schema(
   {
     id: {
@@ -40,6 +63,11 @@ const cartItemSchema = new mongoose.Schema(
       type: String,
       required: false,
       description: "HEX value of the selected color",
+    },
+    complementaryItems: {
+      type: [complementaryItemSchema],
+      default: [],
+      description: "Free products included with this cart item",
     },
   },
   { _id: true, timestamps: true }

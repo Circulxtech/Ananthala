@@ -163,6 +163,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const location = (formData.get("location") as string) ?? ""
     const category = (formData.get("category") as string) ?? ""
     const subCategory = (formData.get("subCategory") as string) ?? ""
+    const productType = (formData.get("productType") as string) ?? "normal"
     const variantsJson = (formData.get("variants") as string) ?? ""
     const detailSectionsJson = (formData.get("detailSections") as string) ?? ""
     const existingImageUrlsJson = (formData.get("existingImageUrls") as string) ?? "[]"
@@ -376,6 +377,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         location,
         category: categoryLower,
         subCategory: subCategory || undefined,
+        productType: (productType === "complementary" ? "complementary" : "normal"),
         imageUrls: nextImageUrls,
         variants: processedVariants,
         detailSections,

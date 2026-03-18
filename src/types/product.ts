@@ -30,6 +30,7 @@ export interface ProductFormData {
   location: string
   category: string
   subCategory: string
+  productType: "normal" | "complementary"
   variants: ProductVariant[]
   detailSections: ProductDetailSectionInput[]
 }

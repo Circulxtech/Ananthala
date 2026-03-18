@@ -38,6 +38,7 @@ interface EditableProduct {
   location: string
   category: string
   subCategory?: string
+  productType?: "normal" | "complementary"
   imageUrls: string[]
   variants: Array<{
     variantId?: string
@@ -72,6 +73,7 @@ const createEmptyFormData = (): ProductFormData => ({
     location: "",
     category: "",
     subCategory: "", // Will be removed from form, kept for backward compatibility
+    productType: "normal",
     variants: [
       {
         id: crypto.randomUUID(),
@@ -281,6 +283,7 @@ export default function AddProductModal({
       formDataToSend.append("location", formData.location)
       formDataToSend.append("category", formData.category)
       formDataToSend.append("subCategory", formData.subCategory)
+      formDataToSend.append("productType", formData.productType)
       formDataToSend.append("detailSections", JSON.stringify(cleanedDetailSections))
       formDataToSend.append(
         "existingImageUrls",
@@ -407,6 +410,7 @@ export default function AddProductModal({
       location: productToEdit.location || "",
       category: productToEdit.category || "",
       subCategory: productToEdit.subCategory || "",
+      productType: (productToEdit as any).productType || "normal",
       variants:
         mappedVariants.length > 0
           ? mappedVariants
@@ -526,6 +530,32 @@ export default function AddProductModal({
                   className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="productType" className="text-sm sm:text-base text-[#6D4530]">
+                  Product Type*
+                </Label>
+                <Select value={formData.productType} onValueChange={(value) => handleInputChange("productType", value)}>
+                  <SelectTrigger id="productType" className="h-12 bg-white border-[#D9CFC7] text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold">
+                    <SelectValue placeholder="Select product type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="normal">
+                      <span className="font-medium">Normal Product</span>
+                      <p className="text-xs text-gray-600">Customers purchase this product</p>
+                    </SelectItem>
+                    <SelectItem value="complementary">
+                      <span className="font-medium">Complementary Product</span>
+                      <p className="text-xs text-gray-600">Can be offered free with other products</p>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-[#8B5A3C]/60 mt-1">
+                  {formData.productType === "normal"
+                    ? "This product will be sold individually"
+                    : "This product can be added as a free gift to other products"}
+                </p>
               </div>
             </div>
 

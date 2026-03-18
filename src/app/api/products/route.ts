@@ -32,6 +32,7 @@ export async function POST(request: Request) {
     const location = formData.get("location") as string
     const category = formData.get("category") as string
     const subCategory = formData.get("subCategory") as string
+    const productType = (formData.get("productType") as string) || "normal"
     const variantsJson = formData.get("variants") as string
     const detailSectionsJson = formData.get("detailSections") as string
 
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
       location,
       category,
       subCategory,
+      productType,
       hasVariants: !!variantsJson,
       hasDetailSections: !!detailSectionsJson,
     })
@@ -264,6 +266,7 @@ export async function POST(request: Request) {
       location,
       category: categoryLower,
       subCategory: subCategory || undefined,
+      productType: (productType === "complementary" ? "complementary" : "normal"),
       imageUrls,
       variants: processedVariants,
       detailSections,

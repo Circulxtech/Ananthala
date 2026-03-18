@@ -31,6 +31,8 @@ export interface IProduct {
   imageUrls: string[] // Array of Vercel Blob URLs
   variants: IProductVariant[]
   detailSections?: IProductDetailSection[]
+  productType: "normal" | "complementary" // Type of product: normal or can be offered as free
+  complementaryProductIds?: string[] // MongoDB IDs of free products
   status: "visible" | "hidden"
   createdAt: Date
   updatedAt: Date
@@ -180,6 +182,21 @@ const ProductSchema = new Schema<IProduct>(
     detailSections: {
       type: [ProductDetailSectionSchema],
       default: [],
+    },
+    productType: {
+      type: String,
+      enum: {
+        values: ["normal", "complementary"],
+        message: "{VALUE} is not a valid product type",
+      },
+      default: "normal",
+      description: "Type of product: normal (purchasable) or complementary (can be offered as free)",
+    },
+    complementaryProductIds: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Product",
+      default: [],
+      description: "Array of product IDs that are given free with this product",
     },
     status: {
       type: String,

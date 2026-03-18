@@ -139,78 +139,96 @@ export default function CartPage() {
                     .join(" ")
 
                   return (
-                    <div
-                      key={item.id}
-                      className={containerClass}
-                    >
-                      <div className="relative w-28 h-28 shrink-0 bg-gray-100 overflow-hidden">
-                        <Image
-                          src={item.image || "/placeholder.svg"}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-xl font-semibold text-foreground mb-2">
-                          {item.name}
-                          {item.productColor && (
-                            <span className="text-sm font-normal text-foreground/70 ml-2">({item.productColor})</span>
-                          )}
-                        </h3>
-                        <div className="space-y-2">
-                          <div className="inline-block px-3 py-1 text-base text-foreground">
-                            {item.fabric ? `Fabric: ${item.fabric}` : `Size: ${item.size}`}
-                          </div>
-                          {item.productColor && (
-                            <div className="flex items-center gap-2 px-3 py-1 text-base text-foreground">
-                              <span>Color:</span>
-                              <div
-                                className="w-4 h-4 rounded border border-gray-300"
-                                style={{ backgroundColor: item.productColorHex || "transparent" }}
-                                title={item.productColor}
-                              />
-                              <span>{item.productColor}</span>
+                    <div key={item.id} className="space-y-4">
+                      {/* Main Item */}
+                      <div className={containerClass}>
+                        <div className="relative w-28 h-28 shrink-0 bg-gray-100 overflow-hidden rounded">
+                          <Image
+                            src={item.image || "/placeholder.svg"}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-xl font-semibold text-foreground mb-2">
+                            {item.name}
+                            {item.productColor && (
+                              <span className="text-sm font-normal text-foreground/70 ml-2">({item.productColor})</span>
+                            )}
+                          </h3>
+                          <div className="space-y-2">
+                            <div className="inline-block px-3 py-1 text-base text-foreground">
+                              {item.fabric ? `Fabric: ${item.fabric}` : `Size: ${item.size}`}
                             </div>
-                          )}
+                            {item.productColor && (
+                              <div className="flex items-center gap-2 px-3 py-1 text-base text-foreground">
+                                <span>Color:</span>
+                                <div
+                                  className="w-4 h-4 rounded border border-gray-300"
+                                  style={{ backgroundColor: item.productColorHex || "transparent" }}
+                                  title={item.productColor}
+                                />
+                                <span>{item.productColor}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-end gap-3">
+                          <div className="flex items-center gap-2 border rounded-md px-2 py-1">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="w-6 h-6 flex items-center justify-center text-foreground hover:opacity-70 transition-opacity"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
+                            <span className="text-foreground w-6 text-center text-sm">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="w-6 h-6 flex items-center justify-center text-foreground hover:opacity-70 transition-opacity"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          <div className="text-right">
+                            <div className="text-lg font-semibold text-foreground">
+                              ₹{(item.price * item.quantity).toLocaleString("en-IN", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => removeFromCart(item.id)}
+                            className="text-foreground hover:opacity-80 transition-opacity"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
                         </div>
                       </div>
 
-                      <div className="flex flex-col items-end gap-3">
-                        
-                        <div className="flex items-center gap-2 border rounded-md px-2 py-1">
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="w-6 h-6 flex items-center justify-center text-foreground hover:opacity-70 transition-opacity"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="text-foreground w-6 text-center text-sm">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="w-6 h-6 flex items-center justify-center text-foreground hover:opacity-70 transition-opacity"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                        </div>
-                       
-                        <div className="text-right">
-                        
-                          <div className="text-lg font-semibold text-foreground">
-                            ₹{(item.price * item.quantity).toLocaleString("en-IN", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
+                      {/* Complementary Items */}
+                      {item.complementaryItems && item.complementaryItems.length > 0 && (
+                        <div className="ml-6 pl-4 border-l-4 border-green-400 py-3 px-4 bg-green-50 rounded-r-lg space-y-3">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-block bg-green-600 text-white text-xs font-bold px-2.5 py-1 rounded">
+                              FREE
+                            </span>
+                            <span className="text-sm font-bold text-green-800">Complimentary Products Included</span>
+                          </div>
+                          <div className="space-y-2">
+                            {item.complementaryItems.map((freeItem, idx) => (
+                              <div key={`${item.id}-free-${idx}`} className="text-sm text-gray-700 pl-1 flex items-center">
+                                <span className="text-green-600 mr-2">✓</span>
+                                {freeItem.name || `Free Product ${idx + 1}`}
+                              </div>
+                            ))}
                           </div>
                         </div>
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-foreground hover:opacity-80 transition-opacity"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
+                      )}
                     </div>
                   )
                 })}
