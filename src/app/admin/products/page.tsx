@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, RefreshCw, Trash2, Loader2, Pencil } from "lucide-react"
+import { Plus, RefreshCw, Trash2, Loader2, Pencil, Gift } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import AddProductModal from "@/components/admin/add-product-modal"
+import ManageComplementaryProductsModal from "@/components/admin/manage-complementary-products-modal"
 
 interface Product {
   _id: string
@@ -13,6 +14,7 @@ interface Product {
   category: string
   subCategory: string
   hamperPrice?: number
+  productRole?: "normal" | "complementary"
   variants: Array<{
     variantId: string
     weight: number
@@ -43,6 +45,7 @@ interface Product {
     imageAlt?: string
     imagePosition?: "left" | "right"
   }>
+  complementaryProductIds?: string[]
   status: "visible" | "hidden"
   sellerName: string
   sellerEmail: string
@@ -60,6 +63,8 @@ export default function ProductManagementPage() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
+  const [isComplementaryModalOpen, setIsComplementaryModalOpen] = useState(false)
+  const [selectedProductForComplementary, setSelectedProductForComplementary] = useState<Product | null>(null)
 
   const fetchProducts = async () => {
     try {
@@ -125,6 +130,41 @@ export default function ProductManagementPage() {
   const handleModalClose = () => {
     setIsAddModalOpen(false)
     setEditingProduct(null)
+  }
+
+  const handleSaveComplementaryProducts = async (selectedIds: string[]) => {
+    if (!selectedProductForComplementary) return
+
+    try {
+      const response = await fetch("/api/products/complementary", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: selectedProductForComplementary._id,
+          complementaryProductIds: selectedIds,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        alert("Complementary products updated successfully!")
+        // Refresh the products list
+        fetchProducts()
+      } else {
+        alert(data.message || "Failed to update complementary products")
+      }
+    } catch (error) {
+      console.error("[v0] Error saving complementary products:", error)
+      alert("Failed to save complementary products")
+    }
+  }
+
+  const handleManageComplementary = (product: Product) => {
+    setSelectedProductForComplementary(product)
+    setIsComplementaryModalOpen(true)
   }
 
   const filteredProducts =
@@ -228,6 +268,7 @@ export default function ProductManagementPage() {
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Product Image</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Category</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Product Name</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Type</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Variants</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Total Stock</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Base Price (₹)</th>
@@ -255,10 +296,30 @@ export default function ProductManagementPage() {
                         )}
                       </div>
                     </td>
+                    <td className="py-4 px-4 text-[#4A2F1F] font-medium">
+                      <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                        product.productRole === "complementary"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-green-100 text-green-700"
+                      }`}>
+                        {product.productRole === "complementary" ? "Complementary" : "Normal"}
+                      </span>
+                    </td>
                     <td className="py-4 px-4 text-[#4A2F1F] font-medium">{variantsCount}</td>
                     <td className="py-4 px-4 text-[#4A2F1F] font-medium">{totalStock}</td>
                     <td className="py-4 px-4 text-[#4A2F1F] font-semibold">₹{basePrice.toLocaleString()}</td>
                     <td className="py-4 px-4">
+                      {product.productRole !== "complementary" && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-[#4A2F1F] hover:bg-[#F5F1ED] mr-1"
+                          title="Manage Complementary Products"
+                          onClick={() => handleManageComplementary(product)}
+                        >
+                          <Gift className="h-4 w-4" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -314,6 +375,15 @@ export default function ProductManagementPage() {
                 </div>
 
                 <div className="flex items-center justify-end pt-2 border-t border-[#D9CFC7]">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-[#4A2F1F] hover:bg-[#F5F1ED] mr-1"
+                    title="Manage Complementary Products"
+                    onClick={() => handleManageComplementary(product)}
+                  >
+                    <Gift className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -387,6 +457,21 @@ export default function ProductManagementPage() {
         mode={editingProduct ? "edit" : "create"}
         productToEdit={editingProduct}
       />
+
+      {/* Manage Complementary Products Modal */}
+      {selectedProductForComplementary && (
+        <ManageComplementaryProductsModal
+          isOpen={isComplementaryModalOpen}
+          productId={selectedProductForComplementary._id}
+          productTitle={selectedProductForComplementary.productTitle}
+          onClose={() => {
+            setIsComplementaryModalOpen(false)
+            setSelectedProductForComplementary(null)
+          }}
+          onSave={handleSaveComplementaryProducts}
+          currentComplementaryIds={selectedProductForComplementary.complementaryProductIds || []}
+        />
+      )}
     </div>
   )
 }

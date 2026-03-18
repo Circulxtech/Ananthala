@@ -6,6 +6,12 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
+export interface ComplementaryItem {
+  id: string
+  name?: string
+  image?: string
+}
+
 export interface CartItem {
   id: string
   name: string
@@ -16,6 +22,7 @@ export interface CartItem {
   productColorHex?: string // HEX value of color
   quantity: number
   price: number
+  complementaryItems?: ComplementaryItem[] // Free products included
 }
 
 interface CartDrawerProps {
@@ -69,42 +76,60 @@ export function CartDrawer({ isOpen, onClose, cartItems = [] }: CartDrawerProps)
             ) : (
               <div className="space-y-6">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-4 pb-6 border-b border-gray-100">
-                    <div className="relative w-24 h-24 flex-shrink-0 bg-gray-100 overflow-hidden">
-                      <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-serif text-black text-lg mb-2 leading-tight">
-                        {item.name}
-                        {item.productColor && (
-                          <span className="text-sm font-normal text-gray-600 ml-1">({item.productColor})</span>
+                  <div key={item.id} className="pb-6 border-b border-gray-100 space-y-4">
+                    {/* Main Item */}
+                    <div className="flex gap-4">
+                      <div className="relative w-24 h-24 flex-shrink-0 bg-gray-100 overflow-hidden">
+                        <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-serif text-black text-lg mb-2 leading-tight">
+                          {item.name}
+                          {item.productColor && (
+                            <span className="text-sm font-normal text-gray-600 ml-1">({item.productColor})</span>
+                          )}
+                        </h3>
+                        <p className="text-black text-sm mb-2">Size: {item.size}</p>
+                        {item.fabric && (
+                          <p className="text-black text-sm mb-2">Fabric: {item.fabric}</p>
                         )}
-                      </h3>
-                      <p className="text-black text-sm mb-2">Size: {item.size}</p>
-                      {item.fabric && (
-                        <p className="text-black text-sm mb-2">Fabric: {item.fabric}</p>
-                      )}
-                      {item.productColor && (
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-black text-sm">Color:</span>
-                          <div
-                            className="w-4 h-4 rounded border border-gray-300"
-                            style={{ backgroundColor: item.productColorHex || "transparent" }}
-                            title={item.productColor}
-                          />
-                          <span className="text-black text-sm">{item.productColor}</span>
+                        {item.productColor && (
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-black text-sm">Color:</span>
+                            <div
+                              className="w-4 h-4 rounded border border-gray-300"
+                              style={{ backgroundColor: item.productColorHex || "transparent" }}
+                              title={item.productColor}
+                            />
+                            <span className="text-black text-sm">{item.productColor}</span>
+                          </div>
+                        )}
+                        <p className="text-black text-sm">Qty: {item.quantity}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-black font-medium text-lg">
+                          ₹{(item.price * item.quantity).toLocaleString("en-IN", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Complementary Items */}
+                    {item.complementaryItems && item.complementaryItems.length > 0 && (
+                      <div className="ml-4 pl-4 border-l-2 border-green-300 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold text-green-700 bg-green-50 px-2 py-1 rounded">FREE</span>
+                          <span className="text-xs text-gray-600">Complimentary Products</span>
                         </div>
-                      )}
-                      <p className="text-black text-sm">Qty: {item.quantity}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-black font-medium text-lg">
-                        ₹{(item.price * item.quantity).toLocaleString("en-IN", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </p>
-                    </div>
+                        {item.complementaryItems.map((freeItem, idx) => (
+                          <div key={`${item.id}-free-${idx}`} className="text-xs text-gray-700">
+                            • {freeItem.name || `Free Product ${idx + 1}`}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

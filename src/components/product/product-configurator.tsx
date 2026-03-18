@@ -14,6 +14,7 @@ import { usePatternConfigurator } from "@/hooks/use-pattern-configurator"
 import { getAllFabricPatterns } from "@/data/fabric-patterns"
 import { MagnifyImage } from "@/components/product/MagnifyImage"
 import { ColorAwareMagnifyImage } from "@/components/product/ColorAwareMagnifyImage"
+import ComplementaryProductsModal from "@/components/product/complementary-products-modal"
 
 interface ApiProductVariant {
   weight: number
@@ -48,6 +49,9 @@ export function ProductConfigurator({
   const [selectedSize, setSelectedSize] = useState("")
   const [selectedFabric, setSelectedFabric] = useState("")
   const [quantity, setQuantity] = useState(1)
+  const [showComplementaryModal, setShowComplementaryModal] = useState(false)
+  const [pendingCartItem, setPendingCartItem] = useState<CartItem | null>(null)
+  const [isLoadingComplementary, setIsLoadingComplementary] = useState(false)
 
   const {
     selectedFabricId: colorFabricId,
@@ -180,7 +184,74 @@ export function ProductConfigurator({
       quantity,
       price,
     }
-    onAddToCart(item)
+    
+    // Check if product has complementary items available
+    try {
+      setIsLoadingComplementary(true)
+      const response = await fetch(`/api/products/${product.id}/complementary`)
+      const data = await response.json()
+      
+      // Only show modal if there are complementary products available
+      if (data.success && data.complementaryProducts && data.complementaryProducts.length > 0) {
+        // Has complementary products - show modal for selection
+        setPendingCartItem(item)
+        setShowComplementaryModal(true)
+      } else {
+        // No complementary products - add directly to cart without modal
+        onAddToCart(item)
+      }
+    } catch (error) {
+      console.error("[v0] Error checking complementary products:", error)
+      // On error, add directly to cart without waiting
+      onAddToCart(item)
+    } finally {
+      setIsLoadingComplementary(false)
+    }
+  }
+
+  const handleComplementaryProductsConfirm = async (selectedComplementaryIds: string[]) => {
+    if (!pendingCartItem) return
+
+    let complementaryItems: any[] = []
+
+    // Fetch the complementary products details if any are selected
+    if (selectedComplementaryIds.length > 0) {
+      try {
+        // Fetch details for each complementary product
+        const productPromises = selectedComplementaryIds.map((id) =>
+          fetch(`/api/products/${id}`).then((res) => res.json())
+        )
+        const productResponses = await Promise.all(productPromises)
+
+        complementaryItems = productResponses
+          .filter((res) => res.success && res.product)
+          .map((res) => ({
+            id: res.product._id,
+            name: res.product.productTitle,
+            image: res.product.imageUrls?.[0] || null,
+          }))
+      } catch (error) {
+        console.error("[v0] Error fetching complementary product details:", error)
+        // Still add to cart even if we couldn't fetch all details
+        complementaryItems = selectedComplementaryIds.map((id) => ({
+          id,
+          name: undefined,
+          image: undefined,
+        }))
+      }
+    }
+
+    // Add the item to cart with complementary items
+    const itemToAdd: CartItem = {
+      ...pendingCartItem,
+      complementaryItems: complementaryItems.length > 0 ? complementaryItems : undefined,
+    }
+    
+    onAddToCart(itemToAdd)
+
+    // Close modal and reset
+    setShowComplementaryModal(false)
+    setPendingCartItem(null)
   }
 
   return (
@@ -505,6 +576,21 @@ export function ProductConfigurator({
           </Button>
         </div>
       </div>
+
+      {/* Complementary Products Modal */}
+      {pendingCartItem && (
+        <ComplementaryProductsModal
+          isOpen={showComplementaryModal}
+          productId={product.id}
+          mainProductName={product.name}
+          onClose={() => {
+            setShowComplementaryModal(false)
+            setPendingCartItem(null)
+          }}
+          onConfirm={handleComplementaryProductsConfirm}
+          isLoading={isLoadingComplementary}
+        />
+      )}
     </div>
   )
 }

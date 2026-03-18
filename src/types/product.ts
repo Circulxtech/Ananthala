@@ -52,6 +52,7 @@ export interface ProductFormData {
   location: string
   category: string
   subCategory: string
+  productRole?: "normal" | "complementary"
   hamperPrice?: string
   hamperFabric?: string
   variants: ProductVariant[]

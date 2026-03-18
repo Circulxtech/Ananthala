@@ -31,6 +31,7 @@ export async function POST(request: Request) {
     // Extract product data
     const productTypeRaw = (formData.get("productType") as string) ?? "single"
     let productType = productTypeRaw.toLowerCase()
+    const productRole = (formData.get("productRole") as string) || "normal"
     const productTitle = formData.get("productTitle") as string
     const description = formData.get("description") as string
     const units = formData.get("units") as string
@@ -55,6 +56,7 @@ export async function POST(request: Request) {
       location,
       category,
       subCategory,
+      productType,
       hasVariants: !!variantsJson,
       hasDetailSections: !!detailSectionsJson,
       hasHamperItems: !!hamperItemsJson,
@@ -435,6 +437,7 @@ export async function POST(request: Request) {
       location,
       category: categoryLower,
       subCategory: subCategory || undefined,
+      productRole: productRole === "complementary" ? "complementary" : "normal",
       imageUrls,
       variants: processedVariants,
       detailSections,

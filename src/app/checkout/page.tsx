@@ -212,6 +212,12 @@ export default function CheckoutPage() {
                   fabric: item.fabric,
                   productColor: item.productColor,
                   productColorHex: item.productColorHex,
+                  complementaryItems: item.complementaryItems && item.complementaryItems.length > 0 
+                    ? item.complementaryItems.map((comp) => ({
+                        id: comp.id,
+                        name: comp.name,
+                      }))
+                    : undefined,
                 })),
                 subtotal,
                 shippingCost: shipping,
@@ -545,36 +551,58 @@ export default function CheckoutPage() {
                 </h2>
 
                 {/* Cart Items */}
-                <div className="space-y-4 mb-6">
+                <div className="space-y-5 mb-6">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="flex gap-3">
-                      <div className="relative w-16 h-16 shrink-0 bg-gray-100 overflow-hidden">
-                        <Image
-                          src={item.image || "/placeholder.svg"}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-black text-base md:text-lg font-medium line-clamp-1">
-                          {item.name}
-                        </h3>
-                        <p className="text-gray-600 text-sm md:text-base">Size: {item.size}</p>
-                        <p className="text-gray-600 text-sm md:text-base">Qty: {item.quantity}</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center gap-1 text-black text-base md:text-lg">
-                          <IndianRupee className="w-4 h-4" />
-                          <span>
-                            {(item.price * item.quantity).toLocaleString("en-IN", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </span>
+                    <div key={item.id} className="space-y-3">
+                      {/* Main Item */}
+                      <div className="flex gap-3">
+                        <div className="relative w-16 h-16 shrink-0 bg-gray-100 overflow-hidden rounded">
+                          <Image
+                            src={item.image || "/placeholder.svg"}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-black text-base md:text-lg font-medium line-clamp-1">
+                            {item.name}
+                          </h3>
+                          <p className="text-gray-600 text-sm md:text-base">Size: {item.size}</p>
+                          <p className="text-gray-600 text-sm md:text-base">Qty: {item.quantity}</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="flex items-center gap-1 text-black text-base md:text-lg font-medium">
+                            <IndianRupee className="w-4 h-4" />
+                            <span>
+                              {(item.price * item.quantity).toLocaleString("en-IN", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </span>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Complementary Items */}
+                      {item.complementaryItems && item.complementaryItems.length > 0 && (
+                        <div className="ml-4 pl-3 border-l-4 border-green-300 py-2 space-y-2 bg-green-50 px-3 rounded-r">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-block bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">
+                              FREE
+                            </span>
+                            <span className="text-xs font-semibold text-green-700">Complimentary Products</span>
+                          </div>
+                          <div className="space-y-1">
+                            {item.complementaryItems.map((freeItem, idx) => (
+                              <div key={`${item.id}-free-${idx}`} className="text-xs text-gray-700 pl-2">
+                                • {freeItem.name || `Free Product ${idx + 1}`}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

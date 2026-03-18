@@ -45,6 +45,7 @@ interface EditableProduct {
   location: string
   category: string
   subCategory?: string
+  productType?: "normal" | "complementary"
   imageUrls: string[]
   hamperPrice?: number
   hamperFabric?: string
@@ -95,6 +96,7 @@ const createEmptyFormData = (): ProductFormData => ({
     location: "",
     category: "",
     subCategory: "", // Will be removed from form, kept for backward compatibility
+    productRole: "normal",
     hamperPrice: "",
     hamperFabric: "",
     variants: [
@@ -465,6 +467,7 @@ export default function AddProductModal({
         )
 
       formDataToSend.append("productType", formData.productType)
+      formDataToSend.append("productRole", formData.productRole || "normal")
       formDataToSend.append("productTitle", formData.productTitle)
       formDataToSend.append("description", formData.description)
       formDataToSend.append("units", formData.units)
@@ -616,6 +619,8 @@ export default function AddProductModal({
       location: productToEdit.location || "",
       category: productToEdit.category || "",
       subCategory: productToEdit.subCategory || "",
+      productType: productToEdit.productType || "single",
+      productRole: productToEdit.productRole || "normal",
       hamperPrice: productToEdit.productType === "hamper" ? String(productToEdit.hamperPrice ?? "") : "",
       hamperFabric: productToEdit.productType === "hamper" ? String(productToEdit.hamperFabric ?? "") : "",
       variants:
@@ -760,6 +765,41 @@ export default function AddProductModal({
                   required
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="productRole" className="text-sm sm:text-base text-[#6D4530]">
+                  Product Role*
+                </Label>
+                <Select value={formData.productRole} onValueChange={(value) => handleInputChange("productRole", value)}>
+                  <SelectTrigger
+                    id="productRole"
+                    className="h-12 bg-white border-[#D9CFC7] text-[#000000] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold"
+                  >
+                    <SelectValue placeholder="Select product role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="normal">
+                      <span className="font-medium">Normal Product</span>
+                      <p className="text-xs text-gray-600">Customers purchase this product</p>
+                    </SelectItem>
+                    <SelectItem value="complementary">
+                      <span className="font-medium">Complementary Product</span>
+                      <p className="text-xs text-gray-600">Can be offered free with other products</p>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-[#8B5A3C]/60 mt-1">
+                  {formData.productRole === "complementary"
+                    ? "This product can be added as a free gift to other products"
+                    : "This product will be sold individually"}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4 sm:space-y-5">
+              <h3 className="text-base sm:text-lg font-semibold text-[#6D4530] border-b border-[#D9CFC7] pb-2">
+                Product Configuration
+              </h3>
 
               <div className="space-y-2">
                 <Label htmlFor="productType" className="text-sm sm:text-base text-[#6D4530]">
