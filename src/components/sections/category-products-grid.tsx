@@ -20,6 +20,7 @@ interface ApiProduct {
   variants: ApiProductVariant[]
   hamperPrice?: number
   status: "visible" | "hidden"
+  productRole?: "normal" | "complementary"
 }
 
 interface CategoryProductsGridProps {
@@ -77,22 +78,27 @@ export function CategoryProductsGrid({ collection }: CategoryProductsGridProps) 
     const normalizedCollection = collection.toLowerCase()
     const isCategoryCollection = ["joy", "bliss", "grace"].includes(normalizedCollection)
 
+    // Filter out complementary products from all collections
+    const nonComplementaryProducts = products.filter(
+      (product) => product.productRole !== "complementary"
+    )
+
     // If it's a category collection (joy, bliss, grace), products are already filtered by category from API
     // Otherwise, filter by subCategory
     if (isCategoryCollection) {
-      return products // Already filtered by category in API call
+      return nonComplementaryProducts // Already filtered by category in API call, now without complementary
     }
 
     if (normalizedCollection === "essentials") {
       const essentialsCategories = new Set(["bedsheet", "pillow", "bedding", "mattress"])
-      return products.filter((product) => essentialsCategories.has((product.category || "").toLowerCase()))
+      return nonComplementaryProducts.filter((product) => essentialsCategories.has((product.category || "").toLowerCase()))
     }
 
-    const collectionMatches = products.filter(
+    const collectionMatches = nonComplementaryProducts.filter(
       (product) => product.subCategory?.toLowerCase() === normalizedCollection,
     )
 
-    return collectionMatches.length > 0 ? collectionMatches : products
+    return collectionMatches.length > 0 ? collectionMatches : nonComplementaryProducts
   }, [collection, products])
 
   if (isLoading) {

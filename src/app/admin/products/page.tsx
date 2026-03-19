@@ -268,7 +268,8 @@ export default function ProductManagementPage() {
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Product Image</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Category</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Product Name</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Type</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Product Type</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Role</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Variants</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Total Stock</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#4A2F1F]">Base Price (₹)</th>
@@ -295,6 +296,15 @@ export default function ProductManagementPage() {
                           <div className="text-sm text-[#6D4530] mt-0.5">{product.subCategory}</div>
                         )}
                       </div>
+                    </td>
+                    <td className="py-4 px-4 text-[#4A2F1F] font-medium">
+                      <span className={`px-2 py-1 rounded text-xs font-semibold capitalize ${
+                        product.productType === "hamper"
+                          ? "bg-purple-100 text-purple-700"
+                          : "bg-amber-100 text-amber-700"
+                      }`}>
+                        {product.productType || "Single"}
+                      </span>
                     </td>
                     <td className="py-4 px-4 text-[#4A2F1F] font-medium">
                       <span className={`px-2 py-1 rounded text-xs font-semibold ${
@@ -364,6 +374,26 @@ export default function ProductManagementPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-[#6D4530]">Type:</span>
+                    <span className={`ml-2 px-2 py-1 rounded text-xs font-semibold inline-block capitalize ${
+                      product.productType === "hamper"
+                        ? "bg-purple-100 text-purple-700"
+                        : "bg-amber-100 text-amber-700"
+                    }`}>
+                      {product.productType || "Single"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[#6D4530]">Role:</span>
+                    <span className={`ml-2 px-2 py-1 rounded text-xs font-semibold inline-block ${
+                      product.productRole === "complementary"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-green-100 text-green-700"
+                    }`}>
+                      {product.productRole === "complementary" ? "Complementary" : "Normal"}
+                    </span>
+                  </div>
                   <div>
                     <span className="text-[#6D4530]">Total Stock:</span>
                     <span className="ml-2 font-semibold text-[#4A2F1F]">{totalStock}</span>
