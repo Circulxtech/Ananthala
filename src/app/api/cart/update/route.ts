@@ -3,6 +3,7 @@ import { cookies } from "next/headers"
 import dbConnect from "@/lib/mongodb"
 import Cart from "@/models/cart"
 import { verifyToken } from "@/lib/jwt"
+import { calculateShippingCharge } from "@/lib/shipping"
 
 interface UpdateCartRequest {
   userId: string
@@ -83,7 +84,8 @@ export async function POST(request: NextRequest) {
 
       // Recalculate totals
       const subtotal = cart.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)
-      const shipping = subtotal > 5000 ? 0 : 500
+      const totalQuantity = cart.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+      const shipping = calculateShippingCharge(totalQuantity)
       const total = subtotal + shipping
 
       cart.subtotal = subtotal
@@ -135,7 +137,8 @@ export async function POST(request: NextRequest) {
 
       // Recalculate totals
       const subtotal = cart.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)
-      const shipping = subtotal > 5000 ? 0 : 500
+      const totalQuantity = cart.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+      const shipping = calculateShippingCharge(totalQuantity)
       const total = subtotal + shipping
 
       cart.subtotal = subtotal
@@ -185,7 +188,8 @@ export async function POST(request: NextRequest) {
 
       // Recalculate totals
       const subtotal = cart.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)
-      const shipping = subtotal > 5000 ? 0 : 500
+      const totalQuantity = cart.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+      const shipping = calculateShippingCharge(totalQuantity)
       const total = subtotal + shipping
 
       cart.subtotal = subtotal

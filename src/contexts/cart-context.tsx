@@ -11,6 +11,14 @@ interface CartContextType {
   updateQuantity: (itemId: string, quantity: number) => void
   clearCart: () => void
   isLoading: boolean
+  appliedCoupon: {
+    code: string
+    discountAmount: number
+    type: string
+    discount: number
+  } | null
+  setAppliedCoupon: (coupon: any) => void
+  clearCoupon: () => void
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -22,6 +30,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [userEmail, setUserEmail] = useState<string>("")
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
 
   const normalizeItemName = (name: string) => name.replace(/\bGRACE\b/g, "Grace")
   const getCartItemMergeKey = (item: CartItem) =>
@@ -209,6 +218,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCartItems([])
   }
 
+  const handleSetAppliedCoupon = (coupon: any) => {
+    setAppliedCoupon(coupon)
+  }
+
+  const clearCoupon = () => {
+    setAppliedCoupon(null)
+  }
+
   return (
     <CartContext.Provider
       value={{
@@ -218,6 +235,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         updateQuantity,
         clearCart,
         isLoading,
+        appliedCoupon,
+        setAppliedCoupon: handleSetAppliedCoupon,
+        clearCoupon,
       }}
     >
       {children}

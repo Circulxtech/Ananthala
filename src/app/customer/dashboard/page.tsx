@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Package, ShoppingCart, User, TrendingUp, Clock, ArrowRight } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
+import { useCart } from "@/contexts/cart-context"
 
 interface AuthenticatedUser {
   id: string
@@ -37,6 +38,7 @@ interface DashboardStats {
 }
 
 export default function CustomerDashboard() {
+  const { cartItems } = useCart()
   const [user, setUser] = useState<AuthenticatedUser | null>(null)
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 0,
@@ -47,6 +49,14 @@ export default function CustomerDashboard() {
   const [recentOrders, setRecentOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
+
+  // Update cart items count when context updates
+  useEffect(() => {
+    setStats((prev) => ({
+      ...prev,
+      cartItems: cartItems.length,
+    }))
+  }, [cartItems])
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -70,21 +80,18 @@ export default function CustomerDashboard() {
           const ordersResponse = await fetch("/api/customer/orders?page=1&limit=5")
           const ordersData = await ordersResponse.json()
 
-          // Fetch cart
-          const cartResponse = await fetch(`/api/cart/get?userId=${profileData.user.id}`)
-          const cartData = await cartResponse.json()
-
           // Calculate stats
           const totalOrders = ordersData.stats?.totalOrders || 0
           const totalSpent = ordersData.stats?.totalSpent || 0
-          const cartItemsCount = cartData.cart?.items?.length || 0
 
-          setStats({
+          setStats((prev) => ({
+            ...prev,
             totalOrders,
             totalSpent,
-            cartItems: cartItemsCount,
             memberSince,
-          })
+            // Keep cartItems from context
+            cartItems: prev.cartItems,
+          }))
 
           // Set recent orders
           if (ordersData.orders && Array.isArray(ordersData.orders)) {

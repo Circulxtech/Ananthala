@@ -12,47 +12,11 @@ import { useCart } from "@/contexts/cart-context"
 export default function CartPage() {
   const router = useRouter()
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart()
-  const [couponCode, setCouponCode] = useState("")
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null)
-  const [couponError, setCouponError] = useState("")
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   )
-
-  const applyCoupon = () => {
-    const validCoupons: Record<string, number> = {
-      SAVE10: 0.1,
-      WELCOME15: 0.15,
-      SLEEP20: 0.2,
-    }
-
-    if (validCoupons[couponCode.toUpperCase()]) {
-      setAppliedCoupon(couponCode.toUpperCase())
-      setCouponError("")
-    } else {
-      setCouponError("Invalid coupon code")
-      setAppliedCoupon(null)
-    }
-  }
-
-  const removeCoupon = () => {
-    setAppliedCoupon(null)
-    setCouponCode("")
-    setCouponError("")
-  }
-
-  const discountRate = appliedCoupon
-    ? appliedCoupon === "SAVE10"
-      ? 0.1
-      : appliedCoupon === "WELCOME15"
-      ? 0.15
-      : 0.2
-    : 0
-  const discount = subtotal * discountRate
-  const shipping = subtotal > 5000 ? 0 : 500
-  const total = subtotal - discount + shipping
 
   const handleCheckout = () => {
     router.push("/checkout")
@@ -247,51 +211,16 @@ export default function CartPage() {
                       ₹{subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
-                  {appliedCoupon && (
-                    <div className="flex items-center justify-between text-foreground text-sm">
-                      <span>Discount ({appliedCoupon})</span>
-                      <span>
-                        -₹{discount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-base text-foreground">Delivery Charge</span>
-                    <span className="text-foreground">{shipping === 0 ? "FREE" : `₹${shipping.toLocaleString("en-IN")}`}</span>
-                  </div>
                 </div>
-
-                <div className="flex items-center gap-2 mb-4">
-                  <input
-                    type="text"
-                    placeholder="Enter Coupon Code"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    className="flex-1 px-3 py-2 border rounded-md text-sm text-foreground focus:outline-none"
-                    style={{ borderColor: "#D9CFC7" }}
-                  />
-                  <button
-                    onClick={appliedCoupon ? removeCoupon : applyCoupon}
-                    className="px-4 py-2 text-sm text-foreground bg-gray-100 hover:bg-gray-200 transition-colors"
-                  >
-                    {appliedCoupon ? "Remove" : "Apply Coupon"}
-                  </button>
-                </div>
-                {couponError && <p className="text-foreground text-sm mb-4">{couponError}</p>}
 
                 <div className="border-t pt-4 mb-6" style={{ borderColor: "#E5E7EB" }}>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-base text-foreground">Sub Total</span>
-                    <span className="text-foreground text-base font-semibold">
+                  <div className="flex items-center justify-between text-xl">
+                    <span className="text-foreground font-semibold">Subtotal</span>
+                    <span className="text-foreground font-bold">
                       ₹{subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-xl mt-2">
-                    <span className="text-foreground font-semibold">Total</span>
-                    <span className="text-foreground font-bold">
-                      ₹{total.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
+                  <p className="text-sm text-foreground/70 mt-2">Shipping & discounts will be applied at checkout</p>
                 </div>
 
                 <button

@@ -18,13 +18,15 @@ declare global {
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { cartItems, clearCart } = useCart()
+  const { cartItems, clearCart, appliedCoupon, setAppliedCoupon, clearCoupon } = useCart()
   const [isProcessing, setIsProcessing] = useState(false)
   const [isAuthChecking, setIsAuthChecking] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [allStates, setAllStates] = useState<string[]>([])
   const [availableCities, setAvailableCities] = useState<string[]>([])
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [couponCode, setCouponCode] = useState("")
+  const [couponError, setCouponError] = useState("")
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -116,8 +118,65 @@ export default function CheckoutPage() {
     (sum, item) => sum + item.price * item.quantity,
     0
   )
-  const shipping = subtotal > 5000 ? 0 : 500
-  const total = subtotal + shipping
+  
+  // Calculate total quantity of all items
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+  
+  // Shipping formula: 120 for first product, +20 for each additional product
+  // Example: 1 product = 120, 2 products = 140, 3 products = 160
+  const shipping = totalQuantity === 0 ? 0 : 120 + (Math.max(0, totalQuantity - 1) * 20)
+  
+  // Calculate discount based on applied coupon
+  const discount = appliedCoupon ? appliedCoupon.discountAmount : 0
+  const total = subtotal - discount + shipping
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError("Please enter a coupon code")
+      return
+    }
+
+    if (cartItems.length === 0) {
+      setCouponError("Your cart is empty")
+      return
+    }
+
+    try {
+      const response = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: couponCode.trim(),
+          subtotal: subtotal,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setAppliedCoupon({
+          code: couponCode.toUpperCase(),
+          discountAmount: data.coupon.discountAmount,
+          type: data.coupon.type,
+          discount: data.coupon.discount,
+        })
+        setCouponError("")
+      } else {
+        setCouponError(data.error || "Invalid coupon code")
+        clearCoupon()
+      }
+    } catch (error) {
+      console.error("Error validating coupon:", error)
+      setCouponError("Error validating coupon. Please try again.")
+      clearCoupon()
+    }
+  }
+
+  const removeCoupon = () => {
+    clearCoupon()
+    setCouponCode("")
+    setCouponError("")
+  }
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -221,7 +280,8 @@ export default function CheckoutPage() {
                 })),
                 subtotal,
                 shippingCost: shipping,
-                discount: 0,
+                discount: discount,
+                couponCode: appliedCoupon?.code || null,
                 totalAmount: total,
                 paymentMethod: formData.paymentMethod,
               }),
@@ -607,6 +667,31 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
+                {/* Coupon Input Section */}
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg border" style={{ borderColor: "#D9CFC7" }}>
+                  <h3 className="text-sm font-semibold text-black mb-3">Apply Coupon Code</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder="Enter Coupon Code"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      className="flex-1 px-3 py-2 border rounded-md text-sm text-black focus:outline-none"
+                      style={{ borderColor: "#D9CFC7" }}
+                    />
+                    <button
+                      onClick={appliedCoupon ? removeCoupon : applyCoupon}
+                      className="px-4 py-2 text-sm text-black bg-gray-200 hover:bg-gray-300 transition-colors rounded-md"
+                    >
+                      {appliedCoupon ? "Remove" : "Apply"}
+                    </button>
+                  </div>
+                  {couponError && <p className="text-xs text-red-600">{couponError}</p>}
+                  {appliedCoupon && (
+                    <p className="text-xs text-green-600 mt-2">✓ Coupon "{appliedCoupon.code}" applied successfully</p>
+                  )}
+                </div>
+
                 <div
                   className="border-t pt-4 mb-4"
                   style={{ borderColor: "#D9CFC7" }}
@@ -626,22 +711,35 @@ export default function CheckoutPage() {
                         </div>
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-base md:text-lg">
-                      <span className="text-black font-medium">Shipping</span>
-                      <span className="text-black">
-                        {shipping === 0 ? (
-                          "Free"
-                        ) : (
+                    {appliedCoupon && (
+                      <div className="flex items-center justify-between text-base md:text-lg">
+                        <span className="text-black font-medium">Discount ({appliedCoupon.code})</span>
+                        <span className="text-green-600 font-semibold">
                           <div className="flex items-center gap-1">
+                            <span>-</span>
                             <IndianRupee className="w-4 h-4" />
                             <span>
-                              {shipping.toLocaleString("en-IN", {
+                              {discount.toLocaleString("en-IN", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
                               })}
                             </span>
                           </div>
-                        )}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between text-base md:text-lg">
+                      <span className="text-black font-medium">Shipping Charge</span>
+                      <span className="text-black">
+                        <div className="flex items-center gap-1">
+                          <IndianRupee className="w-4 h-4" />
+                          <span>
+                            {shipping.toLocaleString("en-IN", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </span>
+                        </div>
                       </span>
                     </div>
                   </div>
