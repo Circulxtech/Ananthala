@@ -56,6 +56,16 @@ export interface IProduct {
   updatedAt: Date
 }
 
+const getProductTypeForValidation = (context: any): "single" | "hamper" | undefined => {
+  if (!context) return undefined
+  if (typeof context.productType === "string") return context.productType
+  if (typeof context.getUpdate !== "function") return undefined
+  const update = context.getUpdate() || {}
+  if (typeof update.productType === "string") return update.productType
+  if (update.$set && typeof update.$set.productType === "string") return update.$set.productType
+  return undefined
+}
+
 const ProductVariantSchema = new Schema<IProductVariant>(
   {
     variantId: {
@@ -253,8 +263,9 @@ const ProductSchema = new Schema<IProduct>(
       type: [String],
       default: [],
       validate: {
-        validator: function (this: IProduct, v: string[]) {
-          if (this.productType === "hamper") {
+        validator: function (this: any, v: string[]) {
+          const productType = getProductTypeForValidation(this)
+          if (productType === "hamper") {
             return Array.isArray(v) && v.length <= 6
           }
           return Array.isArray(v) && v.length > 0 && v.length <= 6
@@ -266,8 +277,9 @@ const ProductSchema = new Schema<IProduct>(
       type: [ProductVariantSchema],
       default: [],
       validate: {
-        validator: function (this: IProduct, v: IProductVariant[]) {
-          if (this.productType === "hamper") return true
+        validator: function (this: any, v: IProductVariant[]) {
+          const productType = getProductTypeForValidation(this)
+          if (productType === "hamper") return true
           return Array.isArray(v) && v.length > 0
         },
         message: "At least one product variant is required",
@@ -281,8 +293,9 @@ const ProductSchema = new Schema<IProduct>(
       type: [HamperItemSchema],
       default: [],
       validate: {
-        validator: function (this: IProduct, v: IHamperItem[]) {
-          if (this.productType !== "hamper") return true
+        validator: function (this: any, v: IHamperItem[]) {
+          const productType = getProductTypeForValidation(this)
+          if (productType !== "hamper") return true
           return Array.isArray(v) && v.length > 0
         },
         message: "At least one hamper item is required for hamper products",
@@ -292,8 +305,9 @@ const ProductSchema = new Schema<IProduct>(
       type: Number,
       min: [0, "Hamper price must be positive"],
       validate: {
-        validator: function (this: IProduct, v: number) {
-          if (this.productType !== "hamper") return true
+        validator: function (this: any, v: number) {
+          const productType = getProductTypeForValidation(this)
+          if (productType !== "hamper") return true
           return typeof v === "number" && Number.isFinite(v) && v > 0
         },
         message: "Hamper price is required for hamper products",
@@ -303,8 +317,9 @@ const ProductSchema = new Schema<IProduct>(
       type: String,
       trim: true,
       validate: {
-        validator: function (this: IProduct, v: string) {
-          if (this.productType !== "hamper") return true
+        validator: function (this: any, v: string) {
+          const productType = getProductTypeForValidation(this)
+          if (productType !== "hamper") return true
           return typeof v === "string" && v.trim().length > 0
         },
         message: "Hamper fabric is required for hamper products",
