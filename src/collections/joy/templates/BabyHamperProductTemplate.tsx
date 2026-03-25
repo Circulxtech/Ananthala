@@ -165,6 +165,7 @@ export function BabyHamperProductTemplate({
             {detailSections.map((section, index) => {
               const isImageLeft = section.imagePosition ? section.imagePosition === "left" : index % 2 === 1
               const image = section.imageUrl || "/placeholder.svg"
+              const isPlaceholder = image === "/placeholder.svg"
               return (
                 <div
                   key={`${section.title}-${index}`}
@@ -176,7 +177,9 @@ export function BabyHamperProductTemplate({
                     <img
                       src={image}
                       alt={section.imageAlt || section.title || "Product detail"}
-                      className="w-full h-full max-h-[420px] object-cover border border-[#EED9C4]"
+                      className={`w-full h-full max-h-[520px] border border-[#EED9C4] ${
+                        isPlaceholder ? "object-contain bg-white" : "object-cover"
+                      }`}
                     />
                   </div>
                   <div className={`order-1 ${isImageLeft ? "lg:order-2" : "lg:order-1"}`}>

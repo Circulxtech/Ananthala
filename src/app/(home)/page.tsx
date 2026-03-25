@@ -19,24 +19,22 @@ import { useRouter } from "next/navigation"
 const categories = [
   {
     id: 1,
-    title: "FOLDABLE MATTRESS",
-    subtitle: "COMFORT WHEN OPEN. COMPACT WHEN CLOSED.",
+    title: "At Ananthala, we truly value our traditions specifically the ones that have taken care of us for generations",
+    
     image:
-      "https://images.unsplash.com/photo-1619490742661-8949b7d3a612?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYWJ5JTIwY3JpYiUyMG1hdHRyZXNzfGVufDF8fHx8MTc2NTQ0Mzc1MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "/banner1.png",
   },
   {
     id: 2,
-    title: "BABY'S MATTRESSES",
-    subtitle: "GENTLE SUPPORT FOR YOUR LITTLE ONE",
+    title: "We look to mother nature for time proven solutions and make them more relevant for the current times",
     image:
-      "https://images.unsplash.com/photo-1691703028663-c5ff8cbb07c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBtZW1vcnklMjBmb2FtJTIwbWF0dHJlc3N8ZW58MXx8fHwxNzY1NDQzNzUyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "/banner2.png",
   },
   {
     id: 3,
-    title: "100% ORGANIC MATTRESSES",
-    subtitle: "FREE FROM TOXIC FOAM",
+    title: "Introducing our virgin cotton mattresses for all ages. Sleep in the lap of nature !",
     image:
-      "https://images.unsplash.com/photo-1718262722567-9f414d4cf98d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwbWF0dHJlc3MlMjBuYXR1cmFsfGVufDF8fHx8MTc2NTQ0Mzc1MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "/banner3.png",
   },
 ]
 
@@ -227,7 +225,9 @@ export default function Home() {
                 <img
                   src={category.image || "/placeholder.svg"}
                   alt={category.title}
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover transition-transform duration-7000 ease-out ${
+                    currentSlide === index ? "scale-105" : "scale-100"
+                  }`}
                 />
                 <div
                   className="absolute inset-0"
@@ -235,23 +235,25 @@ export default function Home() {
                     background: "rgba(0, 0, 0, 0.3)",
                   }}
                 />
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                  <p
-                    className="text-sm md:text-base mb-2 tracking-wider"
-                    style={{ color: "#F9F8F6", fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
-                  >
-                    {category.subtitle}
-                  </p>
+                <div
+                  className={`absolute inset-0 flex flex-col items-center justify-center text-center px-4 transition-all duration-700 ease-out ${
+                    currentSlide === index ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                  }`}
+                >
                   <h2
-                    className="text-3xl md:text-5xl mb-6"
-                    style={{ color: "#F9F8F6", fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
+                    className={`text-lg md:text-xl mb-6 text-white transition-all duration-700 ease-out ${
+                      currentSlide === index ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+                    }`}
+                    style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, transitionDelay: "120ms" }}
                   >
                     {category.title}
                   </h2>
                   <Link
                     href="/#find-your-perfect-mattress"
-                    className="px-6 py-3 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground text-base shadow-lg transition-all duration-200 hover:scale-105"
-                    style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
+                    className={`px-6 py-3 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground text-base shadow-lg transition-all duration-300 hover:scale-105 ${
+                      currentSlide === index ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+                    }`}
+                    style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, transitionDelay: "320ms" }}
                   >
                     SHOP
                   </Link>
@@ -311,7 +313,8 @@ export default function Home() {
                 }
 
                 const cardKey = card._id || card.name
-                const backgroundImage = card.backgroundUrl || ""
+                const backgroundImage = card.backgroundUrl || "/placeholder.svg"
+                const isPlaceholder = backgroundImage === "/placeholder.svg"
                 const isGifBackground = /\.(gif)(\?|#|$)/i.test(backgroundImage)
                 const positionKey = card.position || "center"
 
@@ -319,16 +322,18 @@ export default function Home() {
                   <button
                     key={cardKey}
                     onClick={() => onNavigate(card.name)}
-                    className="relative group overflow-hidden aspect-3/4 cursor-pointer bg-gray-100"
+                    className={`relative group overflow-hidden aspect-3/4 cursor-pointer bg-gray-100 ${
+                      isPlaceholder ? "min-h-[360px] sm:min-h-[420px] lg:min-h-[520px]" : ""
+                    }`}
                     style={{ overflow: "hidden" }}
                   >
-                    {backgroundImage && isGifBackground ? (
-                      <img
-                        src={backgroundImage}
-                        alt={card.name}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : null}
+                    <img
+                      src={backgroundImage}
+                      alt={card.name}
+                      className={`absolute inset-0 w-full h-full transition-transform duration-500 ${
+                        isPlaceholder ? "object-contain bg-white" : "object-cover group-hover:scale-105"
+                      }`}
+                    />
                     <div
                       className={`absolute ${positionClasses[positionKey as keyof typeof positionClasses]} z-10`}
                     >

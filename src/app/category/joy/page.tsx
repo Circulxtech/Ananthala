@@ -281,7 +281,7 @@ export default function JoyPage() {
         <section className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
           <div className="relative w-full h-full">
             <Image
-              src="/baby.jpg"
+              src="/joy.png"
               alt="Baby Products"
               fill
               className="object-cover"
