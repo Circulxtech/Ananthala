@@ -19,20 +19,22 @@ import { useRouter } from "next/navigation"
 const categories = [
   {
     id: 1,
-    title: "At Ananthala, we truly value our traditions specifically the ones that have taken care of us for generations",
-    
+    title: "At Ananthala, we truly value our traditions specifically the ones that have taken care of us for generations.",
+    subtitle: "Time-honored comfort, made for today",
     image:
       "/banner1.png",
   },
   {
     id: 2,
-    title: "We look to mother nature for time proven solutions and make them more relevant for the current times",
+    title: "We look to mother nature for time proven solutions and make them more relevant for the current times.",
+    subtitle: "Inspired by nature, refined for modern sleep",
     image:
       "/banner2.png",
   },
   {
     id: 3,
     title: "Introducing our virgin cotton mattresses for all ages. Sleep in the lap of nature !",
+    subtitle: "Pure cotton luxury for every stage of life",
     image:
       "/banner3.png",
   },
@@ -232,7 +234,7 @@ export default function Home() {
                 <div
                   className="absolute inset-0"
                   style={{
-                    background: "rgba(0, 0, 0, 0.3)",
+                    background: "rgba(0, 0, 0, 0.5)",
                   }}
                 />
                 <div
@@ -240,20 +242,28 @@ export default function Home() {
                     currentSlide === index ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                   }`}
                 >
-                  <h2
-                    className={`text-lg md:text-xl mb-6 text-white transition-all duration-700 ease-out ${
+                  <p
+                    className={`text-xs md:text-sm mb-4 text-white/90 uppercase tracking-[0.3em] transition-all duration-700 ease-out ${
                       currentSlide === index ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
                     }`}
                     style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, transitionDelay: "120ms" }}
+                  >
+                    {category.subtitle}
+                  </p>
+                  <h2
+                    className={`text-2xl md:text-3xl lg:text-4xl mb-6 text-white leading-tight max-w-4xl transition-all duration-700 ease-out ${
+                      currentSlide === index ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+                    }`}
+                    style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, transitionDelay: "220ms" }}
                   >
                     {category.title}
                   </h2>
                   <Link
                     href="/#find-your-perfect-mattress"
-                    className={`px-6 py-3 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground text-base shadow-lg transition-all duration-300 hover:scale-105 ${
+                    className={`px-8 py-3 bg-white/95 hover:bg-white text-foreground text-sm tracking-[0.3em] uppercase font-sans shadow-lg transition-all duration-300 hover:scale-105 ${
                       currentSlide === index ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
                     }`}
-                    style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, transitionDelay: "320ms" }}
+                    style={{ fontWeight: 400, transitionDelay: "320ms" }}
                   >
                     SHOP
                   </Link>
@@ -327,13 +337,13 @@ export default function Home() {
                     }`}
                     style={{ overflow: "hidden" }}
                   >
-                    <img
-                      src={backgroundImage}
-                      alt={card.name}
+                      <img
+                        src={backgroundImage}
+                        alt={card.name}
                       className={`absolute inset-0 w-full h-full transition-transform duration-500 ${
                         isPlaceholder ? "object-contain bg-white" : "object-cover group-hover:scale-105"
                       }`}
-                    />
+                      />
                     <div
                       className={`absolute ${positionClasses[positionKey as keyof typeof positionClasses]} z-10`}
                     >
