@@ -22,21 +22,21 @@ const categories = [
     title: "At Ananthala, we truly value our traditions specifically the ones that have taken care of us for generations.",
     subtitle: "Time-honored comfort, made for today",
     image:
-      "/banner1.png",
+      "/Banner1.png",
   },
   {
     id: 2,
     title: "We look to mother nature for time proven solutions and make them more relevant for the current times.",
     subtitle: "Inspired by nature, refined for modern sleep",
     image:
-      "/banner2.png",
+      "/Banner2.png",
   },
   {
     id: 3,
     title: "Introducing our virgin cotton mattresses for all ages. Sleep in the lap of nature !",
     subtitle: "Pure cotton luxury for every stage of life",
     image:
-      "/banner3.png",
+      "/Banner3.png",
   },
 ]
 
