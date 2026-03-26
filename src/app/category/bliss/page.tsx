@@ -59,7 +59,7 @@ export default function BlissPage() {
         <section className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
           <div className="relative w-full h-full">
             <Image
-              src="/mattress.jpg"
+              src="/bliss.png"
               alt="Premium Mattress"
               fill
               className="object-cover"
