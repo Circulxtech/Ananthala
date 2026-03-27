@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Play } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Play } from 'lucide-react'
 import ReviewVideoModal from '@/components/review-video-modal'
 
 interface ReviewVideo {
@@ -20,7 +19,7 @@ export function CustomerTestimonialVideos() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedVideo, setSelectedVideo] = useState<ReviewVideo | null>(null)
   const [autoPlayInterval, setAutoPlayInterval] = useState<NodeJS.Timeout | null>(null)
-  const [isPaused, setIsPaused] = useState(false)
+  const AUTO_SCROLL_INTERVAL = 3000 // 3 seconds in milliseconds
   const canShowFour = videos.length > 4
 
   // Fetch videos from database
@@ -45,30 +44,19 @@ export function CustomerTestimonialVideos() {
     fetchVideos()
   }, [])
 
-  // Auto-scroll carousel every 5 seconds if more than 4 videos
+  // Auto-scroll carousel every 3 seconds if more than 4 videos
   useEffect(() => {
-    if (videos.length > 4 && !isPaused) {
+    if (videos.length > 4) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % videos.length)
-      }, 5000)
+      }, AUTO_SCROLL_INTERVAL)
       setAutoPlayInterval(interval)
 
       return () => clearInterval(interval)
     }
-  }, [videos.length, isPaused])
+  }, [videos.length, AUTO_SCROLL_INTERVAL])
 
-  const handlePrev = () => {
-    setIsPaused(true)
-    setCurrentIndex((prev) => {
-      const newIndex = prev - 1
-      return newIndex < 0 ? videos.length - 1 : newIndex
-    })
-  }
 
-  const handleNext = () => {
-    setIsPaused(true)
-    setCurrentIndex((prev) => (prev + 1) % videos.length)
-  }
 
   // Show all videos if <= 4, otherwise show 4 in circular manner
   const getVisibleVideos = () => {
@@ -162,37 +150,9 @@ export function CustomerTestimonialVideos() {
             ))}
           </div>
 
-          {/* Navigation Controls - Only show if more than 4 videos */}
-          {showNavigation && (
-            <div className="flex items-center justify-center gap-4">
-              <Button
-                onClick={handlePrev}
-                size="sm"
-                variant="outline"
-                className="border-[#8B5A3C] text-[#8B5A3C] hover:bg-[#8B5A3C]/5 bg-transparent"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
-
-              <Button
-                onClick={handleNext}
-                size="sm"
-                variant="outline"
-                className="border-[#8B5A3C] text-[#8B5A3C] hover:bg-[#8B5A3C]/5 bg-transparent"
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-
-          {/* Auto-scroll indicator for more than 4 videos */}
+          {/* Auto-scroll dot indicators - Only show if more than 4 videos */}
           {showNavigation && (
             <div className="flex items-center justify-center gap-2 mt-4">
-              <span className="text-sm text-[#8B5A3C]/60">
-                {isPaused ? 'Auto-scroll paused' : 'Auto-scrolling'}
-              </span>
               {videos.map((_, idx) => (
                 <div
                   key={idx}
