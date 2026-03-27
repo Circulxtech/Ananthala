@@ -90,41 +90,32 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-white border-b sticky top-0 z-50" style={{ borderColor: "#D9CFC7" }}>
+      <header className="bg-gradient-to-r from-white via-[#FBF8F3] to-white border-b sticky top-0 z-50 shadow-sm" style={{ borderColor: "#D9CFC7" }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-foreground hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
+                className="text-[#6D4530] hover:bg-[#8B5A3C] hover:text-white transition-all duration-300 p-0 h-12 w-12 rounded-lg font-black flex items-center justify-center"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMenuOpen ? <X className="h-10 w-10 stroke-[3]" /> : <Menu className="h-10 w-10 stroke-[3]" />}
                 <span className="sr-only">Menu</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-foreground hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
-                onClick={handleSearchIconClick}
-              >
-                <Search className="h-5 w-5" />
-                <span className="sr-only">Search</span>
               </Button>
             </div>
 
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <Link href="/" className="flex items-center">
+              <Link href="/" className="flex items-center group">
                 <img
                   src="/logo.png"
                   alt="Ananthala Logo"
-                  className="h-20 w-auto hover:opacity-90 transition-opacity"
+                  className="h-20 w-auto hover:scale-105 transition-transform duration-300 drop-shadow-sm"
                 />
               </Link>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-3">
               {!isLoading && (
                 <>
                   {user ? (
@@ -133,10 +124,10 @@ export function Header() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-foreground hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors relative"
+                          className="text-foreground hover:ring-2 hover:ring-[#8B5A3C] transition-all duration-300 relative p-1 h-11 w-11"
                         >
                           <div
-                            className={`w-8 h-8 rounded-full bg-gradient-to-br ${getGradientColor(user.fullname)} flex items-center justify-center text-white font-semibold text-sm`}
+                            className={`w-10 h-10 rounded-full bg-gradient-to-br ${getGradientColor(user.fullname)} flex items-center justify-center text-white font-black text-lg shadow-md border-2 border-white`}
                           >
                             {getFirstName(user.fullname).charAt(0).toUpperCase()}
                           </div>
@@ -145,16 +136,16 @@ export function Header() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-56">
                         <div className="px-2 py-1.5 text-sm text-[#6D4530]">
-                          <div className="font-medium">{getFirstName(user.fullname)}</div>
+                          <div className="font-bold">{getFirstName(user.fullname)}</div>
                           <div className="text-xs text-[#8B5A3C]/70 truncate">{user.email}</div>
                         </div>
-                        <DropdownMenuItem asChild className="text-[#6D4530] cursor-pointer">
+                        <DropdownMenuItem asChild className="text-[#6D4530] cursor-pointer font-semibold">
                           <Link href="/customer/dashboard">
                             <LayoutDashboard className="mr-2 h-4 w-4" />
                             <span>Dashboard</span>
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleLogout} className="text-[#6D4530] cursor-pointer">
+                        <DropdownMenuItem onClick={handleLogout} className="text-[#6D4530] cursor-pointer font-semibold">
                           <LogOut className="mr-2 h-4 w-4" />
                           <span>Logout</span>
                         </DropdownMenuItem>
@@ -165,9 +156,9 @@ export function Header() {
                       <Button
                         variant="ghost"
                         size="icon"
-                      className="text-foreground hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors"
+                        className="text-[#6D4530] hover:bg-[#8B5A3C] hover:text-white transition-all duration-300 p-0 h-12 w-12 rounded-lg font-black flex items-center justify-center"
                       >
-                        <User className="h-5 w-5" />
+                        <User className="h-9 w-9 stroke-[2.5]" />
                         <span className="sr-only">User account</span>
                       </Button>
                     </Link>
@@ -177,12 +168,12 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-foreground hover:bg-[#8B5A3C]/10 hover:text-[#6D4530] transition-colors relative"
+                className="text-[#6D4530] hover:bg-[#D4A574] hover:text-white transition-all duration-300 relative p-0 h-12 w-12 rounded-lg font-black group flex items-center justify-center"
                 onClick={() => router.push("/cart")}
               >
-                <ShoppingCart className="h-5 w-5" />
+                <ShoppingCart className="h-9 w-9 stroke-[2.5]" />
                 {cartItems.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#8B5A3C] text-white text-xs rounded-full min-w-[1rem] h-4 flex items-center justify-center px-1">
+                  <span className="absolute -top-2 -right-2 bg-gradient-to-br from-[#8B5A3C] to-[#6D4530] text-white text-xs font-black rounded-full min-w-[1.5rem] h-6 flex items-center justify-center px-0.5 border-2 border-white shadow-lg animate-pulse">
                     {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
                   </span>
                 )}

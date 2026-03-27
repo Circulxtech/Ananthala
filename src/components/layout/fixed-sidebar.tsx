@@ -1,11 +1,12 @@
 "use client"
 
-import { Phone, Mail } from "lucide-react"
+import { Phone, Mail, Instagram } from "lucide-react"
 import { CONTACT_CONFIG } from "@/lib/contact-config"
 
 const CONTACT_PHONE = CONTACT_CONFIG.phone;
 const CONTACT_WHATSAPP = CONTACT_CONFIG.whatsapp;
 const CONTACT_EMAIL = CONTACT_CONFIG.email;
+const CONTACT_INSTAGRAM = CONTACT_CONFIG.instagram;
 
 export function FixedSidebar() {
   return (
@@ -48,6 +49,18 @@ export function FixedSidebar() {
           title={`Email: ${CONTACT_CONFIG.email}`}
         >
           <Mail className="w-6 h-6" />
+        </a>
+
+        {/* Instagram Icon */}
+        <a
+          href={CONTACT_INSTAGRAM}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-black hover:text-white hover:scale-110 transition-all cursor-pointer"
+          aria-label="Follow us on Instagram"
+          title="Follow us on Instagram"
+        >
+          <Instagram className="w-6 h-6" />
         </a>
       </div>
     </aside>
