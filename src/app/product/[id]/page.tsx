@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { ChevronRight, Sprout, Waves, SprayCan, XCircle, Layers, Grid } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { getProductDetailById, type ProductDetail } from "@/data/product-details"
 import { type CartItem } from "@/components/cart/cart-drawer"
@@ -30,6 +30,7 @@ import { GraceHeadPillowProductTemplate } from "@/collections/grace/templates/Gr
 import { SimpleProductConfigurator } from "@/components/product/simple-product-configurator"
 import { ProductConfigurator } from "@/components/product/product-configurator"
 import { ProductDetailQuoteLoader } from "@/components/sections/product-detail-quote-loader"
+import { CustomerTestimonialVideos } from "@/components/sections/customer-testimonial-videos"
 import { Button } from "@/components/ui/button"
 import {
   Accordion,
@@ -731,46 +732,6 @@ export default function ProductDetailPage() {
                   )}
                   <section className="w-full bg-white py-12">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                      {/* Feature Icons Row */}
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 mb-10">
-                        <div className="flex flex-col items-center text-center">
-                          <div className="mb-3">
-                            <Sprout className="w-6 h-6 text-foreground stroke-[1.5]" />
-                          </div>
-                          <p className="text-sm md:text-base font-medium text-foreground">100% Organic Cotton</p>
-                        </div>
-                        <div className="flex flex-col items-center text-center">
-                          <div className="mb-3">
-                            <Waves className="w-6 h-6 text-foreground stroke-[1.5]" />
-                          </div>
-                          <p className="text-sm md:text-base font-medium text-foreground">Maximum Absorbency</p>
-                        </div>
-                        <div className="flex flex-col items-center text-center">
-                          <div className="mb-3">
-                            <SprayCan className="w-6 h-6 text-foreground stroke-[1.5]" />
-                          </div>
-                          <p className="text-sm md:text-base font-medium text-foreground">No Artificial Softeners</p>
-                        </div>
-                        <div className="flex flex-col items-center text-center">
-                          <div className="mb-3">
-                            <XCircle className="w-6 h-6 text-foreground stroke-[1.5]" />
-                          </div>
-                          <p className="text-sm md:text-base font-medium text-foreground">Anti-Pill</p>
-                        </div>
-                        <div className="flex flex-col items-center text-center">
-                          <div className="mb-3">
-                            <Layers className="w-6 h-6 text-foreground stroke-[1.5]" />
-                          </div>
-                          <p className="text-sm md:text-base font-medium text-foreground">Plush, 700 GSM</p>
-                        </div>
-                        <div className="flex flex-col items-center text-center">
-                          <div className="mb-3">
-                            <Grid className="w-6 h-6 text-foreground stroke-[1.5]" />
-                          </div>
-                          <p className="text-sm md:text-base font-medium text-foreground">Generously Sized</p>
-                        </div>
-                      </div>
-
                       <Accordion type="single" collapsible className="w-full space-y-4">
                         <AccordionItem value="description" className="border border-[#F3E7DA] px-4 rounded-lg shadow-sm">
                           <AccordionTrigger className="text-lg font-medium text-foreground hover:no-underline">
@@ -856,7 +817,7 @@ export default function ProductDetailPage() {
                 />
               )}
 
-             
+              <CustomerTestimonialVideos />
             </>
           )}
         </div>

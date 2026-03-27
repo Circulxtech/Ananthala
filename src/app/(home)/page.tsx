@@ -20,21 +20,18 @@ const categories = [
   {
     id: 1,
     title: "At Ananthala, we truly value our traditions specifically the ones that have taken care of us for generations.",
-    subtitle: "Time-honored comfort, made for today",
     image:
       "/Banner1.png",
   },
   {
     id: 2,
     title: "We look to mother nature for time proven solutions and make them more relevant for the current times.",
-    subtitle: "Inspired by nature, refined for modern sleep",
     image:
       "/Banner2.png",
   },
   {
     id: 3,
     title: "Introducing our virgin cotton mattresses for all ages. Sleep in the lap of nature !",
-    subtitle: "Pure cotton luxury for every stage of life",
     image:
       "/Banner3.png",
   },
@@ -150,7 +147,7 @@ export default function Home() {
       <Header />
       <main>
         {/* Hero Section */}
-        <section className="relative min-h-[680px] flex items-end">
+        <section className="relative min-h-[640px] flex items-end">
           {/* Background Video */}
           <div className="absolute inset-0 z-0">
             <video ref={videoRef} autoPlay loop muted playsInline className="w-full h-full object-cover">
@@ -214,7 +211,7 @@ export default function Home() {
 
         {/* Category Slider Section */}
         <section className="relative w-full overflow-hidden">
-          <div className="relative h-[500px] md:h-[600px] lg:h-[700px]">
+          <div className="relative h-[620px] md:h-[720px] lg:h-[820px]">
             {categories.map((category, index) => (
               <div
                 key={category.id}
@@ -227,7 +224,7 @@ export default function Home() {
                 <img
                   src={category.image || "/placeholder.svg"}
                   alt={category.title}
-                  className={`w-full h-full object-cover transition-transform duration-7000 ease-out ${
+                  className={`w-full h-full object-cover object-top transition-transform duration-7000 ease-out ${
                     currentSlide === index ? "scale-105" : "scale-100"
                   }`}
                 />
@@ -242,19 +239,11 @@ export default function Home() {
                     currentSlide === index ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                   }`}
                 >
-                  <p
-                    className={`text-xs md:text-sm mb-4 text-white/90 uppercase tracking-[0.3em] transition-all duration-700 ease-out ${
-                      currentSlide === index ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-                    }`}
-                    style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, transitionDelay: "120ms" }}
-                  >
-                    {category.subtitle}
-                  </p>
                   <h2
                     className={`text-2xl md:text-3xl lg:text-4xl mb-6 text-white leading-tight max-w-4xl transition-all duration-700 ease-out ${
                       currentSlide === index ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
                     }`}
-                    style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, transitionDelay: "220ms" }}
+                    style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, transitionDelay: "120ms" }}
                   >
                     {category.title}
                   </h2>
@@ -316,47 +305,39 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {homepageCards.map((card) => {
-                const positionClasses = {
-                  center: "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-                  "bottom-right": "bottom-6 left-1/2 -translate-x-1/2",
-                  "bottom-left": "bottom-6 left-1/2 -translate-x-1/2",
-                }
-
                 const cardKey = card._id || card.name
                 const backgroundImage = card.backgroundUrl || "/placeholder.svg"
                 const isPlaceholder = backgroundImage === "/placeholder.svg"
                 const isGifBackground = /\.(gif)(\?|#|$)/i.test(backgroundImage)
-                const positionKey = card.position || "center"
 
                 return (
-                  <button
-                    key={cardKey}
-                    onClick={() => onNavigate(card.name)}
-                    className={`relative group overflow-hidden aspect-3/4 cursor-pointer bg-gray-100 ${
-                      isPlaceholder ? "min-h-[360px] sm:min-h-[420px] lg:min-h-[520px]" : ""
-                    }`}
-                    style={{ overflow: "hidden" }}
-                  >
+                  <div key={cardKey} className="flex flex-col gap-3">
+                    <button
+                      onClick={() => onNavigate(card.name)}
+                      className="group relative w-full aspect-3/4 overflow-hidden cursor-pointer bg-gray-100"
+                    >
                       <img
                         src={backgroundImage}
                         alt={card.name}
-                      className={`absolute inset-0 w-full h-full transition-transform duration-500 ${
-                        isPlaceholder ? "object-contain bg-white" : "object-cover group-hover:scale-105"
-                      }`}
+                        className={`absolute inset-0 w-full h-full transition-transform duration-500 ${
+                          isPlaceholder ? "object-contain bg-white" : "object-cover group-hover:scale-105"
+                        }`}
                       />
-                    <div
-                      className={`absolute ${positionClasses[positionKey as keyof typeof positionClasses]} z-10`}
-                    >
-                      <div className="bg-[#EED9C4] px-8 py-4 text-center relative min-w-[200px]">
+                    </button>
+                    <div className="flex justify-center">
+                      <button
+                        onClick={() => onNavigate(card.name)}
+                        className="min-w-[200px] px-6 py-3 text-center border border-[#EED9C4] bg-[#EED9C4]/60 backdrop-blur-sm transition-colors hover:bg-[#EED9C4]/80 cursor-pointer"
+                      >
                         <span
-                          className="tracking-wider text-base md:text-lg font-semibold uppercase text-foreground relative z-10"
+                          className="tracking-wider text-base md:text-lg font-semibold uppercase text-foreground"
                           style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
                         >
                           {card.name}
                         </span>
-                      </div>
+                      </button>
                     </div>
-                  </button>
+                  </div>
                 )
               })}
             </div>

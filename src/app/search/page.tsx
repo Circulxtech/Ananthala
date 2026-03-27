@@ -4,25 +4,71 @@ import { useSearchParams } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { useState, useEffect, Suspense } from "react"
-import { products, type Product } from "@/data/products"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Search, IndianRupee } from "lucide-react"
+
+interface ApiProductVariant {
+  price: number
+}
+
+interface ApiProduct {
+  _id: string
+  productTitle: string
+  category: string
+  subCategory?: string
+  imageUrls: string[]
+  variants: ApiProductVariant[]
+  hamperPrice?: number
+  productType?: "single" | "hamper"
+}
 
 function SearchContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const query = searchParams.get("q") || ""
   const [searchQuery, setSearchQuery] = useState(query)
+  const [products, setProducts] = useState<ApiProduct[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  // Filter products based on search query
+  useEffect(() => {
+    let isMounted = true
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        const response = await fetch("/api/products?status=visible")
+        const data = await response.json()
+        if (!response.ok || !data?.success) {
+          throw new Error(data?.message || "Failed to fetch products")
+        }
+        if (isMounted) {
+          setProducts(Array.isArray(data.products) ? data.products : [])
+        }
+      } catch (fetchError: any) {
+        if (isMounted) {
+          setError(fetchError.message || "Failed to fetch products")
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+    fetchProducts()
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   const filteredProducts = products.filter((product) => {
     if (!query) return false
     const searchLower = query.toLowerCase()
     return (
-      product.name.toLowerCase().includes(searchLower) ||
-      product.category.toLowerCase().includes(searchLower) ||
-      product.firmness.toLowerCase().includes(searchLower)
+      product.productTitle.toLowerCase().includes(searchLower) ||
+      (product.category || "").toLowerCase().includes(searchLower) ||
+      (product.subCategory || "").toLowerCase().includes(searchLower)
     )
   })
 
@@ -42,7 +88,7 @@ function SearchContent() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Search Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-amber-950 mb-4">
+          <h1 className="text-3xl font-bold text-foreground mb-4">
             Search Results
           </h1>
           <form onSubmit={handleSearch} className="max-w-2xl">
@@ -52,14 +98,14 @@ function SearchContent() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products..."
-                className="w-full px-4 py-3 pl-12 pr-4 border rounded-md text-amber-900 placeholder:text-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-900/30 transition-all"
+                className="w-full px-4 py-3 pl-12 pr-4 border rounded-md text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-foreground/30 transition-all"
                 style={{ borderColor: '#D9CFC7' }}
               />
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-600" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground" />
             </div>
           </form>
           {query && (
-            <p className="mt-4 text-amber-800">
+            <p className="mt-4 text-foreground/80">
               {filteredProducts.length} result{filteredProducts.length !== 1 ? "s" : ""} for "{query}"
             </p>
           )}
@@ -67,54 +113,74 @@ function SearchContent() {
 
         {/* Search Results */}
         {query ? (
-          filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  onClick={() => router.push(`/product/${product.id}`)}
-                  className="group cursor-pointer"
-                >
-                  <div className="relative aspect-square mb-4 overflow-hidden bg-stone-50 rounded-lg">
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      unoptimized
-                    />
-                    <div className="absolute top-4 right-4">
-                      <div className="bg-white px-3 py-1 text-amber-950 rounded">
-                        ⭐ {product.rating}
+          isLoading ? (
+            <div className="text-center py-16">
+              <p className="text-foreground/80 mb-4 text-lg">Loading...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-16 text-red-600">{error}</div>
+          ) : filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,300px))] gap-x-8 gap-y-10 justify-center">
+              {filteredProducts.map((product) => {
+                const startingPrice =
+                  product.productType === "hamper" && typeof product.hamperPrice === "number"
+                    ? product.hamperPrice
+                    : product.variants?.[0]?.price || 0
+                return (
+                  <div
+                    key={product._id}
+                    className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white w-full"
+                  >
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => router.push(`/product/${product._id}`)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          router.push(`/product/${product._id}`)
+                        }
+                      }}
+                      className="block"
+                    >
+                      <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                        <Image
+                          src={product.imageUrls?.[0] || "/placeholder.svg"}
+                          alt={product.productTitle}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
                       </div>
                     </div>
+                    <h3 className="text-base font-semibold text-foreground mb-2 text-center">{product.productTitle}</h3>
+                    <div className="text-sm font-medium text-foreground mb-3 text-center">
+                      Starting at {"\u20B9"}
+                      {startingPrice.toLocaleString("en-IN")}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/product/${product._id}`)}
+                      className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm rounded-md"
+                    >
+                      Customize
+                    </button>
                   </div>
-                  <h3 className="mb-2 text-amber-950 group-hover:text-amber-700 transition-colors font-semibold">
-                    {product.name}
-                  </h3>
-                  <p className="mb-1 text-amber-800 text-sm">
-                    {product.firmness} Firmness
-                  </p>
-                  <div className="flex items-center gap-1 text-amber-950 font-bold">
-                    <IndianRupee className="w-4 h-4" />
-                    <span>{product.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           ) : (
             <div className="text-center py-16">
-              <p className="text-amber-800 mb-4 text-lg">
+              <p className="text-foreground/80 mb-4 text-lg">
                 No products found for "{query}"
               </p>
-              <p className="text-amber-600">
+              <p className="text-foreground/60">
                 Try searching with different keywords
               </p>
             </div>
           )
         ) : (
           <div className="text-center py-16">
-            <p className="text-amber-800 mb-4 text-lg">
+            <p className="text-foreground/80 mb-4 text-lg">
               Enter a search query to find products
             </p>
           </div>

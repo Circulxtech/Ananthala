@@ -141,57 +141,6 @@ export function BlissMattressProductTemplate({
       {/* Product Features & Information Section */}
       <section className="w-full bg-white py-16">
         <div className="w-full px-4 sm:px-6 lg:px-8">
-          {/* Features Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 mb-12 max-w-7xl mx-auto">
-            {/* Feature 1: 100% Organic Cotton */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <Sprout className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">100% Organic Cotton</p>
-            </div>
-
-            {/* Feature 2: Maximum Absorbency */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <Waves className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">Maximum Absorbency</p>
-            </div>
-
-            {/* Feature 3: No Artificial Softeners */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <SprayCan className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">No Artificial Softeners</p>
-            </div>
-
-            {/* Feature 4: Anti-Pill */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <XCircle className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">Anti-Pill</p>
-            </div>
-
-            {/* Feature 5: Plush, 700 GSM */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <Layers className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">Plush, 700 GSM</p>
-            </div>
-
-            {/* Feature 6: Generously Sized */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <Grid className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">Generously Sized</p>
-            </div>
-          </div>
-
           {/* Accordion Sections */}
           <div className="max-w-8xl mx-auto">
             <Accordion type="single" collapsible className="w-full space-y-4">
@@ -348,65 +297,6 @@ export function BlissMattressProductTemplate({
 
       {/* What Our Customers Also Bought Section */}
       <CustomersAlsoBought currentProductId={productId} />
-
-      {/* Customer Testimonials Video Carousel Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-12">
-            <h2 className="text-4xl sm:text-4xl lg:text-4xl font-medium text-foreground mb-4 text-balance">
-              What Our Divas Say
-            </h2>
-            <p className="text-xl sm:text-2xl text-foreground font-medium">Join thousands of happy sleepers</p>
-          </div>
-
-          {/* Video Carousel */}
-          <div className="relative">
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {testimonialVideos.map((testimonial) => (
-                  <CarouselItem
-                    key={testimonial.id}
-                    className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
-                  >
-                    <div className="space-y-2">
-                      <div className="relative aspect-video overflow-hidden border border-[#EED9C4]">
-                        <video
-                          className="w-full h-full object-cover"
-                          controls
-                          controlsList="nodownload nofullscreen noremoteplayback"
-                          disablePictureInPicture
-                          onContextMenu={(e) => e.preventDefault()}
-                          poster={testimonial.poster}
-                        >
-                          <source src={testimonial.video} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
-                      </div>
-                      <p className="text-left text-foreground font-semibold text-lg">
-                        {testimonial.name}
-                      </p>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="left-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-              <CarouselNext className="right-0 bg-white border-2 shadow-md hover:bg-gray-50" style={{ borderColor: "#EED9C4" }} />
-            </Carousel>
-          </div>
-
-          {/* Rating Summary */}
-          <div className="text-center mt-8">
-            <p className="text-foreground text-lg font-semibold">Rated 4.9/5 from over 10,000 reviews</p>
-          </div>
-        </div>
-      </section>
 
       {/* About Us Section */}
 <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">

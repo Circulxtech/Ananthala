@@ -1,7 +1,8 @@
- import { Header } from "@/components/layout/header"
+import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import Image from "next/image"
-import { Heart, Eye, Award, Leaf } from "lucide-react"
+import Link from "next/link"
+import { Heart, Eye, Award, Leaf, ChevronRight } from "lucide-react"
 
 const values = [
   {
@@ -35,6 +36,26 @@ export default function AboutPage() {
     <div className="min-h-screen">
       <Header />
       <main>
+        {/* Fixed Breadcrumb */}
+        <div className="fixed top-20 left-0 right-0 z-40 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="py-2">
+              <ol className="flex items-center gap-2 text-base">
+                <li>
+                  <Link href="/" className="text-foreground hover:text-[#6D4530] transition-colors">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <ChevronRight className="w-4 h-4 text-foreground/50" />
+                </li>
+                <li className="text-foreground font-medium">About Us</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+        {/* Spacer to prevent content from going under fixed breadcrumb */}
+        <div className="h-[49px]"></div>
         {/* Hero Section */}
         <section className="relative h-[60vh] bg-[#EED9C4] overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">

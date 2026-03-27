@@ -56,24 +56,24 @@ export default function BlissPage() {
         {/* Spacer to prevent content from going under fixed breadcrumb */}
         <div className="h-[49px]"></div>
         {/* 1. Hero Section - Mattress Image */}
-        <section className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
+        <section className="relative w-full h-[70vh] md:h-[80vh] overflow-hidden">
           <div className="relative w-full h-full">
             <Image
               src="/bliss.png"
               alt="Premium Mattress"
               fill
-              className="object-cover"
+              className="object-cover object-top"
               priority
             />
             {/* Overlay content on the left */}
             <div className="absolute inset-0 z-10 flex items-center">
               <div className="pl-4 sm:pl-6 lg:pl-8 xl:pl-12">
                 <div className="max-w-md space-y-6">
-                  <div className="bg-[#EED9C4] p-4 md:p-8 rounded-lg shadow-lg">
-                    <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-foreground font-cormorant">
+                  <div className="bg-white/10 backdrop-blur-sm p-4 md:p-8 rounded-lg">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-white font-cormorant">
                       Bliss Collection
                     </h1>
-                    <p className="text-foreground text-base md:text-lg mt-4 leading-relaxed font-medium">
+                    <p className="text-white text-base md:text-lg mt-4 leading-relaxed font-medium">
                       Discover restorative sleep with our Bliss collection, crafted with premium materials
                       and balanced support for every stage of your day.
                     </p>

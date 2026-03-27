@@ -116,14 +116,14 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
         <div className="max-w-4xl mx-auto" ref={dropdownRef}>
           <form onSubmit={handleSearch} className="relative">
             <div className="relative bg-white rounded-lg shadow-lg border" style={{ borderColor: "#D9CFC7" }}>
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8B5A3C]" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground" />
               <input
                 ref={inputRef}
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products by name, type, size, or firmness..."
-                className="w-full px-4 py-4 pl-12 pr-12 bg-white text-[#6D4530] placeholder:text-[#A0826D] focus:outline-none text-lg rounded-lg"
+                className="w-full px-4 py-4 pl-12 pr-12 bg-white text-foreground placeholder:text-foreground/60 focus:outline-none text-lg rounded-lg"
               />
               {searchQuery && (
                 <button
@@ -131,7 +131,7 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                   onClick={() => setSearchQuery("")}
                   className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-[#F5F1ED] rounded"
                 >
-                  <X className="w-5 h-5 text-[#8B5A3C]" />
+                  <X className="w-5 h-5 text-foreground" />
                 </button>
               )}
             </div>

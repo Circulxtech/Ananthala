@@ -145,57 +145,6 @@ export function KidsHamperProductTemplate({
       {/* Product Features & Information Section */}
       <section className="w-full bg-white py-16">
         <div className="w-full px-4 sm:px-6 lg:px-8">
-          {/* Features Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 mb-12 max-w-7xl mx-auto">
-            {/* Feature 1: 100% Organic Cotton */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <Sprout className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">100% Organic Cotton</p>
-            </div>
-
-            {/* Feature 2: Maximum Absorbency */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <Waves className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">Maximum Absorbency</p>
-            </div>
-
-            {/* Feature 3: No Artificial Softeners */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <SprayCan className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">No Artificial Softeners</p>
-            </div>
-
-            {/* Feature 4: Anti-Pill */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <XCircle className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">Anti-Pill</p>
-            </div>
-
-            {/* Feature 5: Plush, 700 GSM */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <Layers className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">Plush, 700 GSM</p>
-            </div>
-
-            {/* Feature 6: Generously Sized */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <Grid className="w-6 h-6 text-foreground stroke-[1.5]" />
-              </div>
-              <p className="text-base md:text-lg font-medium text-foreground">Generously Sized</p>
-            </div>
-          </div>
-
           {/* Accordion Sections */}
           <div className="max-w-8xl mx-auto">
             <Accordion type="single" collapsible className="w-full space-y-4">

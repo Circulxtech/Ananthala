@@ -11,12 +11,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { SearchDropdown } from "@/components/search/search-dropdown"
 
 const menuItems = [
-  { label: "About", href: "/about" },
-  { label: "Joy", href: "/category/joy" },
-  { label: "Bliss", href: "/category/bliss" },
-  { label: "Grace", href: "/category/grace" },
-  { label: "Blog", href: "/blog" },
-  { label: "Contact Us", href: "/contact-us" },
+  { label: "Shop", href: "/#find-your-perfect-mattress" },
+  { label: "Joy", href: "/category/joy#shop" },
+  { label: "Bliss", href: "/category/bliss#shop" },
+  { label: " Grace", href: "/category/grace#shop" },
+  { label: "My Account", href: "/login" },
+  { label: "About Ananthala", href: "/about" },
+  { label: "Search", onClick: "search" as const },
 ]
 
 interface AuthenticatedUser {
@@ -90,18 +91,31 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-gradient-to-r from-white via-[#FBF8F3] to-white border-b sticky top-0 z-50 shadow-sm" style={{ borderColor: "#D9CFC7" }}>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-white border-b sticky top-0 z-50 shadow-sm" style={{ borderColor: "#D9CFC7" }}>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4 -ml-2">
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-[#6D4530] hover:bg-[#8B5A3C] hover:text-white transition-all duration-300 p-0 h-12 w-12 rounded-lg font-black flex items-center justify-center"
+                className="text-foreground hover:text-[#EED9C4] hover:bg-transparent transition-all duration-300 p-0 h-14 w-14 rounded-lg font-black flex items-center justify-center group outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
-                {isMenuOpen ? <X className="h-10 w-10 stroke-[3]" /> : <Menu className="h-10 w-10 stroke-[3]" />}
+                {isMenuOpen ? (
+                  <X className="h-14 w-14 stroke-[3] group-hover:animate-bounce" />
+                ) : (
+                  <Menu className="h-14 w-14 stroke-[3] group-hover:animate-bounce" />
+                )}
                 <span className="sr-only">Menu</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-foreground hover:text-[#EED9C4] hover:bg-transparent transition-all duration-300 relative p-0 h-14 w-14 rounded-lg font-black group flex items-center justify-center outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
+                onClick={handleSearchIconClick}
+              >
+                <Search className="h-12 w-12 stroke-[2.5] group-hover:animate-bounce" />
+                <span className="sr-only">Search</span>
               </Button>
             </div>
 
@@ -115,7 +129,7 @@ export function Header() {
               </Link>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4 -mr-2">
               {!isLoading && (
                 <>
                   {user ? (
@@ -124,10 +138,12 @@ export function Header() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-foreground hover:ring-2 hover:ring-[#8B5A3C] transition-all duration-300 relative p-1 h-11 w-11"
+                          className="text-foreground hover:ring-2 hover:ring-[#EED9C4] transition-all duration-300 relative p-1 h-14 w-14 group outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
                         >
                           <div
-                            className={`w-10 h-10 rounded-full bg-gradient-to-br ${getGradientColor(user.fullname)} flex items-center justify-center text-white font-black text-lg shadow-md border-2 border-white`}
+                            className={`w-12 h-12 rounded-full bg-gradient-to-br ${getGradientColor(
+                              user.fullname,
+                            )} flex items-center justify-center text-white font-black text-lg shadow-md border-2 border-white group-hover:animate-bounce`}
                           >
                             {getFirstName(user.fullname).charAt(0).toUpperCase()}
                           </div>
@@ -156,9 +172,9 @@ export function Header() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-[#6D4530] hover:bg-[#8B5A3C] hover:text-white transition-all duration-300 p-0 h-12 w-12 rounded-lg font-black flex items-center justify-center"
+                        className="text-foreground hover:text-[#EED9C4] hover:bg-transparent transition-all duration-300 p-0 h-14 w-14 rounded-lg font-black flex items-center justify-center group outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
                       >
-                        <User className="h-9 w-9 stroke-[2.5]" />
+                        <User className="h-12 w-12 stroke-[2.5] group-hover:animate-bounce" />
                         <span className="sr-only">User account</span>
                       </Button>
                     </Link>
@@ -168,10 +184,10 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-[#6D4530] hover:bg-[#D4A574] hover:text-white transition-all duration-300 relative p-0 h-12 w-12 rounded-lg font-black group flex items-center justify-center"
+                className="text-foreground hover:text-[#EED9C4] hover:bg-transparent transition-all duration-300 relative p-0 h-14 w-14 rounded-lg font-black group flex items-center justify-center outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
                 onClick={() => router.push("/cart")}
               >
-                <ShoppingCart className="h-9 w-9 stroke-[2.5]" />
+                <ShoppingCart className="h-12 w-12 stroke-[2.5] group-hover:animate-bounce" />
                 {cartItems.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-gradient-to-br from-[#8B5A3C] to-[#6D4530] text-white text-xs font-black rounded-full min-w-[1.5rem] h-6 flex items-center justify-center px-0.5 border-2 border-white shadow-lg animate-pulse">
                     {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
@@ -195,16 +211,34 @@ export function Header() {
             style={{ borderColor: "#D9CFC7" }}
           >
             <nav className="p-4">
+              <div className="flex items-center justify-center py-4">
+                <img src="/logo.png" alt="Ananthala" className="h-14 w-auto" />
+              </div>
               <ul className="space-y-1">
                 {menuItems.map((item, index) => (
                   <li key={index}>
-                    <Link
-                      href={item.href}
-                      className="block py-2.5 px-4 text-foreground text-base font-medium uppercase tracking-wide hover:text-[#8B5A3C] hover:bg-[#8B5A3C]/10 transition-all duration-300 rounded-md"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {item.label}
-                    </Link>
+                    {item.href ? (
+                      <Link
+                        href={item.href}
+                        className="block py-2.5 px-4 text-foreground text-base font-medium uppercase tracking-wide hover:text-[#8B5A3C] transition-all duration-300 rounded-md"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        className="w-full text-left py-2.5 px-4 text-foreground text-base font-medium uppercase tracking-wide hover:text-[#8B5A3C] transition-all duration-300 rounded-md"
+                        onClick={() => {
+                          setIsMenuOpen(false)
+                          if (item.onClick === "search") {
+                            setIsSearchOpen(true)
+                          }
+                        }}
+                      >
+                        {item.label}
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>

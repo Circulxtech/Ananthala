@@ -1,6 +1,7 @@
 "use client"
 
 import { Phone, Mail, Instagram } from "lucide-react"
+import Link from "next/link"
 import { CONTACT_CONFIG } from "@/lib/contact-config"
 
 const CONTACT_PHONE = CONTACT_CONFIG.phone;
@@ -13,14 +14,13 @@ export function FixedSidebar() {
     <aside className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
       <div className="px-3 py-4 rounded-l-2xl flex flex-col items-center gap-3 bg-white/10 backdrop-blur-sm">
         {/* Phone Icon */}
-        <a
-          href={`tel:${CONTACT_CONFIG.phoneRaw}`}
+        <Link
+          href="/contact-us"
           className="p-2 rounded-lg hover:scale-110 transition-all cursor-pointer"
-          aria-label="Call us"
-          title={`Call: ${CONTACT_CONFIG.phone}`}
+          aria-label="Contact us"
         >
           <Phone className="w-6 h-6 text-gray-700" />
-        </a>
+        </Link>
 
         {/* WhatsApp Icon */}
         <a
@@ -29,7 +29,6 @@ export function FixedSidebar() {
           rel="noopener noreferrer"
           className="p-2 rounded-lg hover:scale-110 transition-all cursor-pointer"
           aria-label="Chat on WhatsApp"
-          title={`WhatsApp: ${CONTACT_CONFIG.phone}`}
         >
           <svg
             className="w-6 h-6 text-[#25D366]"
@@ -46,7 +45,6 @@ export function FixedSidebar() {
           href={`mailto:${CONTACT_CONFIG.email}`}
           className="p-2 rounded-lg hover:scale-110 transition-all cursor-pointer"
           aria-label="Email us"
-          title={`Email: ${CONTACT_CONFIG.email}`}
         >
           <Mail className="w-6 h-6 text-blue-500" />
         </a>
@@ -58,7 +56,6 @@ export function FixedSidebar() {
           rel="noopener noreferrer"
           className="p-2 rounded-lg hover:scale-110 transition-all cursor-pointer"
           aria-label="Follow us on Instagram"
-          title="Follow us on Instagram"
         >
           <Instagram className="w-6 h-6 text-pink-500" />
         </a>
