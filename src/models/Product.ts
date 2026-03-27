@@ -51,6 +51,7 @@ export interface IProduct {
   hamperFabric?: string
   productRole?: "normal" | "complementary" // Type of product: normal or can be offered as free
   complementaryProductIds?: string[] // MongoDB IDs of free products
+  displayOrder?: number
   status: "visible" | "hidden"
   createdAt: Date
   updatedAt: Date
@@ -339,6 +340,11 @@ const ProductSchema = new Schema<IProduct>(
       ref: "Product",
       default: [],
       description: "Array of product IDs that are given free with this product",
+    },
+    displayOrder: {
+      type: Number,
+      default: null,
+      description: "Controls display ordering on category pages",
     },
     status: {
       type: String,

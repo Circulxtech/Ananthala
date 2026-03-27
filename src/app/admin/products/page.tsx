@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Plus, RefreshCw, Trash2, Loader2, Pencil, Gift } from "lucide-react"
+import { useMemo, useState, useEffect } from "react"
+import { Plus, RefreshCw, Trash2, Loader2, Pencil, Gift, GripVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import AddProductModal from "@/components/admin/add-product-modal"
@@ -46,6 +46,8 @@ interface Product {
     imagePosition?: "left" | "right"
   }>
   complementaryProductIds?: string[]
+  displayOrder?: number | null
+  createdAt?: string
   status: "visible" | "hidden"
   sellerName: string
   sellerEmail: string
@@ -65,6 +67,11 @@ export default function ProductManagementPage() {
   const itemsPerPage = 10
   const [isComplementaryModalOpen, setIsComplementaryModalOpen] = useState(false)
   const [selectedProductForComplementary, setSelectedProductForComplementary] = useState<Product | null>(null)
+  const [isReorderMode, setIsReorderMode] = useState(false)
+  const [reorderProducts, setReorderProducts] = useState<Product[]>([])
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [isSavingOrder, setIsSavingOrder] = useState(false)
+  const [orderMessage, setOrderMessage] = useState<string | null>(null)
 
   const fetchProducts = async () => {
     try {
@@ -167,8 +174,20 @@ export default function ProductManagementPage() {
     setIsComplementaryModalOpen(true)
   }
 
-  const filteredProducts =
-    selectedCategory === "all" ? products : products.filter((p) => p.category === selectedCategory.toLowerCase())
+  const filteredProducts = useMemo(() => {
+    if (selectedCategory === "all") return products
+    return products.filter((p) => p.category === selectedCategory.toLowerCase())
+  }, [products, selectedCategory])
+
+  const sortByDisplayOrder = (items: Product[]) =>
+    [...items].sort((a, b) => {
+      const aOrder = typeof a.displayOrder === "number" ? a.displayOrder : Number.POSITIVE_INFINITY
+      const bOrder = typeof b.displayOrder === "number" ? b.displayOrder : Number.POSITIVE_INFINITY
+      if (aOrder !== bOrder) return aOrder - bOrder
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
+      return bTime - aTime
+    })
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
@@ -178,6 +197,62 @@ export default function ProductManagementPage() {
   useEffect(() => {
     setCurrentPage(1)
   }, [selectedCategory])
+
+  useEffect(() => {
+    if (selectedCategory === "all") {
+      setIsReorderMode(false)
+      setReorderProducts([])
+      return
+    }
+    setReorderProducts(sortByDisplayOrder(filteredProducts))
+  }, [filteredProducts, selectedCategory])
+
+  const handleDragStart = (index: number) => {
+    setDragIndex(index)
+  }
+
+  const handleDrop = (index: number) => {
+    if (dragIndex === null || dragIndex === index) {
+      setDragIndex(null)
+      return
+    }
+    const updated = [...reorderProducts]
+    const [moved] = updated.splice(dragIndex, 1)
+    updated.splice(index, 0, moved)
+    setReorderProducts(updated)
+    setDragIndex(null)
+  }
+
+  const handleSaveOrder = async () => {
+    if (selectedCategory === "all" || reorderProducts.length === 0) return
+    try {
+      setIsSavingOrder(true)
+      setOrderMessage(null)
+      const orderedIds = reorderProducts.map((product) => product._id)
+      const response = await fetch("/api/products/order", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ category: selectedCategory, orderedIds }),
+      })
+      const data = await response.json()
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to update order")
+      }
+      const orderMap = new Map(orderedIds.map((id, index) => [id, index + 1]))
+      setProducts((prev) =>
+        prev.map((product) =>
+          product.category === selectedCategory
+            ? { ...product, displayOrder: orderMap.get(product._id) ?? product.displayOrder }
+            : product,
+        ),
+      )
+      setOrderMessage("Order saved successfully.")
+    } catch (error: any) {
+      setOrderMessage(error.message || "Failed to save order.")
+    } finally {
+      setIsSavingOrder(false)
+    }
+  }
 
   const getProductStats = (product: Product) => {
     const isHamper = product.productType === "hamper"
@@ -259,6 +334,69 @@ export default function ProductManagementPage() {
             </Button>
           </div>
         </div>
+
+        {selectedCategory !== "all" && (
+          <div className="mb-6 rounded-lg border border-[#D9CFC7] bg-[#F9F6F2] p-4 sm:p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-[#4A2F1F] capitalize">
+                  Reorder {selectedCategory} products
+                </h3>
+                <p className="text-sm text-[#6D4530]">
+                  Drag and drop to set the order shown on the category page, then save.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  variant="outline"
+                  className="border-[#D9CFC7] text-[#4A2F1F] hover:bg-[#8B5A3C]/10 bg-transparent font-medium"
+                  onClick={() => setIsReorderMode((prev) => !prev)}
+                  disabled={reorderProducts.length === 0}
+                >
+                  {isReorderMode ? "Close Reorder" : "Reorder Products"}
+                </Button>
+                {isReorderMode && (
+                  <Button
+                    className="bg-black text-white hover:bg-black/90 font-medium"
+                    onClick={handleSaveOrder}
+                    disabled={isSavingOrder || reorderProducts.length === 0}
+                  >
+                    {isSavingOrder ? "Saving..." : "Save Order"}
+                  </Button>
+                )}
+              </div>
+            </div>
+            {orderMessage && <p className="mt-3 text-sm text-[#4A2F1F]">{orderMessage}</p>}
+            {isReorderMode && (
+              <div className="mt-4 space-y-2">
+                {reorderProducts.map((product, index) => (
+                  <div
+                    key={product._id}
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={() => handleDrop(index)}
+                    onDragEnd={() => setDragIndex(null)}
+                    className={`flex items-center gap-3 rounded-md border border-[#D9CFC7] bg-white p-3 ${
+                      dragIndex === index ? "opacity-60" : ""
+                    }`}
+                  >
+                    <GripVertical className="h-4 w-4 text-[#6D4530] cursor-grab" />
+                    <img
+                      src={product.imageUrls[0] || "/placeholder.svg"}
+                      alt={product.productTitle}
+                      className="w-10 h-10 rounded object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-[#4A2F1F] truncate">{product.productTitle}</div>
+                      <div className="text-xs text-[#6D4530]">Position {index + 1}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Desktop Table View */}
         <div className="hidden lg:block overflow-x-auto">

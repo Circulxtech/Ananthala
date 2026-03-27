@@ -21,6 +21,8 @@ interface ApiProduct {
   hamperPrice?: number
   status: "visible" | "hidden"
   productRole?: "normal" | "complementary"
+  displayOrder?: number | null
+  createdAt?: string
 }
 
 interface CategoryProductsGridProps {
@@ -85,20 +87,32 @@ export function CategoryProductsGrid({ collection }: CategoryProductsGridProps) 
 
     // If it's a category collection (joy, bliss, grace), products are already filtered by category from API
     // Otherwise, filter by subCategory
+    const sortByDisplayOrder = (items: ApiProduct[]) =>
+      [...items].sort((a, b) => {
+        const aOrder = typeof a.displayOrder === "number" ? a.displayOrder : Number.POSITIVE_INFINITY
+        const bOrder = typeof b.displayOrder === "number" ? b.displayOrder : Number.POSITIVE_INFINITY
+        if (aOrder !== bOrder) return aOrder - bOrder
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        return bTime - aTime
+      })
+
     if (isCategoryCollection) {
-      return nonComplementaryProducts // Already filtered by category in API call, now without complementary
+      return sortByDisplayOrder(nonComplementaryProducts)
     }
 
     if (normalizedCollection === "essentials") {
       const essentialsCategories = new Set(["bedsheet", "pillow", "bedding", "mattress"])
-      return nonComplementaryProducts.filter((product) => essentialsCategories.has((product.category || "").toLowerCase()))
+      return sortByDisplayOrder(
+        nonComplementaryProducts.filter((product) => essentialsCategories.has((product.category || "").toLowerCase())),
+      )
     }
 
     const collectionMatches = nonComplementaryProducts.filter(
       (product) => product.subCategory?.toLowerCase() === normalizedCollection,
     )
 
-    return collectionMatches.length > 0 ? collectionMatches : nonComplementaryProducts
+    return sortByDisplayOrder(collectionMatches.length > 0 ? collectionMatches : nonComplementaryProducts)
   }, [collection, products])
 
   if (isLoading) {
