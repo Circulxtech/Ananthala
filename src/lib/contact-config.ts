@@ -10,9 +10,12 @@ export const CONTACT_CONFIG = {
   email: "qualprodsllp@gmail.com",
   // WhatsApp number (without +, with country code)
   whatsapp: "9071799966",
+  // Instagram handle or profile URL
+  instagram: "https://www.instagram.com/ananthala/",
 } as const
 
 // Helper functions for contact links
 export const getPhoneLink = () => `tel:${CONTACT_CONFIG.phoneRaw}`
 export const getWhatsAppLink = () => `https://wa.me/${CONTACT_CONFIG.whatsapp}`
 export const getEmailLink = () => `mailto:${CONTACT_CONFIG.email}`
+export const getInstagramLink = () => CONTACT_CONFIG.instagram

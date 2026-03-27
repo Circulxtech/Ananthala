@@ -2,7 +2,88 @@ import { type NextRequest, NextResponse } from "next/server"
 import { jwtVerify } from "@/lib/jwt"
 import { connectDB } from "@/lib/mongodb"
 import Order from "@/models/order"
+import Product from "@/models/Product"
 import { sendOrderStatusUpdateEmail } from "@/lib/email-service"
+
+// Helper function to reduce product stock when order is delivered
+async function reduceProductStock(order: any) {
+  try {
+    console.log("[v0] Reducing stock for delivered order:", order.orderId)
+    
+    for (const item of order.items) {
+      if (!item.productId) continue
+
+      const product = await Product.findById(item.productId)
+      if (!product) {
+        console.warn(`[v0] Product not found for item in order ${order.orderId}:`, item.productId)
+        continue
+      }
+
+      // Handle single products with variants (fabric-based)
+      if (product.productType === "single") {
+        const variant = product.variants.find(
+          (v: any) => v.fabric === item.fabric
+        )
+
+        if (variant) {
+          const newStock = Math.max(0, variant.stock - item.quantity)
+          console.log(
+            `[v0] Reducing ${product.productTitle} (${item.fabric}) stock from ${variant.stock} to ${newStock}`
+          )
+
+          await Product.findByIdAndUpdate(
+            item.productId,
+            {
+              $inc: {
+                "variants.$[elem].stock": -item.quantity,
+              },
+            },
+            {
+              arrayFilters: [{ "elem.fabric": item.fabric }],
+              new: true,
+            }
+          )
+        }
+      }
+      // Handle hamper products
+      else if (product.productType === "hamper") {
+        // For hampers, reduce stock from hamper items based on product color/variant
+        // This assumes hamper items also have stock tracking
+        const hamperItems = product.hamperItems || []
+        
+        for (const hamperItem of hamperItems) {
+          // Find matching hamper item variant by checking available variants
+          if (hamperItem.variants && hamperItem.variants.length > 0) {
+            const firstVariant = hamperItem.variants[0]
+            const newStock = Math.max(0, firstVariant.stock - item.quantity)
+            
+            console.log(
+              `[v0] Reducing hamper item ${hamperItem.name} stock from ${firstVariant.stock} to ${newStock}`
+            )
+
+            // Update the first variant of the hamper item
+            const itemIndex = hamperItems.indexOf(hamperItem)
+            await Product.findByIdAndUpdate(
+              item.productId,
+              {
+                $inc: {
+                  [`hamperItems.${itemIndex}.variants.0.stock`]: -item.quantity,
+                },
+              },
+              { new: true }
+            )
+          }
+        }
+      }
+    }
+
+    console.log("[v0] Stock reduction completed for order:", order.orderId)
+  } catch (error) {
+    console.error("[v0] Error reducing product stock:", error)
+    // Don't fail the API call if stock reduction fails
+    // This ensures order status update completes even if stock update has issues
+  }
+}
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -83,6 +164,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 })
+    }
+
+    // Reduce product stock if order is being marked as delivered
+    if (orderStatus === "delivered") {
+      console.log("[v0] Order marked as delivered, reducing stock")
+      await reduceProductStock(order)
     }
 
     // Send status update email if orderStatus was changed

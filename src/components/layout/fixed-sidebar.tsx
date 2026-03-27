@@ -1,24 +1,25 @@
 "use client"
 
-import { Phone, Mail } from "lucide-react"
+import { Phone, Mail, Instagram } from "lucide-react"
 import { CONTACT_CONFIG } from "@/lib/contact-config"
 
 const CONTACT_PHONE = CONTACT_CONFIG.phone;
 const CONTACT_WHATSAPP = CONTACT_CONFIG.whatsapp;
 const CONTACT_EMAIL = CONTACT_CONFIG.email;
+const CONTACT_INSTAGRAM = CONTACT_CONFIG.instagram;
 
 export function FixedSidebar() {
   return (
     <aside className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
-      <div className="bg-[#EED9C4] px-4 py-6 rounded-l-2xl shadow-lg flex flex-col items-center gap-5">
+      <div className="px-3 py-4 rounded-l-2xl flex flex-col items-center gap-3 bg-white/10 backdrop-blur-sm">
         {/* Phone Icon */}
         <a
           href={`tel:${CONTACT_CONFIG.phoneRaw}`}
-          className="text-black hover:text-white hover:scale-110 transition-all cursor-pointer"
+          className="p-2 rounded-lg hover:scale-110 transition-all cursor-pointer"
           aria-label="Call us"
           title={`Call: ${CONTACT_CONFIG.phone}`}
         >
-          <Phone className="w-6 h-6" />
+          <Phone className="w-6 h-6 text-gray-700" />
         </a>
 
         {/* WhatsApp Icon */}
@@ -26,12 +27,12 @@ export function FixedSidebar() {
           href={`https://wa.me/${CONTACT_CONFIG.whatsapp}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-black hover:text-white hover:scale-110 transition-all cursor-pointer"
+          className="p-2 rounded-lg hover:scale-110 transition-all cursor-pointer"
           aria-label="Chat on WhatsApp"
           title={`WhatsApp: ${CONTACT_CONFIG.phone}`}
         >
           <svg
-            className="w-6 h-6"
+            className="w-6 h-6 text-[#25D366]"
             fill="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
@@ -43,11 +44,23 @@ export function FixedSidebar() {
         {/* Email Icon */}
         <a
           href={`mailto:${CONTACT_CONFIG.email}`}
-          className="text-black hover:text-white hover:scale-110 transition-all cursor-pointer"
+          className="p-2 rounded-lg hover:scale-110 transition-all cursor-pointer"
           aria-label="Email us"
           title={`Email: ${CONTACT_CONFIG.email}`}
         >
-          <Mail className="w-6 h-6" />
+          <Mail className="w-6 h-6 text-blue-500" />
+        </a>
+
+        {/* Instagram Icon */}
+        <a
+          href={CONTACT_INSTAGRAM}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-2 rounded-lg hover:scale-110 transition-all cursor-pointer"
+          aria-label="Follow us on Instagram"
+          title="Follow us on Instagram"
+        >
+          <Instagram className="w-6 h-6 text-pink-500" />
         </a>
       </div>
     </aside>
