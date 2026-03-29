@@ -17,7 +17,7 @@ export function Footer() {
               Premium mattresses crafted for your best sleep. Experience luxury comfort with our 100-night trial and
               15-year warranty.
             </p>
-            {/* Contact Details */}
+            {/* Contact Details 
             <div className="space-y-3 mb-6 text-foreground text-base">
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-foreground flex-shrink-0" />
@@ -31,7 +31,7 @@ export function Footer() {
                 <MapPin className="w-4 h-4 text-foreground flex-shrink-0" />
                 <span className="font-medium">123 Sleep Street, San Francisco, CA</span>
               </div>
-            </div>
+            </div> */}
             {/* Social Media */}
             <div className="flex gap-3">
               <a
@@ -69,36 +69,14 @@ export function Footer() {
             <h4 className="mb-4 text-foreground font-semibold text-lg">CONTACT</h4>
             <ul className="space-y-3 text-foreground text-base">
               
-              <li>
-                <Link href="/dealer-enquiry" className="hover:text-amber-950 transition-colors font-medium">
-                  Dealer Enquiry
-                </Link>
-              </li>
+              
               <li>
                 <Link href="/contact-us" className="hover:text-amber-950 transition-colors font-medium">
                   Contact Us
                 </Link>
               </li>
-              <li>
-                <Link href="/policy-terms" className="hover:text-amber-950 transition-colors font-medium">
-                  T&C
-                </Link>
-              </li>
-              <li>
-                <Link href="/policy-shipping" className="hover:text-amber-950 transition-colors font-medium">
-                  Shipping & Return
-                </Link>
-              </li>
-              <li>
-                <Link href="/policy-terms" className="hover:text-amber-950 transition-colors font-medium">
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link href="/policy-refund" className="hover:text-amber-950 transition-colors font-medium">
-                  Refund Policy
-                </Link>
-              </li>
+              
+              
             </ul>
           </div>
 
@@ -118,26 +96,10 @@ export function Footer() {
                   Track Order
                 </Link>
               </li>
-              <li>
-                <Link href="/#find-your-perfect-mattress" className="hover:text-amber-950 transition-colors font-medium">
-                  Shop
-                </Link>
-              </li>
-              <li>
-                <Link href="/press" className="hover:text-amber-950 transition-colors font-medium">
-                  Press
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" className="hover:text-amber-950 transition-colors font-medium">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-amber-950 transition-colors font-medium">
-                  Story
-                </Link>
-              </li>
+              
+              
+              
+             
             </ul>
           </div>
         </div>
