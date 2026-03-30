@@ -11,7 +11,7 @@ const CONTACT_INSTAGRAM = CONTACT_CONFIG.instagram;
 export function FixedSidebar() {
   return (
     <aside className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
-      <div className="px-3 py-4 rounded-l-2xl flex flex-col items-center gap-3 bg-[#EED9C4] shadow-lg">
+      <div className="px-1 py-2 rounded-l-2xl flex flex-col items-center gap-3 bg-[#EED9C4] shadow-lg">
         {/* Phone Icon */}
         <a
           href={`tel:${CONTACT_CONFIG.phoneRaw}`}
