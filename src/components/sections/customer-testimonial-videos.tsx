@@ -106,7 +106,7 @@ export function CustomerTestimonialVideos() {
         {/* Videos Grid - Show all available videos */}
         <div className="relative">
           <div
-            className={`grid ${
+            className={`flex gap-6 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide md:mx-0 md:px-0 md:grid md:overflow-visible ${
               visibleVideos.length === 1
                 ? 'md:grid-cols-1'
                 : visibleVideos.length === 2
@@ -114,12 +114,12 @@ export function CustomerTestimonialVideos() {
                   : visibleVideos.length === 3
                     ? 'md:grid-cols-3'
                     : 'md:grid-cols-4'
-            } gap-6 mb-8`}
+            } mb-8`}
           >
             {visibleVideos.map((video) => (
               <div
                 key={video._id}
-                className="group relative bg-white  overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-[#EED9C4]"
+                className="group relative bg-white overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-[#EED9C4] min-w-[260px] sm:min-w-[300px] md:min-w-0 md:w-auto snap-start"
                 onClick={() => setSelectedVideo(video)}
               >
                 {/* Video Thumbnail */}

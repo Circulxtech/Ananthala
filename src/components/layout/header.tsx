@@ -139,7 +139,7 @@ export function Header() {
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <Link href="/" className="flex items-center group">
                 <img
-                  src="/Hi Res Olive Green.png"
+                  src="/Hi Res Logo.png"
                   alt="Ananthala Logo"
                   className="h-20 w-auto"
                 />
@@ -229,7 +229,7 @@ export function Header() {
           >
             <nav className="p-4">
               <div className="flex items-center justify-center py-4">
-                <img src="/Hi Res Olive Green.png" alt="Ananthala" className="h-14 w-auto" />
+                <img src="/Hi Res Logo.png" alt="Ananthala" className="h-14 w-auto" />
               </div>
               <ul className="space-y-1">
                 {getMenuItems(!!user).map((item, index) => (
