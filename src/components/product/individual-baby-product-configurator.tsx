@@ -1,13 +1,15 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
-import { Loader2, IndianRupee, ShoppingCart } from "lucide-react"
+import { Loader2, IndianRupee, ShoppingCart, Expand } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useSimpleProduct } from "@/hooks/use-simple-product"
 import { useColorConfigurator } from "@/hooks/use-color-cofigurator"
 import { MagnifyImage } from "@/components/product/MagnifyImage"
 import { ColorAwareMagnifyImage } from "@/components/product/ColorAwareMagnifyImage"
+import { ProductImageViewerModal } from "@/components/product/product-image-viewer-modal"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
 import { fabricOptions } from "@/data/fabric"
@@ -30,6 +32,8 @@ export function IndividualBabyProductConfigurator({
   isAddingToCart,
   showColorConfigurator = true,
 }: IndividualBabyProductConfiguratorProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const {
     selectedSize,
     setSelectedSize,
@@ -67,21 +71,32 @@ export function IndividualBabyProductConfigurator({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
               {/* Main Product Image with Color Transformation */}
-              {showColorConfigurator && selectedFabricId ? (
-                <ColorAwareMagnifyImage
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  fabricId={selectedFabricId}
-                  className="rounded-lg bg-gray-50"
-                  onColorApplied={setIsColorApplied}
-                />
-              ) : (
-                <MagnifyImage
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  className="rounded-lg bg-gray-50"
-                />
-              )}
+              <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-50 group cursor-pointer">
+                {showColorConfigurator && selectedFabricId ? (
+                  <ColorAwareMagnifyImage
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    fabricId={selectedFabricId}
+                    className="h-full w-full"
+                    onColorApplied={setIsColorApplied}
+                  />
+                ) : (
+                  <MagnifyImage
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    className="h-full w-full"
+                  />
+                )}
+
+                {/* Fullscreen Button */}
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition-colors duration-200"
+                  aria-label="Open fullscreen viewer"
+                >
+                  <Expand className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              </div>
 
               {/* Thumbnail Gallery */}
               {product.images.length > 1 && (
@@ -211,6 +226,15 @@ export function IndividualBabyProductConfigurator({
          
         </div>
       </div>
+
+      {/* Image Viewer Modal */}
+      <ProductImageViewerModal
+        images={product.images}
+        initialIndex={selectedImage}
+        productName={product.name}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   )
 }

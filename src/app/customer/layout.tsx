@@ -58,14 +58,15 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
         const data = await response.json()
         if (data.success && data.user) {
           setUser(data.user)
+          setIsLoading(false)
         } else {
-          router.push("/login")
+          setIsLoading(false)
+          router.push("/login?redirect=/customer/dashboard")
         }
       } catch (error) {
         console.error("Auth check failed:", error)
-        router.push("/login")
-      } finally {
         setIsLoading(false)
+        router.push("/login?redirect=/customer/dashboard")
       }
     }
     checkAuth()

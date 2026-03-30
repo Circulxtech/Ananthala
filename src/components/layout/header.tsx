@@ -3,22 +3,38 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { ShoppingCart, User, Menu, X, Search, LogOut, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/contexts/cart-context"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { SearchDropdown } from "@/components/search/search-dropdown"
 
-const menuItems = [
+  
+const getMenuItems = (isLoggedIn: boolean) => [
+  { label: "Shop", href: "/#find-your-perfect-mattress" },
   { label: "Babies and Kids - Joy", href: "/category/joy#shop" },
   { label: "Adults - Bliss", href: "/category/bliss#shop" },
   { label: "Seniors – Grace", href: "/category/grace#shop" },
-  { label: "My Account", href: "/login" },
+
+  { label: "My Account", href: isLoggedIn ? "/customer/dashboard" : "/login" },
   { label: "About Ananthala", href: "/about" },
   { label: "Blog", href: "/blog" },
   { label: "Search", onClick: "search" as const },
 ]
+
+const handleShopClick = (e: React.MouseEvent<HTMLAnchorElement>, router: any, pathname: string) => {
+  const targetPath = "/#find-your-perfect-mattress"
+  
+  if (pathname === "/" || pathname === "") {
+    e.preventDefault()
+    const element = document.getElementById("find-your-perfect-mattress")
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" })
+    }
+    window.history.pushState({}, "", targetPath)
+  }
+}
 
 interface AuthenticatedUser {
   id: string
@@ -28,6 +44,7 @@ interface AuthenticatedUser {
 
 export function Header() {
   const router = useRouter()
+  const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
@@ -215,13 +232,18 @@ export function Header() {
                 <img src="/Hi Res Olive Green.png" alt="Ananthala" className="h-14 w-auto" />
               </div>
               <ul className="space-y-1">
-                {menuItems.map((item, index) => (
+                {getMenuItems(!!user).map((item, index) => (
                   <li key={index}>
                     {item.href ? (
                       <Link
                         href={item.href}
                         className="block py-2.5 px-4 text-foreground text-base font-medium uppercase tracking-wide hover:text-[#8B5A3C] transition-all duration-300 rounded-md"
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={(e) => {
+                          setIsMenuOpen(false)
+                          if (item.label === "Shop") {
+                            handleShopClick(e, router, pathname)
+                          }
+                        }}
                       >
                         {item.label}
                       </Link>

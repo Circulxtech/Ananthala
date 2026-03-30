@@ -82,6 +82,15 @@ export default function Home() {
     }
   }
 
+  const handleShopScroll = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    const element = document.getElementById("find-your-perfect-mattress")
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" })
+      window.history.pushState({}, "", "/#find-your-perfect-mattress")
+    }
+  }
+
   const goToNext = () => {
     setCurrentSlide((prev) => (prev + 1) % categories.length)
   }
@@ -168,14 +177,18 @@ export default function Home() {
           {/* Action Buttons - Lower Left Corner */}
           <div className="relative z-10 flex flex-col sm:flex-row gap-4 pb-8 lg:pb-12 pl-4 sm:pl-6 lg:pl-8">
             <Button
-              asChild
-              className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md shadow-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto min-w-[160px]"
+              className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md shadow-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto min-w-[160px] flex items-center justify-center"
               style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
+              onClick={(e) => {
+                const element = document.getElementById("find-your-perfect-mattress")
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" })
+                  window.history.pushState({}, "", "/#find-your-perfect-mattress")
+                }
+              }}
             >
-              <Link href="/#find-your-perfect-mattress" className="flex items-center justify-center">
-                Shop
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
+              Shop
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <Button
               asChild
@@ -247,15 +260,21 @@ export default function Home() {
                   >
                     {category.title}
                   </h2>
-                  <Link
-                    href="/#find-your-perfect-mattress"
+                  <button
+                    onClick={(e) => {
+                      const element = document.getElementById("find-your-perfect-mattress")
+                      if (element) {
+                        element.scrollIntoView({ behavior: "smooth" })
+                        window.history.pushState({}, "", "/#find-your-perfect-mattress")
+                      }
+                    }}
                     className={`px-8 py-3 bg-white/95 hover:bg-white text-foreground text-sm tracking-[0.3em] uppercase font-sans shadow-lg transition-all duration-300 hover:scale-105 ${
                       currentSlide === index ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
                     }`}
                     style={{ fontWeight: 400, transitionDelay: "320ms" }}
                   >
                     SHOP
-                  </Link>
+                  </button>
                 </div>
               </div>
             ))}
