@@ -121,7 +121,11 @@ export function BabyHamperProductTemplate({
 
       {detailSections.length > 0 && (
         <section className="w-full bg-white py-12">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-28">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <h2 className="text-center text-3xl sm:text-4xl font-medium text-foreground">
+              Product Traits
+            </h2>
+            <div className="space-y-28">
             {detailSections.map((section, index) => {
               const isImageLeft = section.imagePosition ? section.imagePosition === "left" : index % 2 === 1
               const image = section.imageUrl || "/placeholder.svg"
@@ -157,6 +161,7 @@ export function BabyHamperProductTemplate({
                 </div>
               )
             })}
+            </div>
           </div>
         </section>
       )}

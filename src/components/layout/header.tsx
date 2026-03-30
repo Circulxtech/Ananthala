@@ -11,12 +11,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { SearchDropdown } from "@/components/search/search-dropdown"
 
 const menuItems = [
-  { label: "Shop", href: "/#find-your-perfect-mattress" },
-  { label: "Joy", href: "/category/joy#shop" },
-  { label: "Bliss", href: "/category/bliss#shop" },
-  { label: " Grace", href: "/category/grace#shop" },
+  { label: "Babies and Kids - Joy", href: "/category/joy#shop" },
+  { label: "Adults - Bliss", href: "/category/bliss#shop" },
+  { label: "Seniors – Grace", href: "/category/grace#shop" },
   { label: "My Account", href: "/login" },
   { label: "About Ananthala", href: "/about" },
+  { label: "Blog", href: "/blog" },
   { label: "Search", onClick: "search" as const },
 ]
 
@@ -122,9 +122,9 @@ export function Header() {
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <Link href="/" className="flex items-center group">
                 <img
-                  src="/logo.png"
+                  src="/Hi Res Olive Green.png"
                   alt="Ananthala Logo"
-                  className="h-20 w-auto hover:scale-105 transition-transform duration-300 drop-shadow-sm"
+                  className="h-20 w-auto"
                 />
               </Link>
             </div>
@@ -212,7 +212,7 @@ export function Header() {
           >
             <nav className="p-4">
               <div className="flex items-center justify-center py-4">
-                <img src="/logo.png" alt="Ananthala" className="h-14 w-auto" />
+                <img src="/Hi Res Olive Green.png" alt="Ananthala" className="h-14 w-auto" />
               </div>
               <ul className="space-y-1">
                 {menuItems.map((item, index) => (

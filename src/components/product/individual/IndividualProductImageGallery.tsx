@@ -70,7 +70,7 @@ export function IndividualProductImageGallery({
 
       {/* Thumbnail Gallery */}
       {currentImages.length > 1 && (
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-2 max-w-[320px] sm:max-w-[360px]">
           {currentImages.map((image, index) => (
             <button
               key={index}

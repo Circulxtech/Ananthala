@@ -298,9 +298,10 @@ export default function Home() {
         <section id="find-your-perfect-mattress" className="py-24 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="mb-4 text-4xl font-medium text-foreground">Find Your Perfect Mattress</h2>
+              <h2 className="mb-4 text-4xl font-medium text-foreground">Find your perfect Ananthala product</h2>
               <p className="max-w-2xl mx-auto text-xl font-medium text-foreground">
-                Each mattress is expertly crafted with premium materials to ensure the perfect night's sleep, every night.
+                Each of our products are expertly crafted, custom made to suit your needs while ensuring you stay close
+                to nature and stay well
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -309,6 +310,13 @@ export default function Home() {
                 const backgroundImage = card.backgroundUrl || "/placeholder.svg"
                 const isPlaceholder = backgroundImage === "/placeholder.svg"
                 const isGifBackground = /\.(gif)(\?|#|$)/i.test(backgroundImage)
+                const rangeLabel = (() => {
+                  const normalizedName = card.name.toLowerCase()
+                  if (normalizedName.includes("joy")) return "Kids range"
+                  if (normalizedName.includes("bliss")) return "Adult range"
+                  if (normalizedName.includes("grace")) return "Seniors range"
+                  return ""
+                })()
 
                 return (
                   <div key={cardKey} className="flex flex-col gap-3">
@@ -323,20 +331,25 @@ export default function Home() {
                           isPlaceholder ? "object-contain bg-white" : "object-cover group-hover:scale-105"
                         }`}
                       />
+                      <div className="absolute inset-x-0 bottom-0">
+                        <div className="mx-4 mb-4 border border-[#EED9C4] bg-[#EED9C4]/60 px-4 py-3 text-center backdrop-blur-sm">
+                          <div
+                            className="tracking-wider text-base md:text-lg font-bold uppercase text-foreground"
+                            style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
+                          >
+                            {card.name}
+                          </div>
+                          {rangeLabel && (
+                            <div
+                              className="mt-1 text-xs uppercase tracking-[0.25em] text-foreground/80"
+                              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
+                            >
+                              {rangeLabel}
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </button>
-                    <div className="flex justify-center">
-                      <button
-                        onClick={() => onNavigate(card.name)}
-                        className="min-w-[200px] px-6 py-3 text-center border border-[#EED9C4] bg-[#EED9C4]/60 backdrop-blur-sm transition-colors hover:bg-[#EED9C4]/80 cursor-pointer"
-                      >
-                        <span
-                          className="tracking-wider text-base md:text-lg font-semibold uppercase text-foreground"
-                          style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
-                        >
-                          {card.name}
-                        </span>
-                      </button>
-                    </div>
                   </div>
                 )
               })}
@@ -393,8 +406,8 @@ export default function Home() {
                 </button>
               </div>
               <div className="order-1 lg:order-2">
-                <div className="relative aspect-square overflow-hidden">
-                  <Image src="/mattress.jpg" alt="Comfort" fill className="w-full h-full object-cover" />
+                <div className="relative aspect-[4/3] overflow-hidden max-w-xl mx-auto lg:ml-auto">
+                  <Image src="/Bullock Cart Theme.png" alt="Comfort" fill className="w-full h-full object-cover" />
                 </div>
               </div>
             </div>

@@ -338,21 +338,23 @@ export default function JoyPage() {
                   {[
                     {
                       id: 1,
-                      image: "/productmattress.jpg",
-                      title: "Organic Materials",
-                      description: "Every product in our JOY collection is crafted from 100% organic, chemical-free materials. We understand that your baby's delicate skin requires the purest, most natural fabrics. Our mattresses, toppers, and accessories are made without harmful toxins, ensuring a safe sleeping environment for your little one.",
+                      image: "/Ananthala Difference 1.png",                      title: "Ananthala Difference",
+                      description:
+                        "At Ananthala, our craftsmen choose the finest and the most suitable inputs that make your baby's products.",
                     },
                     {
                       id: 2,
-                      image: "/cotton.jpg",
-                      title: "Breathable Design",
-                      description: "Our innovative breathable design ensures optimal air circulation, preventing overheating and maintaining a comfortable temperature throughout the night. This feature is especially crucial for newborns and infants who are still developing their temperature regulation systems.",
+                      image: "/Ananthala Difference 2.png",
+                      title: "Ananthala Difference",
+                      description:
+                        "We want to be active partners in helping you bring up your kids healthy, happy and fit - by staying close to nature !",
                     },
                     {
                       id: 3,
-                      image: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      title: "Pediatrician Approved",
-                      description: "All our baby products are designed in consultation with pediatricians and child development experts. We prioritize spinal alignment, proper support, and safe sleep practices. Our products meet and exceed international safety standards for infant bedding and accessories.",
+                      image: "/Ananthala Difference 3.png",
+                      title: "Ananthala Difference",
+                      description:
+                        "All our products are custom made based on your and your baby's needs. Odd measurements, different cribs, we have your back !",
                     },
                   ].map((slide) => (
                     <CarouselItem
@@ -361,12 +363,18 @@ export default function JoyPage() {
                     >
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-[#EED9C4]">
                         {/* Left Side - Image */}
-                        <div className="relative aspect-[4/3] overflow-hidden ">
+                        <div className="relative h-[320px] sm:h-[380px] md:h-[460px] lg:h-[520px] xl:h-[580px] overflow-hidden">
                           <Image
                             src={slide.image || "/placeholder.svg"}
                             alt={slide.title}
                             fill
-                            className="object-cover"
+                            className={
+                              slide.id === 1
+                                ? "object-cover object-top"
+                                : slide.id === 3
+                                  ? "object-cover object-[center_12%]"
+                                  : "object-cover"
+                            }
                           />
                         </div>
                         
@@ -380,7 +388,7 @@ export default function JoyPage() {
                             JOY COLLECTION
                           </div>
                           <p className="text-lg leading-relaxed text-foreground">
-                            At Ananthala we specifically make products to take care of your babies health. Every product in our JOY collection is crafted from 100% organic, chemical-free materials. We understand that your baby's delicate skin requires the purest, most natural fabrics.
+                            {slide.description}
                           </p>
                           
                          
@@ -416,7 +424,7 @@ export default function JoyPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
               <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
                 <Image
-                  src="/productmattress.jpg"
+                  src="/Bullock Cart Theme.png"
                   alt="About Ananthala"
                   fill
                   className="object-cover"

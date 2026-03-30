@@ -85,7 +85,7 @@ export function IndividualBabyProductConfigurator({
 
               {/* Thumbnail Gallery */}
               {product.images.length > 1 && (
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-5 gap-2 max-w-[320px] sm:max-w-[360px]">
                   {product.images.map((image: string, index: number) => (
                     <button
                       key={index}

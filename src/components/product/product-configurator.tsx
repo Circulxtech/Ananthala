@@ -280,7 +280,7 @@ export function ProductConfigurator({
               )}
 
               {productImages.length > 1 && (
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-5 gap-2 max-w-[320px] sm:max-w-[360px]">
                   {productImages.map((image, index) => (
                     <button
                       key={`${image}-${index}`}

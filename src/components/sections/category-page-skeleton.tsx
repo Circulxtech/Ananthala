@@ -25,15 +25,15 @@ export function CategoryPageSkeleton() {
       <section className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden bg-stone-100">
         <Skeleton className="absolute inset-0 h-full w-full" />
         <div className="absolute inset-0 z-10 flex items-center">
-          <div className="pl-4 sm:pl-6 lg:pl-8 xl:pl-12">
-            <div className="max-w-md space-y-4">
+          <div className="flex w-full flex-col gap-6 px-4 sm:px-6 lg:px-8 xl:px-12 md:flex-row md:items-center md:justify-between">
+            <div className="order-2 flex flex-col sm:flex-row gap-4 md:order-1">
+              <Skeleton className="h-12 w-full sm:w-32" />
+              <Skeleton className="h-12 w-full sm:w-32" />
+            </div>
+            <div className="order-1 max-w-md space-y-4 md:order-2">
               <Skeleton className="h-10 w-56" />
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-11/12" />
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Skeleton className="h-12 w-full sm:w-32" />
-                <Skeleton className="h-12 w-full sm:w-32" />
-              </div>
             </div>
           </div>
         </div>

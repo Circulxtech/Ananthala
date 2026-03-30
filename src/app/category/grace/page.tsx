@@ -65,10 +65,27 @@ export default function GracePage() {
               className="object-cover object-top"
               priority
             />
-            {/* Overlay content on the left */}
+            {/* Overlay content with right-aligned text box and left CTA */}
             <div className="absolute inset-0 z-10 flex items-center">
-              <div className="pl-4 sm:pl-6 lg:pl-8 xl:pl-12">
-                <div className="max-w-md space-y-6">
+              <div className="flex w-full flex-col gap-6 px-4 sm:px-6 lg:px-8 xl:px-12 md:flex-row md:items-start md:justify-between">
+                <div className="order-2 flex flex-col sm:flex-row gap-4 md:order-1 md:pt-44">
+                  <Button 
+                    onClick={scrollToShop}
+                    className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md w-full sm:w-auto sm:min-w-[140px]"
+                    style={{ fontFamily: '"Playfair Display", serif' }}
+                  >
+                    Shop
+                  </Button>
+                  <Button
+                    onClick={scrollToAboutUs}
+                    variant="outline"
+                    className="border-2 border-white text-white hover:bg-white hover:text-[#8B5A3C] px-8 py-6 text-lg bg-transparent rounded-md w-full sm:w-auto sm:min-w-[140px]"
+                    style={{ fontFamily: '"Playfair Display", serif' }}
+                  >
+                    Learn More
+                  </Button>
+                </div>
+                <div className="order-1 max-w-md space-y-6 md:order-2 md:text-left">
                   <div className="bg-white/10 backdrop-blur-sm p-4 md:p-8 rounded-lg">
                     <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-white font-cormorant">
                       Grace Collection
@@ -76,23 +93,6 @@ export default function GracePage() {
                     <p className="text-white text-base md:text-lg mt-4 leading-relaxed font-medium">
                       Discover elegant sleep solutions in our Grace collection, crafted with premium materials and thoughtful design for everyday comfort.
                     </p>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <Button 
-                      onClick={scrollToShop}
-                      className="bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground px-8 py-6 text-lg rounded-md w-full sm:w-auto sm:min-w-[140px]"
-                      style={{ fontFamily: '"Playfair Display", serif' }}
-                    >
-                      Shop
-                    </Button>
-                    <Button
-                      onClick={scrollToAboutUs}
-                      variant="outline"
-                      className="border-2 border-white text-white hover:bg-white hover:text-[#8B5A3C] px-8 py-6 text-lg bg-transparent rounded-md w-full sm:w-auto sm:min-w-[140px]"
-                      style={{ fontFamily: '"Playfair Display", serif' }}
-                    >
-                      Learn More
-                    </Button>
                   </div>
                 </div>
               </div>
@@ -114,21 +114,23 @@ export default function GracePage() {
                   {[
                     {
                       id: 1,
-                      image: "/mattress.jpg",
-                      title: "Premium Comfort",
-                      description: "Our Grace collection is designed for those in their prime years, offering the perfect balance of luxury and support. Each mattress is crafted with premium memory foam and natural latex layers that contour to your body, providing exceptional pressure relief and spinal alignment for the best sleep of your life.",
+                      image: "/ananthala Diff1.png",
+                      title: "Ananthala Difference",
+                      description: "True love ages like fine wine and so do our products. Naturally lasting !",
                     },
                     {
                       id: 2,
-                      image: "/hybrid-mattress-with-blue-accent-pillows-bedroom.jpg",
-                      title: "Temperature Regulation",
-                      description: "Experience cool, comfortable sleep all night long with our advanced cooling technology. Our mattresses feature gel-infused memory foam and breathable cover materials that wick away moisture and regulate temperature, ensuring you stay comfortable regardless of the season.",
+                      image: "/ananthala Diff2.png",
+                      title: "Ananthala Difference",
+                      description:
+                        "Every sleep feels like a rejuvenation in itself - deep and comforting !",
                     },
                     {
                       id: 3,
-                      image: "/luxury-plush-mattress-with-pillows-on-bed.jpg",
-                      title: "Complete Sleep System",
-                      description: "Enhance your sleep experience with our complimentary pillows and bedspreads. Every mattress purchase includes premium accessories that complement your mattress perfectly, creating a complete sleep environment designed for optimal rest and recovery.",
+                      image: "/ananthala Diff3.png",
+                      title: "Ananthala Difference",
+                      description:
+                        "At Ananthala, our craftsmen choose the finest and the most suitable inputs that go into making your products.",
                     },
                   ].map((slide) => (
                     <CarouselItem
@@ -137,12 +139,12 @@ export default function GracePage() {
                     >
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-[#EED9C4]">
                         {/* Left Side - Image */}
-                        <div className="relative aspect-4/3 overflow-hidden ">
+                        <div className="relative h-[320px] sm:h-[380px] md:h-[460px] lg:h-[520px] xl:h-[580px] overflow-hidden">
                           <Image
                             src={slide.image || "/placeholder.svg"}
                             alt={slide.title}
                             fill
-                            className="object-cover"
+                            className={slide.id === 3 ? "object-cover object-top" : "object-cover"}
                           />
                         </div>
                         
@@ -156,7 +158,7 @@ export default function GracePage() {
                             Grace Collection
                           </div>
                           <p className="text-lg leading-relaxed text-foreground">
-                            At Ananthala we specifically make products to take care of your sleep health. Every product in our Grace collection is crafted with premium materials and innovative technology. We understand that quality sleep is essential for your well-being, and our mattresses are designed to provide the perfect balance of comfort and support.
+                            {slide.description}
                           </p>
                           
                          
@@ -193,7 +195,7 @@ export default function GracePage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
               <div className="relative aspect-4/3 overflow-hidden max-w-lg mx-auto lg:mx-0">
                 <Image
-                  src="/mattress.jpg"
+                  src="/Bullock Cart Theme.png"
                   alt="About Ananthala"
                   fill
                   className="object-cover"

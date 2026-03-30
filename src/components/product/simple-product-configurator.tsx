@@ -49,9 +49,10 @@ export function SimpleProductConfigurator({
   }
   
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-      {/* Image Gallery */}
-      <div>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {/* Image Gallery */}
+        <div>
         {/* Main Image */}
         <div className="mb-4" style={{ backgroundColor: colors.bg50 }}>
           <MagnifyImage
@@ -64,7 +65,7 @@ export function SimpleProductConfigurator({
         
         {/* Thumbnail Gallery */}
         {product.images.length > 1 && (
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-4 gap-3 max-w-[320px] sm:max-w-[360px]">
             {product.images.map((image: string, index: number) => (
               <button
                 key={index}
@@ -90,13 +91,13 @@ export function SimpleProductConfigurator({
             ))}
           </div>
         )}
-      </div>
+        </div>
 
-      {/* Product Info */}
-      <div>
-        <p className="text-2xl font-normal text-black mb-4 tracking-wider uppercase">
-          {product.name}
-        </p>
+        {/* Product Info */}
+        <div>
+          <p className="text-2xl font-normal text-black mb-4 tracking-wider uppercase">
+            {product.name}
+          </p>
 
         <p className="mb-6 text-lg text-black">
           {product.description}
@@ -206,6 +207,7 @@ export function SimpleProductConfigurator({
           <p className="text-center text-base text-black">
             Free shipping on all orders
           </p>
+        </div>
         </div>
       </div>
     </div>
