@@ -379,7 +379,7 @@ export default function JoyPage() {
                         </div>
                         
                         {/* Right Side - Text Content with Card */}
-                        <div className="space-y-6">
+                        <div className="space-y-6 p-6 sm:p-8 lg:p-0">
                          
                           <h1 className="text-xl md:text-2xl lg:text-3xl font-medium font-cormorant text-foreground">
                             Ananthala Difference
