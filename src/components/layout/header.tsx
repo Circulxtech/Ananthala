@@ -109,44 +109,58 @@ export function Header() {
   return (
     <>
       <header className="bg-white border-b sticky top-0 z-50 shadow-sm" style={{ borderColor: "#D9CFC7" }}>
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-4 -ml-2">
+        <div className="w-full px-2 sm:px-4 md:px-6">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            {/* Left Icons - Menu & Search */}
+            <div className="flex items-center gap-1 sm:gap-2 -ml-1 sm:-ml-2 flex-shrink-0">
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-foreground hover:text-[#EED9C4] hover:bg-transparent transition-all duration-300 p-0 h-14 w-14 rounded-lg font-black flex items-center justify-center group outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
+                className="text-foreground hover:bg-[#F5EFE8] transition-all duration-300 p-0 h-12 sm:h-14 w-12 sm:w-14 rounded-lg font-black flex items-center justify-center group outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? (
-                  <X className="h-14 w-14 stroke-[3] group-hover:animate-bounce" />
+                  <X className="h-10 sm:h-14 w-10 sm:w-14 stroke-[3] group-hover:scale-110 transition-transform duration-300 text-foreground" />
                 ) : (
-                  <Menu className="h-14 w-14 stroke-[3] group-hover:animate-bounce" />
+                  <Menu className="h-10 sm:h-14 w-10 sm:w-14 stroke-[3] group-hover:scale-110 transition-transform duration-300 text-foreground" />
                 )}
                 <span className="sr-only">Menu</span>
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-foreground hover:text-[#EED9C4] hover:bg-transparent transition-all duration-300 relative p-0 h-14 w-14 rounded-lg font-black group flex items-center justify-center outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
+                className="hidden sm:flex text-foreground hover:bg-[#F5EFE8] transition-all duration-300 relative p-0 h-12 sm:h-14 w-12 sm:w-14 rounded-lg font-black group outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
                 onClick={handleSearchIconClick}
               >
-                <Search className="h-12 w-12 stroke-[2.5] group-hover:animate-bounce" />
+                <Search className="h-10 sm:h-12 w-10 sm:w-12 stroke-[2.5] group-hover:scale-110 transition-transform duration-300 text-foreground" />
                 <span className="sr-only">Search</span>
               </Button>
             </div>
 
-            <div className="absolute left-1/2 transform -translate-x-1/2">
-              <Link href="/" className="flex items-center group">
+            {/* Logo - Centered */}
+            <div className="flex-1 flex justify-center px-2 sm:px-4">
+              <Link href="/" className="flex items-center group flex-shrink-0">
                 <img
                   src="/Hi Res Logo.png"
                   alt="Ananthala Logo"
-                  className="h-20 w-auto"
+                  className="h-14 sm:h-16 md:h-20 w-auto"
                 />
               </Link>
             </div>
 
-            <div className="flex items-center gap-4 -mr-2">
+            {/* Right Icons - User & Cart */}
+            <div className="flex items-center gap-1 sm:gap-2 -mr-1 sm:-mr-2 flex-shrink-0">
+              {/* Mobile Search Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="sm:hidden text-foreground hover:bg-[#F5EFE8] transition-all duration-300 relative p-0 h-12 w-12 rounded-lg font-black group flex items-center justify-center outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
+                onClick={handleSearchIconClick}
+              >
+                <Search className="h-10 w-10 stroke-[2.5] group-hover:scale-110 transition-transform duration-300 text-foreground" />
+                <span className="sr-only">Search</span>
+              </Button>
+
               {!isLoading && (
                 <>
                   {user ? (
@@ -155,31 +169,31 @@ export function Header() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-foreground hover:ring-2 hover:ring-[#EED9C4] transition-all duration-300 relative p-1 h-14 w-14 group outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
+                          className="hover:bg-[#F5EFE8] transition-all duration-300 relative p-0.5 sm:p-1 h-12 sm:h-14 w-12 sm:w-14 group outline-none focus:outline-none focus-visible:ring-0 focus:ring-0 rounded-lg"
                         >
                           <div
-                            className={`w-12 h-12 rounded-full bg-gradient-to-br ${getGradientColor(
+                            className={`w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-gradient-to-br ${getGradientColor(
                               user.fullname,
-                            )} flex items-center justify-center text-white font-black text-lg shadow-md border-2 border-white group-hover:animate-bounce`}
+                            )} flex items-center justify-center text-white font-black text-sm sm:text-lg shadow-md border-2 border-white group-hover:scale-110 transition-transform duration-300`}
                           >
                             {getFirstName(user.fullname).charAt(0).toUpperCase()}
                           </div>
                           <span className="sr-only">User menu</span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56">
-                        <div className="px-2 py-1.5 text-sm text-[#6D4530]">
+                      <DropdownMenuContent align="end" className="w-48 sm:w-56">
+                        <div className="px-2 py-1.5 text-xs sm:text-sm text-[#6D4530]">
                           <div className="font-bold">{getFirstName(user.fullname)}</div>
                           <div className="text-xs text-[#8B5A3C]/70 truncate">{user.email}</div>
                         </div>
-                        <DropdownMenuItem asChild className="text-[#6D4530] cursor-pointer font-semibold">
+                        <DropdownMenuItem asChild className="text-[#6D4530] cursor-pointer font-semibold text-xs sm:text-sm">
                           <Link href="/customer/dashboard">
-                            <LayoutDashboard className="mr-2 h-4 w-4" />
+                            <LayoutDashboard className="mr-2 h-3 sm:h-4 w-3 sm:w-4" />
                             <span>Dashboard</span>
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleLogout} className="text-[#6D4530] cursor-pointer font-semibold">
-                          <LogOut className="mr-2 h-4 w-4" />
+                        <DropdownMenuItem onClick={handleLogout} className="text-[#6D4530] cursor-pointer font-semibold text-xs sm:text-sm">
+                          <LogOut className="mr-2 h-3 sm:h-4 w-3 sm:w-4" />
                           <span>Logout</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -189,24 +203,26 @@ export function Header() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-foreground hover:text-[#EED9C4] hover:bg-transparent transition-all duration-300 p-0 h-14 w-14 rounded-lg font-black flex items-center justify-center group outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
+                        className="text-foreground hover:bg-[#F5EFE8] transition-all duration-300 p-0 h-12 sm:h-14 w-12 sm:w-14 rounded-lg font-black flex items-center justify-center group outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
                       >
-                        <User className="h-12 w-12 stroke-[2.5] group-hover:animate-bounce" />
+                        <User className="h-10 sm:h-12 w-10 sm:w-12 stroke-[2.5] group-hover:scale-110 transition-transform duration-300 text-foreground" />
                         <span className="sr-only">User account</span>
                       </Button>
                     </Link>
                   )}
                 </>
               )}
+              
+              {/* Cart Button */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-foreground hover:text-[#EED9C4] hover:bg-transparent transition-all duration-300 relative p-0 h-14 w-14 rounded-lg font-black group flex items-center justify-center outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
+                className="text-foreground hover:bg-[#F5EFE8] transition-all duration-300 relative p-0 h-12 sm:h-14 w-12 sm:w-14 rounded-lg font-black group flex items-center justify-center outline-none focus:outline-none focus-visible:ring-0 focus:ring-0"
                 onClick={() => router.push("/cart")}
               >
-                <ShoppingCart className="h-12 w-12 stroke-[2.5] group-hover:animate-bounce" />
+                <ShoppingCart className="h-10 sm:h-12 w-10 sm:w-12 stroke-[2.5] group-hover:scale-110 transition-transform duration-300 text-foreground" />
                 {cartItems.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-gradient-to-br from-[#8B5A3C] to-[#6D4530] text-white text-xs font-black rounded-full min-w-[1.5rem] h-6 flex items-center justify-center px-0.5 border-2 border-white shadow-lg animate-pulse">
+                  <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-gradient-to-br from-[#8B5A3C] to-[#6D4530] text-white text-xs font-black rounded-full min-w-[1.5rem] h-5 sm:h-6 flex items-center justify-center px-0.5 border-2 border-white shadow-lg animate-pulse">
                     {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
                   </span>
                 )}
@@ -224,20 +240,20 @@ export function Header() {
 
         {isMenuOpen && (
           <div
-            className="fixed left-0 top-16 bottom-0 w-56 bg-white border-r shadow-lg animate-in slide-in-from-left duration-300 overflow-y-auto z-40"
+            className="fixed left-0 top-16 sm:top-20 bottom-0 w-64 sm:w-72 bg-white border-r shadow-lg animate-in slide-in-from-left duration-300 overflow-y-auto z-40"
             style={{ borderColor: "#D9CFC7" }}
           >
-            <nav className="p-4">
-              <div className="flex items-center justify-center py-4">
-                <img src="/Hi Res Logo.png" alt="Ananthala" className="h-14 w-auto" />
+            <nav className="p-3 sm:p-4">
+              <div className="flex items-center justify-center py-3 sm:py-4">
+                <img src="/Hi Res Logo.png" alt="Ananthala" className="h-12 sm:h-14 w-auto" />
               </div>
-              <ul className="space-y-1">
+              <ul className="space-y-0.5 sm:space-y-1">
                 {getMenuItems(!!user).map((item, index) => (
                   <li key={index}>
                     {item.href ? (
                       <Link
                         href={item.href}
-                        className="block py-2.5 px-4 text-foreground text-base font-medium uppercase tracking-wide hover:text-[#8B5A3C] transition-all duration-300 rounded-md"
+                        className="block py-2 sm:py-2.5 px-3 sm:px-4 text-foreground text-sm sm:text-base font-medium uppercase tracking-wide hover:text-[#8B5A3C] hover:bg-[#F5F1ED] transition-all duration-300 rounded-md"
                         onClick={(e) => {
                           setIsMenuOpen(false)
                           if (item.label === "Shop") {
@@ -250,7 +266,7 @@ export function Header() {
                     ) : (
                       <button
                         type="button"
-                        className="w-full text-left py-2.5 px-4 text-foreground text-base font-medium uppercase tracking-wide hover:text-[#8B5A3C] transition-all duration-300 rounded-md"
+                        className="w-full text-left py-2 sm:py-2.5 px-3 sm:px-4 text-foreground text-sm sm:text-base font-medium uppercase tracking-wide hover:text-[#8B5A3C] hover:bg-[#F5F1ED] transition-all duration-300 rounded-md"
                         onClick={() => {
                           setIsMenuOpen(false)
                           if (item.onClick === "search") {
