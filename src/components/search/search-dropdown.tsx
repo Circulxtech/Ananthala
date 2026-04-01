@@ -3,8 +3,18 @@
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Search, X, ChevronRight } from "lucide-react"
-import { products } from "@/data/products"
 import Image from "next/image"
+
+interface SearchProduct {
+  id: string
+  name: string
+  description: string
+  category: string
+  subCategory: string
+  image: string
+  price: number
+  productType?: "single" | "hamper"
+}
 
 interface SearchDropdownProps {
   isOpen: boolean
@@ -14,62 +24,71 @@ interface SearchDropdownProps {
 
 export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProps) {
   const [searchQuery, setSearchQuery] = useState("")
-  const [filteredProducts, setFilteredProducts] = useState<typeof products>([])
-  const [allFilteredProducts, setAllFilteredProducts] = useState<typeof products>([])
+  const [filteredProducts, setFilteredProducts] = useState<SearchProduct[]>([])
+  const [allFilteredProducts, setAllFilteredProducts] = useState<SearchProduct[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
   const [showMore, setShowMore] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const resultsContainerRef = useRef<HTMLDivElement>(null)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Filter products based on search query with better relevance scoring
+  // Fetch products from database API based on search query
   useEffect(() => {
+    // Clear existing timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
     if (!searchQuery.trim()) {
       setFilteredProducts([])
       setAllFilteredProducts([])
       setSelectedIndex(-1)
+      setError(null)
       return
     }
 
-    setIsLoading(true)
-    const searchLower = searchQuery.toLowerCase()
+    // Debounce API call for better performance
+    debounceTimerRef.current = setTimeout(async () => {
+      setIsLoading(true)
+      setError(null)
 
-    // Filter products by name, category, or firmness
-    const filtered = products.filter((product) => {
-      const matchesName = product.name.toLowerCase().includes(searchLower)
-      const matchesCategory = product.category.toLowerCase().includes(searchLower)
-      const matchesFirmness = product.firmness.toLowerCase().includes(searchLower)
-      const matchesSize = product.size.some((s) => s.toLowerCase().includes(searchLower))
+      try {
+        const params = new URLSearchParams({
+          q: searchQuery.trim(),
+          dropdown: "true",
+          dropdownLimit: "20",
+        })
 
-      return matchesName || matchesCategory || matchesFirmness || matchesSize
-    })
+        const response = await fetch(`/api/search?${params.toString()}`)
+        const data = await response.json()
 
-    // Sort by relevance score
-    const sorted = filtered.sort((a, b) => {
-      const aNameExact = a.name.toLowerCase() === searchLower ? 10 : 0
-      const bNameExact = b.name.toLowerCase() === searchLower ? 10 : 0
-      
-      const aNameStart = a.name.toLowerCase().startsWith(searchLower) ? 8 : 0
-      const bNameStart = b.name.toLowerCase().startsWith(searchLower) ? 8 : 0
-      
-      const aNameMatch = a.name.toLowerCase().includes(searchLower) ? 6 : 0
-      const bNameMatch = b.name.toLowerCase().includes(searchLower) ? 6 : 0
-      
-      const aCategoryMatch = a.category.toLowerCase().includes(searchLower) ? 3 : 0
-      const bCategoryMatch = b.category.toLowerCase().includes(searchLower) ? 3 : 0
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "Failed to search products")
+        }
 
-      const aScore = aNameExact + aNameStart + aNameMatch + aCategoryMatch
-      const bScore = bNameExact + bNameStart + bNameMatch + bCategoryMatch
+        const results = data.data || []
+        setAllFilteredProducts(results)
+        setFilteredProducts(results.slice(0, 6))
+        setSelectedIndex(-1)
+      } catch (err) {
+        console.error("[v0] Search error:", err)
+        setError(err instanceof Error ? err.message : "Search failed")
+        setFilteredProducts([])
+        setAllFilteredProducts([])
+      } finally {
+        setIsLoading(false)
+      }
+    }, 300) // 300ms debounce delay
 
-      return bScore - aScore
-    })
-    
-    setAllFilteredProducts(sorted)
-    setFilteredProducts(sorted.slice(0, 6))
-    setSelectedIndex(-1)
-    setIsLoading(false)
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
   }, [searchQuery])
 
   // Handle search submission
@@ -84,8 +103,8 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
   }
 
   // Handle product click - navigate to product detail page
-  const handleProductClick = (productId: number | string) => {
-    if (productId && productId.toString().trim()) {
+  const handleProductClick = (productId: string) => {
+    if (productId && productId.trim()) {
       router.push(`/product/${productId}`)
       setSearchQuery("")
       onClose()
@@ -209,7 +228,12 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                     <div className="inline-block animate-spin">
                       <div className="w-6 h-6 border-2 border-[#D9CFC7] border-t-[#8B5A3C] rounded-full"></div>
                     </div>
-                    <p className="text-xs sm:text-sm mt-2">Searching...</p>
+                    <p className="text-xs sm:text-sm mt-2">Searching database...</p>
+                  </div>
+                ) : error ? (
+                  <div className="px-3 sm:px-4 py-6 text-center text-red-600">
+                    <p className="text-xs sm:text-sm font-semibold">Search Error</p>
+                    <p className="text-xs mt-1">{error}</p>
                   </div>
                 ) : (showMore ? allFilteredProducts : filteredProducts).length > 0 ? (
                   <>
@@ -247,7 +271,8 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                             </h4>
                             <div className="flex items-center justify-between gap-1 sm:gap-2">
                               <p className="text-xs text-[#A0826D] line-clamp-1">
-                                {product.category.charAt(0).toUpperCase() + product.category.slice(1)} • {product.firmness}
+                                {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+                                {product.subCategory && ` • ${product.subCategory}`}
                               </p>
                               <p className="font-semibold text-[#8B5A3C] text-xs flex-shrink-0">
                                 ₹{product.price.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
@@ -282,7 +307,7 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                         onClick={handleSearch}
                         className="w-full px-3 sm:px-4 py-2 sm:py-3 text-center font-semibold text-white bg-gradient-to-r from-[#8B5A3C] to-[#6D4530] hover:from-[#9B6A4C] hover:to-[#7D5440] transition-colors text-xs sm:text-sm"
                       >
-                        View all results
+                        View all {allFilteredProducts.length} results
                       </button>
                     )}
                   </>
@@ -290,7 +315,7 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                   <div className="px-3 sm:px-4 py-6 sm:py-8 text-center text-[#8B5A3C]">
                     <Search className="w-8 sm:w-12 h-8 sm:h-12 mx-auto mb-2 opacity-30" />
                     <p className="text-xs sm:text-sm font-semibold">No products found</p>
-                    <p className="text-xs text-[#A0826D] mt-1">Try different keywords</p>
+                    <p className="text-xs text-[#A0826D] mt-1">Try searching with different keywords</p>
                   </div>
                 )}
               </div>

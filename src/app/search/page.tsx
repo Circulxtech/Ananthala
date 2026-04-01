@@ -31,24 +31,55 @@ function SearchContent() {
   const [products, setProducts] = useState<ApiProduct[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [totalMatches, setTotalMatches] = useState(0)
 
   useEffect(() => {
     let isMounted = true
+
     const fetchProducts = async () => {
       try {
         setIsLoading(true)
         setError(null)
-        const response = await fetch("/api/products?status=visible")
+
+        if (!query.trim()) {
+          setProducts([])
+          setTotalMatches(0)
+          setIsLoading(false)
+          return
+        }
+
+        // Use the search API for database-driven results
+        const params = new URLSearchParams({
+          q: query.trim(),
+          limit: "100",
+        })
+
+        const response = await fetch(`/api/search?${params.toString()}`)
         const data = await response.json()
+
         if (!response.ok || !data?.success) {
           throw new Error(data?.message || "Failed to fetch products")
         }
+
         if (isMounted) {
-          setProducts(Array.isArray(data.products) ? data.products : [])
+          const searchResults = (data.data || []).map((product: any) => ({
+            _id: product.id,
+            productTitle: product.name,
+            category: product.category,
+            subCategory: product.subCategory,
+            imageUrls: [product.image],
+            variants: product.price ? [{ price: product.price }] : [],
+            hamperPrice: product.productType === "hamper" ? product.price : undefined,
+            productType: product.productType,
+          }))
+          setProducts(searchResults)
+          setTotalMatches(data.totalMatches || searchResults.length)
         }
       } catch (fetchError: any) {
         if (isMounted) {
-          setError(fetchError.message || "Failed to fetch products")
+          setError(fetchError.message || "Failed to search products")
+          setProducts([])
+          setTotalMatches(0)
         }
       } finally {
         if (isMounted) {
@@ -56,21 +87,13 @@ function SearchContent() {
         }
       }
     }
+
     fetchProducts()
+
     return () => {
       isMounted = false
     }
-  }, [])
-
-  const filteredProducts = products.filter((product) => {
-    if (!query) return false
-    const searchLower = query.toLowerCase()
-    return (
-      product.productTitle.toLowerCase().includes(searchLower) ||
-      (product.category || "").toLowerCase().includes(searchLower) ||
-      (product.subCategory || "").toLowerCase().includes(searchLower)
-    )
-  })
+  }, [query])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -106,7 +129,7 @@ function SearchContent() {
           </form>
           {query && (
             <p className="mt-4 text-foreground/80">
-              {filteredProducts.length} result{filteredProducts.length !== 1 ? "s" : ""} for "{query}"
+              {products.length} result{products.length !== 1 ? "s" : ""} for "{query}"
             </p>
           )}
         </div>
@@ -115,67 +138,94 @@ function SearchContent() {
         {query ? (
           isLoading ? (
             <div className="text-center py-16">
-              <p className="text-foreground/80 mb-4 text-lg">Loading...</p>
+              <div className="inline-block animate-spin mb-4">
+                <div className="w-8 h-8 border-4 border-[#D9CFC7] border-t-[#8B5A3C] rounded-full"></div>
+              </div>
+              <p className="text-foreground/80 text-lg">Searching database...</p>
             </div>
           ) : error ? (
-            <div className="text-center py-16 text-red-600">{error}</div>
-          ) : filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,300px))] gap-x-8 gap-y-10 justify-center">
-              {filteredProducts.map((product) => {
-                const startingPrice =
-                  product.productType === "hamper" && typeof product.hamperPrice === "number"
-                    ? product.hamperPrice
-                    : product.variants?.[0]?.price || 0
-                return (
-                  <div
-                    key={product._id}
-                    className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white w-full"
-                  >
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => router.push(`/product/${product._id}`)}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                          router.push(`/product/${product._id}`)
-                        }
-                      }}
-                      className="block"
-                    >
-                      <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
-                        <Image
-                          src={product.imageUrls?.[0] || "/placeholder.svg"}
-                          alt={product.productTitle}
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                    </div>
-                    <h3 className="text-base font-semibold text-foreground mb-2 text-center">{product.productTitle}</h3>
-                    <div className="text-sm font-medium text-foreground mb-3 text-center">
-                      Starting at {"\u20B9"}
-                      {startingPrice.toLocaleString("en-IN")}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => router.push(`/product/${product._id}`)}
-                      className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm rounded-md"
-                    >
-                      Customize
-                    </button>
-                  </div>
-                )
-              })}
+            <div className="text-center py-16 bg-red-50 rounded-lg p-4">
+              <p className="text-red-700 font-semibold mb-2">Search Error</p>
+              <p className="text-red-600 text-sm">{error}</p>
             </div>
+          ) : products.length > 0 ? (
+            <>
+              <p className="mb-6 text-foreground/70 text-sm">
+                Found {totalMatches} product{totalMatches !== 1 ? "s" : ""} matching "{query}"
+              </p>
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,300px))] gap-x-8 gap-y-10 justify-center">
+                {products.map((product) => {
+                  const startingPrice =
+                    product.productType === "hamper" && typeof product.hamperPrice === "number"
+                      ? product.hamperPrice
+                      : product.variants?.[0]?.price || 0
+                  return (
+                    <div
+                      key={product._id}
+                      className="border border-[#EED9C4] p-4 hover:shadow-lg transition-shadow bg-white w-full"
+                    >
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => router.push(`/product/${product._id}`)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            router.push(`/product/${product._id}`)
+                          }
+                        }}
+                        className="block"
+                      >
+                        <div className="relative aspect-square overflow-hidden mb-3 cursor-pointer">
+                          <Image
+                            src={product.imageUrls?.[0] || "/placeholder.svg"}
+                            alt={product.productTitle}
+                            fill
+                            className="object-cover hover:scale-105 transition-transform"
+                            unoptimized
+                          />
+                        </div>
+                      </div>
+                      <h3 className="text-base font-semibold text-foreground mb-2 text-center line-clamp-2">{product.productTitle}</h3>
+                      {product.subCategory && (
+                        <p className="text-xs text-foreground/60 text-center mb-2">{product.subCategory}</p>
+                      )}
+                      <div className="text-sm font-medium text-foreground mb-3 text-center">
+                        {startingPrice > 0 ? (
+                          <>
+                            Starting at {"\u20B9"}
+                            {startingPrice.toLocaleString("en-IN")}
+                          </>
+                        ) : (
+                          <span className="text-foreground/50">Price on request</span>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/product/${product._id}`)}
+                        className="w-full bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground py-2.5 text-sm rounded-md font-medium transition-colors"
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
           ) : (
             <div className="text-center py-16">
-              <p className="text-foreground/80 mb-4 text-lg">
-                No products found for "{query}"
+              <Search className="w-16 h-16 mx-auto mb-4 text-foreground/20" />
+              <p className="text-foreground/80 mb-2 text-lg font-semibold">
+                No products found
               </p>
-              <p className="text-foreground/60">
-                Try searching with different keywords
+              <p className="text-foreground/60 mb-6">
+                No products match "{query}". Try different keywords.
               </p>
+              <button
+                onClick={() => router.push("/")}
+                className="inline-block bg-[#8B5A3C] text-white px-6 py-2.5 rounded-md hover:bg-[#6D4530] transition-colors"
+              >
+                Back to Home
+              </button>
             </div>
           )
         ) : (
