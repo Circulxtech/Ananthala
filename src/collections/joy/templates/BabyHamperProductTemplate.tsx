@@ -16,7 +16,6 @@ import {
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useBabyHamper } from "@/collections/joy/hooks/use-baby-hamper"
-import { CustomersAlsoBought } from "@/collections/joy/components/customers-also-bought"
 import { Sprout, Waves, SprayCan, XCircle, Layers, Grid } from "lucide-react"
 
 interface BackendDetailSection {
@@ -29,7 +28,7 @@ interface BackendDetailSection {
 
 interface BabyHamperProductTemplateProps {
   product: ProductDetail
-  productId?: number
+  productId?: string | number
   dbHamper?: {
     hamperItems: DbHamperItem[]
     hamperPrice: number
@@ -167,7 +166,6 @@ export function BabyHamperProductTemplate({
       )}
 
       {/* What Our Customers Also Bought Section (static IDs only; hide for DB-only hampers) */}
-      {typeof productId === "number" && <CustomersAlsoBought currentProductId={productId} />}
     </div>
   )
 }

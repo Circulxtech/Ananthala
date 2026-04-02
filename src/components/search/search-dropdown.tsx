@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Search, X, ChevronRight } from "lucide-react"
-import { products } from "@/data/products"
 import Image from "next/image"
 
 interface SearchDropdownProps {
@@ -12,10 +11,20 @@ interface SearchDropdownProps {
   onSearch: (query: string) => void
 }
 
+interface SearchProduct {
+  id: string
+  name: string
+  description?: string
+  category?: string
+  subCategory?: string
+  image?: string
+  price?: number
+}
+
 export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProps) {
   const [searchQuery, setSearchQuery] = useState("")
-  const [filteredProducts, setFilteredProducts] = useState<typeof products>([])
-  const [allFilteredProducts, setAllFilteredProducts] = useState<typeof products>([])
+  const [filteredProducts, setFilteredProducts] = useState<SearchProduct[]>([])
+  const [allFilteredProducts, setAllFilteredProducts] = useState<SearchProduct[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
   const [showMore, setShowMore] = useState(false)
@@ -24,52 +33,47 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
   const dropdownRef = useRef<HTMLDivElement>(null)
   const resultsContainerRef = useRef<HTMLDivElement>(null)
 
+  const toTitleCase = (value?: string) =>
+    value ? value.charAt(0).toUpperCase() + value.slice(1) : ""
+
   // Filter products based on search query with better relevance scoring
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredProducts([])
       setAllFilteredProducts([])
       setSelectedIndex(-1)
+      setShowMore(false)
       return
     }
 
-    setIsLoading(true)
-    const searchLower = searchQuery.toLowerCase()
+    const controller = new AbortController()
+    const timeout = window.setTimeout(async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(searchQuery.trim())}&limit=20`,
+          { signal: controller.signal },
+        )
+        const data = await response.json()
+        const results: SearchProduct[] = Array.isArray(data?.data) ? data.data : []
+        setAllFilteredProducts(results)
+        setFilteredProducts(results.slice(0, 6))
+        setSelectedIndex(-1)
+      } catch (error) {
+        if ((error as Error).name !== "AbortError") {
+          setAllFilteredProducts([])
+          setFilteredProducts([])
+          setSelectedIndex(-1)
+        }
+      } finally {
+        setIsLoading(false)
+      }
+    }, 200)
 
-    // Filter products by name, category, or firmness
-    const filtered = products.filter((product) => {
-      const matchesName = product.name.toLowerCase().includes(searchLower)
-      const matchesCategory = product.category.toLowerCase().includes(searchLower)
-      const matchesFirmness = product.firmness.toLowerCase().includes(searchLower)
-      const matchesSize = product.size.some((s) => s.toLowerCase().includes(searchLower))
-
-      return matchesName || matchesCategory || matchesFirmness || matchesSize
-    })
-
-    // Sort by relevance score
-    const sorted = filtered.sort((a, b) => {
-      const aNameExact = a.name.toLowerCase() === searchLower ? 10 : 0
-      const bNameExact = b.name.toLowerCase() === searchLower ? 10 : 0
-      
-      const aNameStart = a.name.toLowerCase().startsWith(searchLower) ? 8 : 0
-      const bNameStart = b.name.toLowerCase().startsWith(searchLower) ? 8 : 0
-      
-      const aNameMatch = a.name.toLowerCase().includes(searchLower) ? 6 : 0
-      const bNameMatch = b.name.toLowerCase().includes(searchLower) ? 6 : 0
-      
-      const aCategoryMatch = a.category.toLowerCase().includes(searchLower) ? 3 : 0
-      const bCategoryMatch = b.category.toLowerCase().includes(searchLower) ? 3 : 0
-
-      const aScore = aNameExact + aNameStart + aNameMatch + aCategoryMatch
-      const bScore = bNameExact + bNameStart + bNameMatch + bCategoryMatch
-
-      return bScore - aScore
-    })
-    
-    setAllFilteredProducts(sorted)
-    setFilteredProducts(sorted.slice(0, 6))
-    setSelectedIndex(-1)
-    setIsLoading(false)
+    return () => {
+      controller.abort()
+      window.clearTimeout(timeout)
+    }
   }, [searchQuery])
 
   // Handle search submission
@@ -230,7 +234,7 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                           {/* Product Image */}
                           <div className="relative w-10 sm:w-12 h-10 sm:h-12 flex-shrink-0 rounded overflow-hidden bg-stone-50">
                             <Image
-                              src={product.image}
+                              src={product.image || "/placeholder.svg"}
                               alt={product.name}
                               fill
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform"
@@ -245,14 +249,18 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                             }`}>
                               {product.name}
                             </h4>
-                            <div className="flex items-center justify-between gap-1 sm:gap-2">
-                              <p className="text-xs text-[#A0826D] line-clamp-1">
-                                {product.category.charAt(0).toUpperCase() + product.category.slice(1)} • {product.firmness}
-                              </p>
-                              <p className="font-semibold text-[#8B5A3C] text-xs flex-shrink-0">
-                                ₹{product.price.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                              </p>
-                            </div>
+                          <div className="flex items-center justify-between gap-1 sm:gap-2">
+                            <p className="text-xs text-[#A0826D] line-clamp-1">
+                              {toTitleCase(product.category)}
+                              {product.subCategory ? ` • ${toTitleCase(product.subCategory)}` : ""}
+                            </p>
+                            <p className="font-semibold text-[#8B5A3C] text-xs flex-shrink-0">
+                              ₹
+                              {Number.isFinite(product.price)
+                                ? product.price.toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                                : "0"}
+                            </p>
+                          </div>
                           </div>
 
                           {/* Arrow Indicator */}

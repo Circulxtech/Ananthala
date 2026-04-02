@@ -24,7 +24,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useKidsHamper } from "@/collections/joy/hooks/use-kids-hamper"
 import { Sprout, Waves, SprayCan, XCircle, Layers, Grid } from "lucide-react"
-import { CustomersAlsoBought } from "@/collections/joy/components/customers-also-bought"
 
 // Testimonial videos data
 interface TestimonialVideo {
@@ -75,7 +74,7 @@ const testimonialVideos: TestimonialVideo[] = [
 
 interface KidsHamperProductTemplateProps {
   product: ProductDetail
-  productId?: number
+  productId?: string | number
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
@@ -301,7 +300,6 @@ export function KidsHamperProductTemplate({
       </section>
 
       {/* What Our Customers Also Bought Section */}
-      {typeof productId === "number" && <CustomersAlsoBought currentProductId={productId} />}
 
       {/* Customer Testimonials Video Carousel Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">

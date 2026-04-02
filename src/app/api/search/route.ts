@@ -21,31 +21,36 @@ export async function GET(request: NextRequest) {
 
     await dbConnect()
 
-    // Search products by name, description, or category
+    // Search products by title, description, or category
     const searchLower = query.toLowerCase()
 
     const products = await Product.find({
+      status: "visible",
       $or: [
-        { name: { $regex: searchLower, $options: "i" } },
+        { productTitle: { $regex: searchLower, $options: "i" } },
         { description: { $regex: searchLower, $options: "i" } },
         { category: { $regex: searchLower, $options: "i" } },
         { subCategory: { $regex: searchLower, $options: "i" } },
       ],
     })
-      .select("_id name description category subCategory images variants rating")
+      .select("_id productTitle description category subCategory imageUrls variants hamperPrice")
       .limit(limit)
       .lean()
 
     // Transform results to match frontend expectations
     const formattedResults = products.map((product: any) => ({
       id: product._id,
-      name: product.name,
+      name: product.productTitle,
       description: product.description?.substring(0, 100) || "",
       category: product.category,
       subCategory: product.subCategory,
-      image: product.images?.[0] || "/placeholder.png",
-      rating: product.rating || 4.5,
-      price: product.variants?.[0]?.price || 0,
+      image: product.imageUrls?.[0] || "/placeholder.png",
+      price:
+        typeof product.hamperPrice === "number"
+          ? product.hamperPrice
+          : Array.isArray(product.variants) && product.variants.length > 0
+            ? Math.min(...product.variants.map((variant: any) => variant.price || 0))
+            : 0,
     }))
 
     return NextResponse.json(

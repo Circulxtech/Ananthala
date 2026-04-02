@@ -6,7 +6,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { ChevronRight } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { getProductDetailById, type ProductDetail } from "@/data/product-details"
+import { type ProductDetail } from "@/data/product-details"
 import { type CartItem } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
 import { getProductType, isBlissProduct, isGraceProduct, isJoyProduct } from "@/utils/product-type"
@@ -161,15 +161,11 @@ export default function ProductDetailPage() {
   const params = useParams()
   const router = useRouter()
   const rawId = params.id as string
-  const isNumericId = /^\d+$/.test(rawId)
-  const numericId = isNumericId ? Number(rawId) : null
-  const staticProduct = numericId !== null ? getProductDetailById(numericId) : undefined
-
   const [apiProduct, setApiProduct] = useState<ProductDetail | null>(null)
   const [rawApiProduct, setRawApiProduct] = useState<ApiProduct | null>(null)
-  const [isLoading, setIsLoading] = useState(!staticProduct)
-  const [showLoader, setShowLoader] = useState(!staticProduct)
-  const [contentVisible, setContentVisible] = useState(!!staticProduct)
+  const [isLoading, setIsLoading] = useState(true)
+  const [showLoader, setShowLoader] = useState(true)
+  const [contentVisible, setContentVisible] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<"features" | "specs">("features")
   const [isAddingToCart, setIsAddingToCart] = useState(false)
@@ -178,16 +174,6 @@ export default function ProductDetailPage() {
   const [selectedHamperVariants, setSelectedHamperVariants] = useState<Record<number, number>>({})
 
   useEffect(() => {
-    if (staticProduct) {
-      setApiProduct(null)
-      setRawApiProduct(null)
-      setIsLoading(false)
-      setShowLoader(false)
-      setContentVisible(true)
-      setLoadError(null)
-      return
-    }
-
     let isMounted = true
 
     const fetchProduct = async () => {
@@ -231,7 +217,7 @@ export default function ProductDetailPage() {
     return () => {
       isMounted = false
     }
-  }, [rawId, staticProduct])
+  }, [rawId])
 
   useEffect(() => {
     if (!rawApiProduct || rawApiProduct.productType !== "hamper") return
@@ -260,8 +246,8 @@ export default function ProductDetailPage() {
     return () => window.clearTimeout(timer)
   }, [isLoading, MIN_LOADER_MS])
 
-  const product = staticProduct ?? apiProduct
-  const productId = staticProduct ? numericId : null
+  const product = apiProduct
+  const productId = product?.id ?? null
 
   if (showLoader) {
     return <ProductDetailQuoteLoader />
