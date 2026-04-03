@@ -110,7 +110,7 @@ export default function EssentialsPage() {
                     },
                   ].map((slide) => (
                     <CarouselItem key={slide.id} className="pl-2 md:pl-4 basis-full">
-                      <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-12 items-start bg-[#EED9C4] pr-6 sm:pr-8">
+                      <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-12 items-start bg-[#EED9C4] pr-0 sm:pr-8">
                         <div className="relative h-[280px] sm:h-[340px] md:h-[420px] lg:h-[480px] xl:h-[540px] overflow-hidden">
                           <Image src={slide.image} alt="Ananthala Essentials" fill className="object-cover" />
                         </div>
