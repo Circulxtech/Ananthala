@@ -114,20 +114,20 @@ export default function GracePage() {
                   {[
                     {
                       id: 1,
-                      image: "/ananthala Diff1.png",
+                      image: "/Ananthala Diff1.png",
                       title: "Ananthala Difference",
                       description: "True love ages like fine wine and so do our products. Naturally lasting !",
                     },
                     {
                       id: 2,
-                      image: "/ananthala Diff2.png",
+                      image: "/Ananthala Diff2.png",
                       title: "Ananthala Difference",
                       description:
                         "Every sleep feels like a rejuvenation in itself - deep and comforting !",
                     },
                     {
                       id: 3,
-                      image: "/ananthala Diff3.png",
+                      image: "/Ananthala Diff3.png",
                       title: "Ananthala Difference",
                       description:
                         "At Ananthala, our craftsmen choose the finest and the most suitable inputs that go into making your products.",
