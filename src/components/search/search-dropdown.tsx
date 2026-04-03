@@ -228,7 +228,6 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                     <div className="inline-block animate-spin">
                       <div className="w-6 h-6 border-2 border-[#D9CFC7] border-t-[#8B5A3C] rounded-full"></div>
                     </div>
-                    <p className="text-xs sm:text-sm mt-2">Searching database...</p>
                   </div>
                 ) : error ? (
                   <div className="px-3 sm:px-4 py-6 text-center text-red-600">

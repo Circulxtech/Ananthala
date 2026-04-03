@@ -9,11 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { type CartItem } from "@/components/cart/cart-drawer"
 import type { ProductDetail } from "@/data/product-details"
 import { fabricOptions } from "@/data/fabric"
-import { useColorConfigurator } from "@/hooks/use-color-cofigurator"
-import { usePatternConfigurator } from "@/hooks/use-pattern-configurator"
-import { getAllFabricPatterns } from "@/data/fabric-patterns"
 import { MagnifyImage } from "@/components/product/MagnifyImage"
-import { ColorAwareMagnifyImage } from "@/components/product/ColorAwareMagnifyImage"
 import ComplementaryProductsModal from "@/components/product/complementary-products-modal"
 
 interface ApiProductVariant {
@@ -53,23 +49,7 @@ export function ProductConfigurator({
   const [pendingCartItem, setPendingCartItem] = useState<CartItem | null>(null)
   const [isLoadingComplementary, setIsLoadingComplementary] = useState(false)
 
-  const {
-    selectedFabricId: colorFabricId,
-    selectedFabricColor,
-    isColorApplied,
-    setIsColorApplied,
-    handleFabricChange: handleColorChange,
-  } = useColorConfigurator()
 
-  const {
-    selectedPatternId,
-    selectedPattern,
-    isPatternApplied,
-    setIsPatternApplied,
-    handlePatternChange,
-  } = usePatternConfigurator()
-
-  const allPatterns = getAllFabricPatterns()
 
   const productImages = product.images?.length ? product.images : ["/placeholder.svg"]
   const customSizeLabel = `${customLength || "-"}x${customWidth || "-"}x${customHeight || "-"} cm`
@@ -174,13 +154,11 @@ export function ProductConfigurator({
 
     const finalSize = useCustomDimensions ? customSizeLabel : selectedSize
     const item: CartItem = {
-      id: `${product.id}-${finalSize}-${colorFabricId || "default"}-${Date.now()}`,
+      id: `${product.id}-${finalSize}-${Date.now()}`,
       name: product.name,
       image: productImages[0],
       size: finalSize,
       fabric: selectedFabric || selectedVariant?.fabric || undefined,
-      productColor: selectedFabricColor?.name,
-      productColorHex: selectedFabricColor?.hex,
       quantity,
       price,
     }
@@ -261,23 +239,11 @@ export function ProductConfigurator({
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
-              {showColorConfigurator && (colorFabricId || selectedPatternId !== "pattern-solid") ? (
-                <ColorAwareMagnifyImage
-                  src={productImages[selectedImageIndex] || "/placeholder.svg"}
-                  alt={product.name}
-                  fabricId={colorFabricId}
-                  patternId={selectedPatternId}
-                  className="rounded-lg bg-gray-50"
-                  onColorApplied={setIsColorApplied}
-                  onPatternApplied={setIsPatternApplied}
-                />
-              ) : (
-                <MagnifyImage
-                  src={productImages[selectedImageIndex] || "/placeholder.svg"}
-                  alt={product.name}
-                  className="rounded-lg bg-gray-50"
-                />
-              )}
+              <MagnifyImage
+                src={productImages[selectedImageIndex] || "/placeholder.svg"}
+                alt={product.name}
+                className="rounded-lg bg-gray-50"
+              />
 
               {productImages.length > 1 && (
                 <div className="grid grid-cols-5 gap-2 max-w-[320px] sm:max-w-[360px]">
@@ -424,96 +390,8 @@ export function ProductConfigurator({
                   </div>
                 )}
 
-                {/* Color Configurator for Product Colors */}
-                {showColorConfigurator && (
-                  <div>
-                    <label className="text-base font-medium text-foreground mb-2 block">Product Color</label>
-                    <Select value={colorFabricId || "original-color"} onValueChange={(value) => {
-                      if (value === "original-color") {
-                        handleColorChange("")
-                      } else {
-                        handleColorChange(value)
-                      }
-                    }}>
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select color" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="original-color">
-                          <span className="flex items-center gap-2">
-                            <span>Original Color</span>
-                          </span>
-                        </SelectItem>
-                        {fabricOptions.map((fabric) => (
-                          <SelectItem key={fabric.id} value={fabric.id}>
-                            <span className="flex items-center gap-2">
-                              <img
-                                src={fabric.image}
-                                alt={fabric.name}
-                                className="h-5 w-5 rounded object-cover"
-                              />
-                              <span>{fabric.name}</span>
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {selectedFabricColor && (
-                      <div className="mt-2 flex items-center gap-2">
-                        <div
-                          className="w-6 h-6 rounded border border-gray-200"
-                          style={{ backgroundColor: selectedFabricColor.hex }}
-                          title={selectedFabricColor.name}
-                        />
-                        <span className="text-sm text-foreground/70">{selectedFabricColor.name}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
 
-                {/* Pattern Configurator */}
-                {showColorConfigurator && allPatterns.length > 0 && (
-                  <div>
-                    <label className="text-base font-medium text-foreground mb-2 block">Pattern</label>
-                    <Select value={selectedPatternId} onValueChange={handlePatternChange}>
-                      <SelectTrigger className="w-full text-foreground">
-                        <SelectValue placeholder="Select pattern" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {allPatterns.map((pattern) => (
-                          <SelectItem key={pattern.id} value={pattern.id}>
-                            <span className="flex items-center gap-2">
-                              <span className="inline-block w-4 h-4 rounded border border-gray-300" style={{
-                                background: pattern.type === "solid" 
-                                  ? "linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd), linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd)"
-                                  : pattern.type === "striped"
-                                  ? "repeating-linear-gradient(90deg, #333 0px, #333 2px, transparent 2px, transparent 6px)"
-                                  : pattern.type === "checkered"
-                                  ? "linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333), linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333)"
-                                  : "radial-gradient(circle, #333 2px, transparent 2px)",
-                                backgroundSize: pattern.type === "solid" 
-                                  ? "8px 8px"
-                                  : pattern.type === "striped"
-                                  ? "8px 4px"
-                                  : pattern.type === "checkered"
-                                  ? "8px 8px"
-                                  : "8px 8px",
-                                backgroundPosition: "0 0, 4px 4px"
-                              }} />
-                              <span>{pattern.name}</span>
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {selectedPattern && (
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="text-sm font-medium text-foreground/70">Selected:</span>
-                        <span className="text-sm text-foreground">{selectedPattern.name}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
+
 
                 <div>
                   <label className="text-base font-medium text-foreground mb-2 block">Quantity</label>
@@ -581,7 +459,7 @@ export function ProductConfigurator({
       {pendingCartItem && (
         <ComplementaryProductsModal
           isOpen={showComplementaryModal}
-          productId={product.id}
+          productId={String(product.id)}
           mainProductName={product.name}
           onClose={() => {
             setShowComplementaryModal(false)
