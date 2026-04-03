@@ -5,20 +5,21 @@ import { useRouter } from "next/navigation"
 import { Search, X, ChevronRight } from "lucide-react"
 import Image from "next/image"
 
+interface SearchProduct {
+  id: string
+  name: string
+  description: string
+  category: string
+  subCategory: string
+  image: string
+  price: number
+  productType?: "single" | "hamper"
+}
+
 interface SearchDropdownProps {
   isOpen: boolean
   onClose: () => void
   onSearch: (query: string) => void
-}
-
-interface SearchProduct {
-  id: string
-  name: string
-  description?: string
-  category?: string
-  subCategory?: string
-  image?: string
-  price?: number
 }
 
 export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProps) {
@@ -28,51 +29,65 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
   const [isLoading, setIsLoading] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
   const [showMore, setShowMore] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const resultsContainerRef = useRef<HTMLDivElement>(null)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  const toTitleCase = (value?: string) =>
-    value ? value.charAt(0).toUpperCase() + value.slice(1) : ""
-
-  // Filter products based on search query with better relevance scoring
+  // Fetch products from database API based on search query
   useEffect(() => {
+    // Clear existing timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
     if (!searchQuery.trim()) {
       setFilteredProducts([])
       setAllFilteredProducts([])
       setSelectedIndex(-1)
-      setShowMore(false)
+      setError(null)
       return
     }
 
-    const controller = new AbortController()
-    const timeout = window.setTimeout(async () => {
+    // Debounce API call for better performance
+    debounceTimerRef.current = setTimeout(async () => {
+      setIsLoading(true)
+      setError(null)
+
       try {
-        setIsLoading(true)
-        const response = await fetch(
-          `/api/search?q=${encodeURIComponent(searchQuery.trim())}&limit=20`,
-          { signal: controller.signal },
-        )
+        const params = new URLSearchParams({
+          q: searchQuery.trim(),
+          dropdown: "true",
+          dropdownLimit: "20",
+        })
+
+        const response = await fetch(`/api/search?${params.toString()}`)
         const data = await response.json()
-        const results: SearchProduct[] = Array.isArray(data?.data) ? data.data : []
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "Failed to search products")
+        }
+
+        const results = data.data || []
         setAllFilteredProducts(results)
         setFilteredProducts(results.slice(0, 6))
         setSelectedIndex(-1)
-      } catch (error) {
-        if ((error as Error).name !== "AbortError") {
-          setAllFilteredProducts([])
-          setFilteredProducts([])
-          setSelectedIndex(-1)
-        }
+      } catch (err) {
+        console.error("[v0] Search error:", err)
+        setError(err instanceof Error ? err.message : "Search failed")
+        setFilteredProducts([])
+        setAllFilteredProducts([])
       } finally {
         setIsLoading(false)
       }
-    }, 200)
+    }, 300) // 300ms debounce delay
 
     return () => {
-      controller.abort()
-      window.clearTimeout(timeout)
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
     }
   }, [searchQuery])
 
@@ -88,8 +103,8 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
   }
 
   // Handle product click - navigate to product detail page
-  const handleProductClick = (productId: number | string) => {
-    if (productId && productId.toString().trim()) {
+  const handleProductClick = (productId: string) => {
+    if (productId && productId.trim()) {
       router.push(`/product/${productId}`)
       setSearchQuery("")
       onClose()
@@ -213,15 +228,11 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                     <div className="inline-block animate-spin">
                       <div className="w-6 h-6 border-2 border-[#D9CFC7] border-t-[#8B5A3C] rounded-full"></div>
                     </div>
-<<<<<<< HEAD
                   </div>
                 ) : error ? (
                   <div className="px-3 sm:px-4 py-6 text-center text-red-600">
                     <p className="text-xs sm:text-sm font-semibold">Search Error</p>
                     <p className="text-xs mt-1">{error}</p>
-=======
-                    <p className="text-xs sm:text-sm mt-2">Searching...</p>
->>>>>>> 1667bdc22d6be94103ca33ff793be7b26b09ec17
                   </div>
                 ) : (showMore ? allFilteredProducts : filteredProducts).length > 0 ? (
                   <>
@@ -242,7 +253,7 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                           {/* Product Image */}
                           <div className="relative w-10 sm:w-12 h-10 sm:h-12 flex-shrink-0 rounded overflow-hidden bg-stone-50">
                             <Image
-                              src={product.image || "/placeholder.svg"}
+                              src={product.image}
                               alt={product.name}
                               fill
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform"
@@ -257,18 +268,15 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                             }`}>
                               {product.name}
                             </h4>
-                          <div className="flex items-center justify-between gap-1 sm:gap-2">
-                            <p className="text-xs text-[#A0826D] line-clamp-1">
-                              {toTitleCase(product.category)}
-                              {product.subCategory ? ` • ${toTitleCase(product.subCategory)}` : ""}
-                            </p>
-                            <p className="font-semibold text-[#8B5A3C] text-xs flex-shrink-0">
-                              ₹
-                              {Number.isFinite(product.price)
-                                ? product.price.toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                                : "0"}
-                            </p>
-                          </div>
+                            <div className="flex items-center justify-between gap-1 sm:gap-2">
+                              <p className="text-xs text-[#A0826D] line-clamp-1">
+                                {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+                                {product.subCategory && ` • ${product.subCategory}`}
+                              </p>
+                              <p className="font-semibold text-[#8B5A3C] text-xs flex-shrink-0">
+                                ₹{product.price.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                              </p>
+                            </div>
                           </div>
 
                           {/* Arrow Indicator */}
@@ -298,7 +306,7 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                         onClick={handleSearch}
                         className="w-full px-3 sm:px-4 py-2 sm:py-3 text-center font-semibold text-white bg-gradient-to-r from-[#8B5A3C] to-[#6D4530] hover:from-[#9B6A4C] hover:to-[#7D5440] transition-colors text-xs sm:text-sm"
                       >
-                        View all results
+                        View all {allFilteredProducts.length} results
                       </button>
                     )}
                   </>
@@ -306,7 +314,7 @@ export function SearchDropdown({ isOpen, onClose, onSearch }: SearchDropdownProp
                   <div className="px-3 sm:px-4 py-6 sm:py-8 text-center text-[#8B5A3C]">
                     <Search className="w-8 sm:w-12 h-8 sm:h-12 mx-auto mb-2 opacity-30" />
                     <p className="text-xs sm:text-sm font-semibold">No products found</p>
-                    <p className="text-xs text-[#A0826D] mt-1">Try different keywords</p>
+                    <p className="text-xs text-[#A0826D] mt-1">Try searching with different keywords</p>
                   </div>
                 )}
               </div>
