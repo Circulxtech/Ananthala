@@ -1,20 +1,136 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { ChevronRight } from "lucide-react"
-import { getProductDetailById } from "@/data/product-details"
+import { type ProductDetail } from "@/data/product-details"
 import { type CartItem } from "@/components/cart/cart-drawer"
 import { useCart } from "@/contexts/cart-context"
 import { SwaddleProductTemplate } from "@/collections/joy/templates/SwaddleProductTemplate"
 
+interface ApiProductVariant {
+  weight: number
+  length: number
+  width: number
+  height: number
+  fabric: string
+  price: number
+  stock: number
+}
+
+interface ApiProduct {
+  _id: string
+  productTitle: string
+  description: string
+  units: string
+  category: string
+  subCategory?: string
+  imageUrls: string[]
+  variants: ApiProductVariant[]
+  hamperPrice?: number
+  status: "visible" | "hidden"
+}
+
+const formatVariantSize = (variant: ApiProductVariant) => {
+  return `${variant.length}x${variant.width}x${variant.height} cm`
+}
+
+const mapApiProductToDetail = (product: ApiProduct): ProductDetail => {
+  const variants = Array.isArray(product.variants) ? product.variants : []
+  const minVariantPrice = variants.reduce((currentMin, variant) => Math.min(currentMin, variant.price), Number.POSITIVE_INFINITY)
+  const startingPrice = Number.isFinite(minVariantPrice) ? minVariantPrice : 0
+  const totalStock = variants.reduce((sum, variant) => sum + (variant.stock || 0), 0)
+
+  return {
+    id: product._id,
+    name: product.productTitle,
+    category: product.category,
+    price: startingPrice,
+    rating: 0,
+    reviews: 0,
+    description: product.description,
+    images: product.imageUrls?.length ? product.imageUrls : ["/placeholder.svg"],
+    firmness: "Standard",
+    height: variants[0]?.height ? `${variants[0].height} cm` : "Standard",
+    materials: [
+      `Category: ${product.category.charAt(0).toUpperCase() + product.category.slice(1)}`,
+      ...(product.subCategory ? [`Collection: ${product.subCategory.charAt(0).toUpperCase() + product.subCategory.slice(1)}`] : []),
+    ],
+    features: [],
+    specifications: {
+      Units: product.units,
+      Variants: `${variants.length}`,
+      "Total Stock": `${totalStock}`,
+    },
+    sizes: variants.length
+      ? variants.map((variant) => ({
+          name: formatVariantSize(variant),
+          price: variant.price,
+        }))
+      : [{ name: "Standard", price: startingPrice }],
+  }
+}
+
 export default function SwaddlesProductPage() {
-  const productId = 14
-  const product = getProductDetailById(productId)
   const [isAddingToCart, setIsAddingToCart] = useState(false)
+  const [product, setProduct] = useState<ProductDetail | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const { addToCart } = useCart()
+
+  useEffect(() => {
+    let isMounted = true
+
+    const fetchProduct = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch("/api/products?category=joy&status=visible")
+        const data = await response.json()
+        const products: ApiProduct[] = Array.isArray(data?.products) ? data.products : []
+        const match = products.find((item) => item.productTitle?.toLowerCase().includes("swaddle"))
+
+        if (!match) {
+          throw new Error("Product not found")
+        }
+
+        if (isMounted) {
+          setProduct(mapApiProductToDetail(match))
+          setLoadError(null)
+        }
+      } catch (error: any) {
+        if (isMounted) {
+          setProduct(null)
+          setLoadError(error.message || "Product not found")
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    fetchProduct()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <main className="pt-16 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <p className="text-foreground">Loading product...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
 
   if (!product) {
     return (
@@ -23,7 +139,7 @@ export default function SwaddlesProductPage() {
         <main className="pt-16 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-black mb-4">
-              Product Not Found in database
+              {loadError || "Product Not Found in database"}
             </h1>
             <Link
               href="/"
@@ -82,7 +198,7 @@ export default function SwaddlesProductPage() {
         <div className="max-w-7xl mx-auto px-4 pb-12 mt-8">
           <SwaddleProductTemplate
             product={product}
-            productId={productId}
+            productId={product.id}
             onAddToCart={handleAddToCart}
             isAddingToCart={isAddingToCart}
           />

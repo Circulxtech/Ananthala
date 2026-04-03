@@ -23,7 +23,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Sprout, Waves, SprayCan, XCircle, Layers, Grid } from "lucide-react"
-import { CustomersAlsoBought } from "@/collections/grace/components/customers-also-bought"
 
 // Testimonial videos data
 interface TestimonialVideo {
@@ -74,7 +73,7 @@ const testimonialVideos: TestimonialVideo[] = [
 
 interface GraceMattressProductTemplateProps {
   product: ProductDetail
-  productId: number
+  productId: string | number
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
@@ -347,7 +346,6 @@ export function GraceMattressProductTemplate({
       </section>
 
       {/* What Our Customers Also Bought Section */}
-      <CustomersAlsoBought currentProductId={productId} />
 
       {/* Customer Testimonials Video Carousel Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">

@@ -23,7 +23,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Sprout, Waves, SprayCan, XCircle, Layers, Grid } from "lucide-react"
-import { CustomersAlsoBought } from "@/collections/bliss/components/customers-also-bought"
 
 // Testimonial videos data
 interface TestimonialVideo {
@@ -74,7 +73,7 @@ const testimonialVideos: TestimonialVideo[] = [
 
 interface BlissMattressProductTemplateProps {
   product: ProductDetail
-  productId: number
+  productId: string | number
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
@@ -296,7 +295,6 @@ export function BlissMattressProductTemplate({
       </section>
 
       {/* What Our Customers Also Bought Section */}
-      <CustomersAlsoBought currentProductId={productId} />
 
       {/* About Us Section */}
 <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
