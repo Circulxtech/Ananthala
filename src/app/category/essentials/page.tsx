@@ -51,7 +51,7 @@ export default function EssentialsPage() {
           <div className="relative w-full h-full">
             <Image src="/mattress.jpg" alt="Sleep Essentials" fill className="object-cover object-top" priority />
             <div className="absolute inset-0 z-10 flex items-center">
-              <div className="flex w-full flex-col gap-6 px-4 sm:px-6 lg:px-8 xl:px-12 md:flex-row md:items-center md:justify-between">
+              <div className="flex w-full flex-col gap-6 px-4 sm:px-6 lg:px-8 xl:px-12 pt-12 sm:pt-14 md:pt-0 md:flex-row md:items-center md:justify-between">
                 <div className="order-2 flex flex-col sm:flex-row gap-4 md:order-1">
                   <Button
                     onClick={scrollToShop}

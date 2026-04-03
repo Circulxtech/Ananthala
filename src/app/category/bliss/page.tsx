@@ -67,7 +67,7 @@ export default function BlissPage() {
             />
             {/* Overlay content with right-aligned text and left CTA */}
             <div className="absolute inset-0 z-10 flex items-center">
-              <div className="flex w-full flex-col gap-6 px-4 sm:px-6 lg:px-8 xl:px-12 md:flex-row md:items-start md:justify-between">
+              <div className="flex w-full flex-col gap-6 px-4 sm:px-6 lg:px-8 xl:px-12 pt-12 sm:pt-14 md:pt-0 md:flex-row md:items-start md:justify-between">
                 <div className="order-2 flex flex-col sm:flex-row gap-4 md:order-1 md:pt-44">
                   <Button 
                     onClick={scrollToShop}
@@ -193,7 +193,7 @@ export default function BlissPage() {
         <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-              <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
+              <div className="relative w-full min-h-[240px] aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
                 <Image
                   src="/Bullock Cart Theme.png"
                   alt="About Ananthala"

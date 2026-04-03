@@ -289,7 +289,7 @@ export default function JoyPage() {
             />
             {/* Overlay content on the left */}
             <div className="absolute inset-0 z-10 flex items-center">
-              <div className="pl-4 sm:pl-6 lg:pl-8 xl:pl-12">
+              <div className="pl-4 sm:pl-6 lg:pl-8 xl:pl-12 pt-12 sm:pt-14 md:pt-0">
                 <div className="max-w-md space-y-6">
                   <div className="bg-white/10 backdrop-blur-sm p-4 md:p-8 rounded-lg">
                     <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-white font-cormorant">
@@ -424,7 +424,7 @@ export default function JoyPage() {
         <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-              <div className="relative aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
+              <div className="relative w-full min-h-[240px] aspect-[4/3] overflow-hidden max-w-lg mx-auto lg:mx-0">
                 <Image
                   src="/Bullock Cart Theme.png"
                   alt="About Ananthala"
