@@ -8,7 +8,7 @@ import { IndividualProductSpecifications } from "@/components/product/individual
 
 interface IndividualProductTemplateProps {
   product: ProductDetail
-  productId: string | number
+  productId: number
   onAddToCart: (item: CartItem) => void
   isAddingToCart: boolean
 }

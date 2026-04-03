@@ -70,7 +70,7 @@ const testimonialVideos: TestimonialVideo[] = [
 
 interface BlissTopperProductTemplateProps {
   product: ProductDetail
-  productId: string | number
+  productId: number
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
@@ -285,7 +285,6 @@ export function BlissTopperProductTemplate({
       </section>
 
       {/* What Our Customers Also Bought Section */}
-
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">

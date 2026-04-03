@@ -6,16 +6,10 @@ import { Heart, Eye, Award, Leaf, ChevronRight } from "lucide-react"
 
 const values = [
   {
-    icon: Heart,
-    title: "Customer_first",
+    icon: Eye,
+    title: "Transparency",
     description:
-      "Your comfort,satisfaction are at the heartof everything we do.We listen,adapt and continuously improve to serve you better.",
-  },
-  {
-    icon: Leaf,
-    title: "Sustainability",
-    description:
-      "We source eco-friendly materials and use sustainable manufacturing processes to minimize our environmental footprint.",
+      "We believe in being honest about our materials, processes, and pricing. No hidden costs and no compromises.",
   },
   {
     icon: Award,
@@ -24,10 +18,16 @@ const values = [
       "Every mattress undergoes rigorous testing and quality control to ensure it meets our exceptionally high standards.",
   },
   {
-    icon: Eye,
-    title: "Transparency",
+    icon: Heart,
+    title: "Customer First",
     description:
-      "We believe in being honest about our materials, processes, and pricing.No hidden costs & no compromises.",
+      "Your comfort and satisfaction are at the heart of everything we do. We listen, adapt, and continuously improve to serve you better.",
+  },
+  {
+    icon: Leaf,
+    title: "Sustainability",
+    description:
+      "We source eco-friendly materials and use sustainable manufacturing processes to ensure we stay close to nature and help nature preserve its strengths.",
   },
 ]
 
@@ -57,22 +57,22 @@ export default function AboutPage() {
         {/* Spacer to prevent content from going under fixed breadcrumb */}
         <div className="h-[49px]"></div>
         {/* Hero Section */}
-        <section className="relative h-[60vh] bg-[#EED9C4] overflow-hidden">
+        <section className="relative h-[75vh] bg-[#EED9C4] overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
             <Image
-              src="https://images.unsplash.com/photo-1609587639086-b4cbf85e4355?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWlnZSUyMG1hdHRyZXNzJTIwYmVkcm9vbXxlbnwxfHx8fDE3NjQzMTk5NjR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-              alt="About Us"
+              src="/about ananthala.png"
+              alt="About Ananthala"
               fill
-              className="object-cover transition-transform duration-700 hover:scale-110"
-              unoptimized
+              className="object-cover object-[center_25%] transition-transform duration-700 hover:scale-110"
             />
           </div>
-          <div className="absolute inset-0 bg-[#EED9C4]/60"></div>
+          <div className="absolute inset-0 bg-black/50"></div>
           <div className="relative h-full flex items-center justify-center px-4">
-            <div className="text-center text-foreground max-w-3xl">
-              <h1 className="mb-6 text-5xl font-semibold text-foreground">About Ananthala</h1>
-              <p className="text-foreground/90 font-semibold text-lg">
-                Crafting premium mattresses with care, precision, and acommitment to your best sleep.
+            <div className="text-center text-white max-w-3xl">
+              <h1 className="mb-6 text-5xl font-bold text-white">About Ananthala</h1>
+              <p className="text-white font-bold text-lg">
+                Rejuvenating the best of heritage to craft great products with care, precision, and a commitment to
+                bringing out your best selves.
               </p>
             </div>
           </div>
@@ -90,51 +90,97 @@ export default function AboutPage() {
             {/* IMAGE AND TEXT GRID */}
             <div className="grid md:grid-cols-2 gap-12 items-start">
               {/* LEFT SIDE — IMAGE */}
-              <div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg group">
+              <div className="relative w-full h-[420px] sm:h-[480px] md:h-[560px] lg:h-[640px] overflow-hidden rounded-lg group bg-white md:mt-0">
                 <Image
-                  src="https://images.unsplash.com/photo-1640109478916-f445f8f19b11?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBiZWRyb29tJTIwd2hpdGV8ZW58MXx8fHwxNzY0MTI2NDExfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                  src="/Ananthala Story.png"
                   alt="Ananthala Story"
                   fill
-                  className="object-cover shadow-md transition-transform duration-700 group-hover:scale-110"
-                  unoptimized
+                  className="object-contain object-center shadow-md transition-transform duration-700"
                 />
               </div>
-
               {/* RIGHT SIDE — TEXT */}
-              <div className="space-y-6 text-foreground">
-                <p className="text-lg font-medium">
-                  Founded in 2015, Ananthala wa born from a simple yet profound realization: quality sleep is the
-                  foundation of a quality life. Our founder, after years of struggling with poor sleep and back pain,
-                  discovered that the right mattress could transform not just nights, but entire days. This personal
-                  journey sparked a mission to create mattresses that truly serve the needs of every sleeper.
-                </p>
-                <p className="text-lg font-medium">
-                  What began in a small workshop with a passion for craftsmanship has grown into a trusted name in the
-                  sleep industry. We started by handcrafting mattresses for friends and family, carefully listening to
-                  their feedback and refining our designs. Word spread about the exceptional comfort and support our
-                  mattresses provided, and demand grew organically.
-                </p>
-                <p className="text-lg font-medium">
-                  Every mattress we create is the result of extensive research, countless prototypes, and feedback from
-                  real sleepers. We work with sleep scientists, orthopedic specialists, and materials experts to ensure
-                  each design meets the highest standards of comfort, support, and durability. 
-                </p>
+              <div className="space-y-10 text-foreground">
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-bold">A Legacy Rooted in Nature</h3>
+                  <p className="text-lg font-medium">
+                    There are stories that are told, and there are those that are lived--quietly, over generations.
+                  </p>
+                  <p className="text-lg font-medium">
+                    Ours began in the early 20th century, amidst fields of cotton and stretches of timber, where the
+                    rhythm of the land shaped our way of life. What started as cultivation evolved into trade in 1959,
+                    when we brought the finest milling technologies from Manchester to refine what nature had so
+                    generously given us.
+                  </p>
+                  <p className="text-lg font-medium">
+                    Today, in our fourth generation, this legacy continues--not as tradition alone, but as a philosophy
+                    of living.
+                  </p>
+                </div>
+                <hr className="border-[#EED9C4]" />
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-semibold">The Art of Rest</h3>
+                  <p className="text-lg font-medium">
+                    We believe that true luxury is not excess, but restoration.
+                  </p>
+                  <p className="text-lg font-medium">
+                    Sleep, to us, is more than a necessity--it is a ritual of renewal. A moment where the body unwinds,
+                    the mind softens, and one awakens restored. In a world that moves relentlessly forward, we seek to
+                    bring you back--to stillness, to simplicity, to nature.
+                  </p>
+                  <p className="text-lg font-medium">Because nature, in its quiet wisdom, knows best.</p>
+                </div>
+                <hr className="border-[#EED9C4]" />
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-semibold">Materials in Their Purest Form</h3>
+                  <p className="text-lg font-medium">
+                    At the heart of our craft lies an uncompromising respect for natural materials.
+                  </p>
+                  <p className="text-lg font-medium">
+                    We work with the finest cotton and timber--materials that have thrived in our tropical landscape for
+                    generations. Free from chemical interventions, our creations are untouched by foam, latex, or
+                    synthetics. Instead, we use carefully selected Naati virgin cotton, grown locally and chosen for its
+                    inherent strength, breathability, and comfort.
+                  </p>
+                  <p className="text-lg font-medium">
+                    Each fibre, each layer, is guided by both tradition and research--coming together to create a
+                    balance that feels instinctively right.
+                  </p>
+                </div>
+                <hr className="border-[#EED9C4]" />
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-semibold">Crafted with Quiet Precision</h3>
+                  <p className="text-lg font-medium">Luxury reveals itself in the details.</p>
+                  <p className="text-lg font-medium">
+                    The fabrics that envelop our mattresses are inspired by classic Belgian weaves--subtle stripes,
+                    checks, and textures that speak of understated elegance. Made from 100% pure cotton, they allow the
+                    material to breathe, just as nature intended.
+                  </p>
+                  <p className="text-lg font-medium">
+                    Beneath, solid wood frames--crafted from locally sourced timber--provide a foundation of strength
+                    and longevity. Each piece is shaped by the hands of craftsmen who have inherited not just skill, but
+                    a philosophy: to create with integrity, and to craft for a lifetime.
+                  </p>
+                </div>
+                <hr className="border-[#EED9C4]" />
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-semibold">A Return to What Matters</h3>
+                  <p className="text-lg font-medium">
+                    In every product we offer is an invitation--to slow down, to reconnect, and to rediscover the simple
+                    luxury of living well.
+                  </p>
+                  <p className="text-lg font-medium">This is not just about sleep.</p>
+                  <p className="text-lg font-medium">
+                    It is about returning to nature, and in doing so, returning to yourself.
+                  </p>
+                </div>
               </div>
+              
             </div>
           </div>
         </section>
 
         {/* Mission & Vision (With Dark Overlay Background) */}
-        <section className="relative py-12 px-4 bg-[#EED9C4] overflow-hidden">
-          <div className="absolute inset-0 opacity-40 overflow-hidden">
-            <Image
-              src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080"
-              alt="Mission and Vision"
-              fill
-              className="object-cover transition-transform duration-700 hover:scale-110"
-              unoptimized
-            />
-          </div>
+        <section className="relative py-12 px-4 bg-[#F5F1ED] overflow-hidden">
           <div className="relative max-w-7xl mx-auto text-foreground pb-8">
             <div className="text-center mb-8">
               <p className="text-foreground text-4xl font-semibold mb-2">What We Stand For</p>
@@ -145,38 +191,46 @@ export default function AboutPage() {
             <div className="flex justify-center mb-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl w-full">
                 {/* Mission */}
-                <div className="bg-[#EED9C4] px-8 pt-8 pb-10 border border-white/20 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl cursor-pointer">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-[#EED9C4] text-foreground rounded-full flex items-center justify-center">
+                <div className="relative overflow-hidden bg-white px-14 pt-14 pb-16 border border-[#EED9C4]/60 rounded-2xl transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl cursor-pointer">
+                  <Image
+                    src="/Vision and Mission Background.png"
+                    alt="Mission Background"
+                    fill
+                    className="object-cover opacity-60"
+                  />
+                  <div className="absolute inset-0 bg-black/55"></div>
+                  <div className="relative z-10 flex items-center gap-3 mb-4 text-white">
+                    <div className="w-12 h-12 bg-white/10 text-white rounded-full flex items-center justify-center">
                       <Heart className="w-5 h-5" />
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground">Our Mission</h3>
+                    <h3 className="text-2xl font-semibold text-white">Our Mission</h3>
                   </div>
-                  <p className="text-lg font-medium text-foreground leading-relaxed mb-3">
-                    To craft exceptional mattresses that transform the way people sleep, using sustainable materials and
-                    innovative design. We exist to help our customers wake up feeling their best, every single day.
-                  </p>
-                  <p className="text-lg font-medium text-foreground leading-relaxed">
-                    We believe that everyone deserves access to quality sleep, which is why we've made it our mission to
-                    create mattresses that combine luxury comfort with responsible manufacturing.
+                  <p className="relative z-10 text-lg font-medium text-white leading-relaxed">
+                    To craft refined, nature-rooted products that restore and elevate everyday living--drawing from
+                    generations of Indian craftsmanship, the purity of natural materials, and an uncompromising
+                    commitment to holistic well-being.
                   </p>
                 </div>
 
               {/* Vision */}
-                <div className="bg-[#EED9C4] px-8 pt-8 pb-10 border border-white/20 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl cursor-pointer">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-[#EED9C4] text-foreground rounded-full flex items-center justify-center">
+                <div className="relative overflow-hidden bg-white px-14 pt-14 pb-16 border border-[#EED9C4]/60 rounded-2xl transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl cursor-pointer">
+                  <Image
+                    src="/Vision and Mission Background.png"
+                    alt="Vision Background"
+                    fill
+                    className="object-cover opacity-60"
+                  />
+                  <div className="absolute inset-0 bg-black/55"></div>
+                  <div className="relative z-10 flex items-center gap-3 mb-4 text-white">
+                    <div className="w-12 h-12 bg-white/10 text-white rounded-full flex items-center justify-center">
                       <Eye className="w-5 h-5" />
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground">Our Vision</h3>
+                    <h3 className="text-2xl font-semibold text-white">Our Vision</h3>
                   </div>
-                  <p className="text-lg font-medium text-foreground leading-relaxed mb-3">
-                    To become the most trusted sleep brand, known for exceptional quality, sustainability, and customer
-                    care — setting new standards for what a mattress company can be.
-                  </p>
-                  <p className="text-lg font-medium text-foreground leading-relaxed">
-                    We envision a future where quality sleep is recognized as essential to health and wellbeing, and where
-                    sustainable practices are the norm, not the exception.
+                  <p className="relative z-10 text-lg font-medium text-white leading-relaxed">
+                    To be a distinguished symbol of Indian heritage luxury--where timeless craftsmanship, natural
+                    living, and quiet sophistication come together to redefine how the world rests, lives, and reconnects
+                    with nature.
                   </p>
                 </div>
               </div>
@@ -186,7 +240,7 @@ export default function AboutPage() {
 
         {/* Values */}
         <section className="py-24 px-4 bg-white">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-[1400px] mx-auto">
             <div className="text-center mb-16">
               <p className="text-foreground text-4xl font-semibold mb-2">What Drives Us</p>
               
@@ -237,69 +291,90 @@ export default function AboutPage() {
             <div className="text-center mb-12">
               <h2 className="mb-6 text-3xl font-semibold text-foreground">Our Commitment to Sustainability</h2>
               <p className="text-foreground font-semibold text-lg max-w-2xl mx-auto">
-                At Ananthala, we believe that taking care of our customers means taking care of our planet. 
+                At Ananthala, we honour the land that sustains us, knowing that in preserving it, we protect the legacy
+                of life for generations to come.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Eco-Friendly Materials Card */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {/* Materials Card */}
               <div className="relative rounded-lg overflow-hidden shadow-sm min-h-[250px] group">
                 <Image
-                  src="https://images.unsplash.com/photo-1609587639086-b4cbf85e4355?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWlnZSUyMG1hdHRyZXNzJTIwYmVkcm9vbXxlbnwxfHx8fDE3NjQzMTk5NjR8MA&ixlib=rb-4.1.0&q=80&w=1080"
-                  alt="Eco-Friendly Materials"
+                  src="/Sustainability - Materials BG.png"
+                  alt="Materials"
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  unoptimized
                 />
-                <div className="absolute inset-0 bg-[#EED9C4]/70"></div>
+                <div className="absolute inset-0 bg-black/55"></div>
                 <div className="relative z-10 p-8 h-full flex flex-col">
-                  <h3 className="text-xl font-semibold text-foreground mb-4 text-center">Eco-Friendly Materials</h3>
+                  <h3 className="text-xl font-semibold text-white mb-4 text-center">Materials</h3>
                   <div className="flex-1 flex items-center justify-center">
-                    <p className="text-lg font-semibold text-foreground text-center">
-                      Certified organic cotton, natural latex, and recyclable components. All materials are carefully
-                      sourced from certified suppliers who share our commitment to environmental responsibility and
-                      ethical practices.
+                    <p className="text-lg font-semibold text-white text-center">
+                      We begin with what nature provides--pure, enduring, and honest. Our cotton is locally grown, our
+                      timber responsibly sourced, each chosen for its inherent strength, breathability, and harmony with
+                      our environment. Free from synthetics and unnecessary processing, our materials remain as close to
+                      their natural state as possible--gentle on both the body and the earth.
                     </p>
                   </div>
                 </div>
               </div>
-              {/* Responsible Manufacturing Card */}
+              {/* Craft Card */}
               <div className="relative rounded-lg overflow-hidden shadow-sm min-h-[250px] group">
                 <Image
-                  src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080"
-                  alt="Responsible Manufacturing"
+                  src="/Sustaibaility - Craft BG.png"
+                  alt="Craft"
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  unoptimized
                 />
-                <div className="absolute inset-0 bg-[#EED9C4]/70"></div>
+                <div className="absolute inset-0 bg-black/55"></div>
                 <div className="relative z-10 p-8 h-full flex flex-col">
-                  <h3 className="text-xl font-semibold text-foreground mb-4 text-center">Responsible Manufacturing</h3>
+                  <h3 className="text-xl font-semibold text-white mb-4 text-center">Craft</h3>
                   <div className="flex-1 flex items-center justify-center">
-                    <p className="text-lg font-semibold text-foreground text-center">
-                      Low-emission facilities powered by renewable energy. Our manufacturing processes are designed to
-                      minimize waste and maximize efficiency, ensuring that every mattress we produce has the smallest
-                      possible environmental footprint.
+                    <p className="text-lg font-semibold text-white text-center">
+                      Our approach to making is guided by restraint and respect. We minimise intervention, allowing
+                      natural materials to retain their integrity, while our craftsmen shape each piece with precision
+                      and care. Rooted in generations of knowledge, our craft is not about excess, but about creating
+                      with intention--where every detail serves a purpose, and nothing is superfluous.
                     </p>
                   </div>
                 </div>
               </div>
-              {/* Mattress Recycling Program Card */}
+              {/* Responsibility Card */}
               <div className="relative rounded-lg overflow-hidden shadow-sm min-h-[250px] group">
                 <Image
-                  src="https://images.unsplash.com/photo-1609587639086-b4cbf85e4355?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWlnZSUyMG1hdHRyZXNzJTIwYmVkcm9vbXxlbnwxfHx8fDE3NjQzMTk5NjR8MA&ixlib=rb-4.1.0&q=80&w=1080"
-                  alt="Mattress Recycling Program"
+                  src="/Sustainability - Repsonsibility BG.png"
+                  alt="Responsibility"
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  unoptimized
                 />
-                <div className="absolute inset-0 bg-[#EED9C4]/70"></div>
+                <div className="absolute inset-0 bg-black/55"></div>
                 <div className="relative z-10 p-8 h-full flex flex-col">
-                  <h3 className="text-xl font-semibold text-foreground mb-4 text-center">Mattress Recycling Program</h3>
+                  <h3 className="text-xl font-semibold text-white mb-4 text-center">Responsibility</h3>
                   <div className="flex-1 flex items-center justify-center">
-                    <p className="text-lg font-semibold text-foreground text-center">
-                      Free pickup and eco-friendly disposal of your old mattress. We partner with recycling facilities
-                      to ensure that up to 95% of your old mattress materials are recycled or repurposed, keeping waste out
-                      of    landfills.
+                    <p className="text-lg font-semibold text-white text-center">
+                      Our responsibility extends beyond what we create, to how we create it. We work in close harmony
+                      with local ecosystems and communities, ensuring that our processes honour the land that sustains
+                      us. By choosing longevity over disposability and purity over convenience, we seek to preserve a
+                      balance that endures.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {/* Legacy Card */}
+              <div className="relative rounded-lg overflow-hidden shadow-sm min-h-[250px] group">
+                <Image
+                  src="/Sustainability - Legacy BG.png"
+                  alt="Legacy"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black/55"></div>
+                <div className="relative z-10 p-8 h-full flex flex-col">
+                  <h3 className="text-xl font-semibold text-white mb-4 text-center">Legacy</h3>
+                  <div className="flex-1 flex items-center justify-center">
+                    <p className="text-lg font-semibold text-white text-center">
+                      For us, sustainability is not a statement--it is a legacy. In caring for the earth today, we
+                      safeguard the quiet continuity of life for generations to come, ensuring that what we build
+                      remains as timeless as the values we uphold.
                     </p>
                   </div>
                 </div>

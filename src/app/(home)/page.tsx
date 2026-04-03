@@ -1,10 +1,5 @@
 "use client"
 
-import { CarouselNext } from "@/components/ui/carousel"
-import { CarouselPrevious } from "@/components/ui/carousel"
-import { CarouselItem } from "@/components/ui/carousel"
-import { CarouselContent } from "@/components/ui/carousel"
-import { Carousel } from "@/components/ui/carousel"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { CustomerTestimonialVideos } from "@/components/sections/customer-testimonial-videos"
@@ -46,28 +41,6 @@ interface HomepageCard {
   displayOrder?: number
 }
 
-// Testimonial Videos data
-const testimonialVideos = [
-  {
-    id: 1,
-    name: "Jane Doe",
-    video: "/testimonial1.mp4",
-    poster: "/testimoniail1.jpg",
-  },
-  {
-    id: 2,
-    name: "John Smith",
-    video: "/testimonial2.mp4",
-    poster: "/testimonial2.jpg",
-  },
-  {
-    id: 3,
-    name: "Emily Johnson",
-    video: "/testimonial3.mp4",
-    poster: "/testimonial3.jpg",
-  },
-]
-
 export default function Home() {
   const router = useRouter()
   const [isMuted, setIsMuted] = useState(true)
@@ -79,15 +52,6 @@ export default function Home() {
     if (videoRef.current) {
       videoRef.current.muted = !isMuted
       setIsMuted(!isMuted)
-    }
-  }
-
-  const handleShopScroll = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault()
-    const element = document.getElementById("find-your-perfect-mattress")
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
-      window.history.pushState({}, "", "/#find-your-perfect-mattress")
     }
   }
 
@@ -137,13 +101,13 @@ export default function Home() {
   const getCategoryPath = (productName: string) => {
     const name = productName.toLowerCase()
     // Map product names to category pages (matching second section redirects)
-    if (name === "joy") return "/category/joy#shop"
-    if (name === "bliss") return "/category/bliss#shop"
-    if (name === "grace") return "/category/grace#shop"
+    if (name === "joy") return "/category/joy"
+    if (name === "bliss") return "/category/bliss"
+    if (name === "grace") return "/category/grace"
     if (name.includes("pillow") || name.includes("bedsheet") || name.includes("bedding") || name.includes("more")) {
-      return "/category/essentials#shop"
+      return "/category/essentials"
     }
-    return "/category/bliss#shop"
+    return "/category/bliss"
   }
 
   const onNavigate = (productName: string) => {
@@ -207,18 +171,9 @@ export default function Home() {
         {/* Experience The Difference Section */}
         <div className="py-16 bg-white">
           <div className="max-w-7xl mx-auto text-center px-4">
-            <h2
-              className="mb-4 font-semibold text-4xl text-foreground"
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
-            >
-              Experience The Difference
+            <h2 className="mb-4 text-4xl font-medium text-foreground">
+              Experience Infinity, Experience Ananthala
             </h2>
-            <p
-              className="max-w-2xl mx-auto text-xl font-semibold text-foreground"
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
-            >
-              See how our mattresses are crafted with precision and care to deliver unmatched comfort.
-            </p>
           </div>
         </div>
 
@@ -328,7 +283,6 @@ export default function Home() {
                 const cardKey = card._id || card.name
                 const backgroundImage = card.backgroundUrl || "/placeholder.svg"
                 const isPlaceholder = backgroundImage === "/placeholder.svg"
-                const isGifBackground = /\.(gif)(\?|#|$)/i.test(backgroundImage)
                 const rangeLabel = (() => {
                   const normalizedName = card.name.toLowerCase()
                   if (normalizedName.includes("joy")) return "Kids range"

@@ -4,16 +4,12 @@ import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import { Loader2 } from "lucide-react"
 import { MagnifyImage } from "@/components/product/MagnifyImage"
-import { ColorAwareMagnifyImage } from "@/components/product/ColorAwareMagnifyImage"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import type { ProductDetail } from "@/data/product-details"
 import type { CartItem } from "@/components/cart/cart-drawer"
 import { fabricOptions } from "@/data/fabric"
-import { useColorConfigurator } from "@/hooks/use-color-cofigurator"
-import { usePatternConfigurator } from "@/hooks/use-pattern-configurator"
-import { getAllFabricPatterns } from "@/data/fabric-patterns"
 
 export interface DbHamperItemVariant {
   weight: number
@@ -54,15 +50,6 @@ export function DbHamperConfigurator({
   >({})
   const [selectedFabric, setSelectedFabric] = useState<string>("")
 
-  const {
-    selectedFabricId: colorFabricId,
-    selectedFabricColor,
-    handleFabricChange: handleColorChange,
-  } = useColorConfigurator()
-
-  const { selectedPatternId, selectedPattern, handlePatternChange } = usePatternConfigurator()
-  const allPatterns = getAllFabricPatterns()
-
   useEffect(() => {
     if (!selectedFabric && hamperFabric) {
       setSelectedFabric(hamperFabric)
@@ -82,9 +69,7 @@ export function DbHamperConfigurator({
   const handleAddToCart = () => {
     const cover = product.images?.[0] || "/placeholder.svg"
     const fabricLabel = fabricOptions.find((f) => f.id === selectedFabric)?.name || selectedFabric || hamperFabric
-    const patternLabel = selectedPattern?.name ? `Pattern: ${selectedPattern.name}` : ""
-    const colorLabel = selectedFabricColor?.name ? `Color: ${selectedFabricColor.name}` : ""
-    const sizeParts = [normalizedItems.map((i) => i.name).join(", "), colorLabel, patternLabel].filter(Boolean)
+    const sizeParts = [normalizedItems.map((i) => i.name).join(", ")].filter(Boolean)
     const sizeInfo = sizeParts.join(" | ") || "Hamper"
     const items: CartItem[] = [
       {
@@ -93,8 +78,6 @@ export function DbHamperConfigurator({
         image: cover,
         size: sizeInfo,
         fabric: fabricLabel || "Standard",
-        productColor: selectedFabricColor?.name,
-        productColorHex: selectedFabricColor?.hex,
         quantity: 1,
         price: hamperPrice,
       },
@@ -121,22 +104,11 @@ export function DbHamperConfigurator({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Left Side - Images */}
                 <div className="space-y-4">
-                  {/* Use color-aware image when a product color or pattern is selected, like single products */}
-                  {colorFabricId || selectedPatternId !== "pattern-solid" ? (
-                    <ColorAwareMagnifyImage
-                      src={images[imageIndex] || "/placeholder.svg"}
-                      alt={item.name}
-                      fabricId={colorFabricId}
-                      patternId={selectedPatternId}
-                      className="rounded-lg bg-gray-50"
-                    />
-                  ) : (
-                    <MagnifyImage
-                      src={images[imageIndex] || "/placeholder.svg"}
-                      alt={item.name}
-                      className="rounded-lg bg-gray-50"
-                    />
-                  )}
+                <MagnifyImage
+                  src={images[imageIndex] || "/placeholder.svg"}
+                  alt={item.name}
+                  className="rounded-lg bg-gray-50"
+                />
 
                   {images.length > 1 && (
                     <div className="grid grid-cols-5 gap-2">
@@ -300,69 +272,6 @@ export function DbHamperConfigurator({
               </div>
             )}
 
-            {/* Color Configurator for Product Colors (same behavior as single products) */}
-            <div>
-              <label className="text-base font-medium text-foreground mb-2 block">Product Color</label>
-              <Select
-                value={colorFabricId || "original-color"}
-                onValueChange={(value) => {
-                  if (value === "original-color") {
-                    handleColorChange("")
-                  } else {
-                    handleColorChange(value)
-                  }
-                }}
-              >
-                <SelectTrigger className="w-full text-foreground">
-                  <SelectValue placeholder="Select color" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="original-color">
-                    <span className="flex items-center gap-2">
-                      <span>Original Color</span>
-                    </span>
-                  </SelectItem>
-                  {fabricOptions.map((fabric) => (
-                    <SelectItem key={fabric.id} value={fabric.id}>
-                      <span className="flex items-center gap-2">
-                        <img src={fabric.image} alt={fabric.name} className="h-5 w-5 rounded object-cover" />
-                        <span>{fabric.name}</span>
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {selectedFabricColor && (
-                <div className="mt-2 flex items-center gap-2">
-                  <div
-                    className="w-6 h-6 rounded border border-gray-200"
-                    style={{ backgroundColor: selectedFabricColor.hex }}
-                    title={selectedFabricColor.name}
-                  />
-                  <span className="text-sm text-foreground/70">{selectedFabricColor.name}</span>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="text-base font-medium text-foreground mb-3 block">Pattern</label>
-              <Select value={selectedPatternId} onValueChange={handlePatternChange}>
-                <SelectTrigger className="w-full text-foreground py-3">
-                  <SelectValue placeholder="Solid" />
-                </SelectTrigger>
-                <SelectContent>
-                  {allPatterns.map((pattern) => (
-                    <SelectItem key={pattern.id} value={pattern.id} className="text-foreground">
-                      {pattern.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {selectedPattern?.name && (
-                <p className="mt-2 text-sm text-foreground/70">Selected: {selectedPattern.name}</p>
-              )}
-            </div>
           </div>
 
           <div className="mt-6 pt-6 border-t border-[#EED9C4]">

@@ -7,6 +7,7 @@ import { FixedSidebar } from "@/components/layout/fixed-sidebar"
 import { Toaster } from "@/components/ui/toaster"
 
 import "./globals.css"
+import "react-inner-image-zoom/lib/styles.min.css"
 
 const cormorantGaramond = Cormorant_Garamond({ 
   subsets: ["latin"],

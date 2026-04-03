@@ -71,7 +71,7 @@ const testimonialVideos: TestimonialVideo[] = [
 
 interface MattressProductTemplateProps {
   product: ProductDetail
-  productId: string | number
+  productId: number
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
@@ -254,8 +254,6 @@ export function MattressProductTemplate({
           </div>
         </div>
       </section>
-
-      {/* What Our Customers Also Bought Section */}
 
       {/* About Us Section */}
       <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">

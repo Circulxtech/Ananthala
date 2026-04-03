@@ -73,7 +73,7 @@ const testimonialVideos: TestimonialVideo[] = [
 
 interface BlissMattressProductTemplateProps {
   product: ProductDetail
-  productId: string | number
+  productId: number
   onAddToCart: (items: CartItem[]) => void
   isAddingToCart: boolean
 }
@@ -295,7 +295,6 @@ export function BlissMattressProductTemplate({
       </section>
 
       {/* What Our Customers Also Bought Section */}
-
       {/* About Us Section */}
 <section ref={aboutUsSectionRef} className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">

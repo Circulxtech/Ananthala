@@ -28,7 +28,7 @@ interface BackendDetailSection {
 
 interface BabyHamperProductTemplateProps {
   product: ProductDetail
-  productId?: string | number
+  productId?: number
   dbHamper?: {
     hamperItems: DbHamperItem[]
     hamperPrice: number
@@ -165,7 +165,6 @@ export function BabyHamperProductTemplate({
         </section>
       )}
 
-      {/* What Our Customers Also Bought Section (static IDs only; hide for DB-only hampers) */}
     </div>
   )
 }

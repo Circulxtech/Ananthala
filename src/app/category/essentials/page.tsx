@@ -110,18 +110,18 @@ export default function EssentialsPage() {
                     },
                   ].map((slide) => (
                     <CarouselItem key={slide.id} className="pl-2 md:pl-4 basis-full">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-[#EED9C4]">
-                        <div className="relative aspect-[4/3] overflow-hidden ">
+                      <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-12 items-start bg-[#EED9C4] pr-6 sm:pr-8">
+                        <div className="relative h-[280px] sm:h-[340px] md:h-[420px] lg:h-[480px] xl:h-[540px] overflow-hidden">
                           <Image src={slide.image} alt="Ananthala Essentials" fill className="object-cover" />
                         </div>
-                        <div className="space-y-6">
-                          <h1 className="text-xl md:text-2xl lg:text-3xl font-medium font-cormorant text-foreground">
+                        <div className="space-y-6 p-6 pb-8 pr-8 sm:p-8 lg:py-8 lg:pr-10 lg:pl-0 self-start">
+                          <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium font-cormorant text-foreground">
                             Ananthala Difference
                           </h1>
                           <div className="text-sm uppercase tracking-wider font-medium text-foreground">
                             ESSENTIALS COLLECTION
                           </div>
-                          <p className="text-lg leading-relaxed text-foreground">
+                          <p className="text-lg leading-relaxed text-foreground mt-10">
                             At Ananthala, we design sleep essentials that blend comfort, durability, and thoughtful
                             craftsmanship. From breathable bedsheets to supportive pillows and quality bedding, every
                             product is made to improve everyday rest.

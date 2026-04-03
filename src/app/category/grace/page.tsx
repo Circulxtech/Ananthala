@@ -88,10 +88,10 @@ export default function GracePage() {
                 <div className="order-1 max-w-md space-y-6 md:order-2 md:text-left">
                   <div className="bg-white/10 backdrop-blur-sm p-4 md:p-8 rounded-lg">
                     <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-white font-cormorant">
-                      Grace Collection
+                      Grace
                     </h1>
                     <p className="text-white text-base md:text-lg mt-4 leading-relaxed font-medium">
-                      Discover elegant sleep solutions in our Grace collection, crafted with premium materials and thoughtful design for everyday comfort.
+                      Plush comfort ensuring the best support your body can get
                     </p>
                   </div>
                 </div>
@@ -137,9 +137,9 @@ export default function GracePage() {
                       key={slide.id}
                       className="pl-2 md:pl-4 basis-full"
                     >
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-[#EED9C4]">
+                      <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-12 items-start bg-[#EED9C4] pr-6 sm:pr-8">
                         {/* Left Side - Image */}
-                        <div className="relative h-[320px] sm:h-[380px] md:h-[460px] lg:h-[520px] xl:h-[580px] overflow-hidden">
+                        <div className="relative h-[280px] sm:h-[340px] md:h-[420px] lg:h-[480px] xl:h-[540px] overflow-hidden">
                           <Image
                             src={slide.image || "/placeholder.svg"}
                             alt={slide.title}
@@ -149,15 +149,15 @@ export default function GracePage() {
                         </div>
                         
                         {/* Right Side - Text Content with Card */}
-                        <div className="space-y-6 p-6 sm:p-8 lg:p-0">
+                        <div className="space-y-6 p-6 pb-8 pr-8 sm:p-8 lg:py-8 lg:pr-10 lg:pl-0 self-start">
                          
-                          <h1 className="text-xl md:text-2xl lg:text-3xl font-medium font-cormorant text-foreground">
+                          <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium font-cormorant text-foreground">
                             Ananthala Difference
                           </h1>
-                          <div className="text-sm uppercase tracking-wider font-medium text-foreground">
+                          <div className="text-lg md:text-xl uppercase tracking-wider font-medium text-foreground">
                             Grace Collection
                           </div>
-                          <p className="text-lg leading-relaxed text-foreground">
+                          <p className="text-lg leading-relaxed text-foreground mt-10">
                             {slide.description}
                           </p>
                           
