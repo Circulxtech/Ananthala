@@ -47,13 +47,7 @@ const menuItems = [
     label: "Products",
     href: "/admin/products",
     icon: Package,
-  },
-  {
-    label: "Blogs",
-    href: "/admin/blogs",
-    icon: BookOpen,
-  },
-   
+  }, 
   {
     label: "Review Videos",
     href: "/admin/review-videos",
@@ -102,6 +96,14 @@ const menuItems = [
         href: "/admin/enquiries/contact",
       },
     ],
+  },
+  {
+    label: "Policies Management",
+    icon: BookOpen,
+   
+        label: "Privacy Policy",
+        href: "/admin/policies/privacy",
+     
   },
   
   {
@@ -153,6 +155,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (pathname.startsWith("/admin/enquiries")) {
       setOpenDropdown("Enquiry & Queries")
+    }
+    if (pathname.startsWith("/admin/policies")) {
+      setOpenDropdown("Policies Management")
     }
   }, [pathname])
 
