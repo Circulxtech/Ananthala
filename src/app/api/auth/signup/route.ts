@@ -8,15 +8,30 @@ export const runtime = "nodejs"
 export async function POST(request: Request) {
   try {
     console.log("[v0] Signup request received")
-    const { fullname, email, password } = await request.json()
+    const { fullname, email, password, phone } = await request.json()
 
     // Validate input
-    if (!fullname || !email || !password) {
+    if (!fullname || !email || !password || !phone) {
       return NextResponse.json({ success: false, message: "All fields are required" }, { status: 400 })
     }
 
     if (password.length < 6) {
       return NextResponse.json({ success: false, message: "Password must be at least 6 characters" }, { status: 400 })
+    }
+
+    const rawPhone = String(phone).trim()
+    let normalizedPhone = rawPhone.replace(/[\s-]/g, "")
+    if (normalizedPhone.startsWith("+91")) {
+      normalizedPhone = normalizedPhone.slice(3)
+    }
+    if (normalizedPhone.startsWith("0")) {
+      normalizedPhone = normalizedPhone.slice(1)
+    }
+    if (!/^[6-9]\d{9}$/.test(normalizedPhone)) {
+      return NextResponse.json(
+        { success: false, message: "Please enter a valid 10-digit Indian mobile number" },
+        { status: 400 },
+      )
     }
 
     // Connect to database
@@ -38,6 +53,7 @@ export async function POST(request: Request) {
       email: email.toLowerCase(),
       password: hashedPassword,
       role: "customer",
+      phone: normalizedPhone,
     }
 
     console.log("[v0] Creating user with data:", { ...userData, password: "[REDACTED]" })

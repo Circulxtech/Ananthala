@@ -4,7 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { User, Mail, Lock, Eye, EyeOff } from "lucide-react"
+import { User, Mail, Lock, Eye, EyeOff, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
@@ -23,6 +23,7 @@ export default function SignupPage() {
     const fullname = formData.get("fullname") as string
     const email = formData.get("email") as string
     const password = formData.get("password") as string
+    const phone = formData.get("phone") as string
 
     try {
       const response = await fetch("/api/auth/signup", {
@@ -30,7 +31,7 @@ export default function SignupPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fullname, email, password }),
+        body: JSON.stringify({ fullname, email, password, phone }),
       })
 
       const data = await response.json()
@@ -112,6 +113,30 @@ export default function SignupPage() {
                   placeholder="your.email@example.com"
                   className="pl-12 h-12 bg-white border-[#E5D5C5] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C]"
                   required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            {/* Phone Number Field */}
+            <div>
+              <label htmlFor="phone" className="block text-[#6D4530] text-base font-medium mb-3">
+                Phone Number
+              </label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B5A3C]">
+                  <Phone className="h-5 w-5" />
+                </div>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="10-digit mobile number"
+                  className="pl-12 h-12 bg-white border-[#E5D5C5] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C]"
+                  required
+                  inputMode="numeric"
+                  pattern="^(?:\\+91[\\s-]?)?[6-9]\\d{9}$"
+                  title="Enter a valid 10-digit Indian mobile number"
                   disabled={isLoading}
                 />
               </div>

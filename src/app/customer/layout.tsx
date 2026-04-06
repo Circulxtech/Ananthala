@@ -118,7 +118,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-40" style={{ borderColor: "#D9CFC7" }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-24 relative">
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
@@ -128,10 +128,14 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
               >
                 {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
-              <Link href="/" className="flex items-center">
-                <Image src="/logo.png" alt="Ananthala" width={170} height={68} className="h-14 w-auto" />
-              </Link>
             </div>
+            <Link
+              href="/"
+              className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center overflow-hidden"
+              aria-label="Ananthala home"
+            >
+              <Image src="/Hi Res Logo.png" alt="Ananthala" width={170} height={68} className="h-24 w-auto " />
+            </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -170,7 +174,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
       <div className="flex">
         {/* Sidebar - Desktop */}
         <aside
-          className="hidden lg:block w-64 bg-white border-r min-h-[calc(100vh-4rem)] sticky top-16"
+          className="hidden lg:block w-64 bg-white border-r min-h-[calc(100vh-5rem)] sticky top-20"
           style={{ borderColor: "#D9CFC7" }}
         >
           <nav className="p-4 space-y-1">
@@ -200,7 +204,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
           <>
             <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
             <aside
-              className="fixed left-0 top-16 bottom-0 w-64 bg-white border-r z-50 lg:hidden animate-in slide-in-from-left duration-300"
+              className="fixed left-0 top-20 bottom-0 w-64 bg-white border-r z-50 lg:hidden animate-in slide-in-from-left duration-300"
               style={{ borderColor: "#D9CFC7" }}
             >
               <nav className="p-4 space-y-1">

@@ -45,15 +45,6 @@ export function Footer() {
             </Link>
           </div>
           
-          {/* Track Order Button */}
-          <div className="flex justify-center">
-            <Link
-              href="/track-order"
-              className="px-3 sm:px-5 py-2 bg-amber-900 hover:bg-amber-950 text-white font-semibold rounded-lg transition-colors whitespace-nowrap text-xs sm:text-sm md:text-base"
-            >
-              Track Order
-            </Link>
-          </div>
         </div>
       </div>
     </footer>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Package, ShoppingCart, User, TrendingUp, Clock, ArrowRight } from "lucide-react"
+import { Package, ShoppingCart, User, Clock, ArrowRight } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { useCart } from "@/contexts/cart-context"
@@ -32,7 +32,6 @@ interface CartItem {
 
 interface DashboardStats {
   totalOrders: number
-  totalSpent: number
   cartItems: number
   memberSince: string
 }
@@ -42,7 +41,6 @@ export default function CustomerDashboard() {
   const [user, setUser] = useState<AuthenticatedUser | null>(null)
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 0,
-    totalSpent: 0,
     cartItems: 0,
     memberSince: "",
   })
@@ -82,12 +80,9 @@ export default function CustomerDashboard() {
 
           // Calculate stats
           const totalOrders = ordersData.stats?.totalOrders || 0
-          const totalSpent = ordersData.stats?.totalSpent || 0
-
           setStats((prev) => ({
             ...prev,
             totalOrders,
-            totalSpent,
             memberSince,
             // Keep cartItems from context
             cartItems: prev.cartItems,
@@ -132,13 +127,6 @@ export default function CustomerDashboard() {
       color: "text-green-600",
       bgColor: "bg-green-50",
     },
-    {
-      title: "Total Spent",
-      value: `₹${stats.totalSpent.toFixed(0)}`,
-      icon: TrendingUp,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
   ]
 
   const getStatusColor = (status: string) => {
@@ -174,7 +162,7 @@ export default function CustomerDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {statCards.map((stat, index) => {
           const Icon = stat.icon
           return (
