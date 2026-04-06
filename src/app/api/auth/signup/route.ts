@@ -40,9 +40,18 @@ export async function POST(request: Request) {
     console.log("[v0] Database connected")
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() })
+    const normalizedEmail = email.toLowerCase()
+    const existingUser = await User.findOne({ email: normalizedEmail })
     if (existingUser) {
       return NextResponse.json({ success: false, message: "User already exists with this email" }, { status: 409 })
+    }
+
+    const existingPhoneUser = await User.findOne({ phone: normalizedPhone })
+    if (existingPhoneUser) {
+      return NextResponse.json(
+        { success: false, message: "An account already exists with this phone number" },
+        { status: 409 },
+      )
     }
 
     // Hash password
@@ -50,7 +59,7 @@ export async function POST(request: Request) {
 
     const userData = {
       fullname,
-      email: email.toLowerCase(),
+      email: normalizedEmail,
       password: hashedPassword,
       role: "customer",
       phone: normalizedPhone,
