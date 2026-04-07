@@ -112,7 +112,8 @@ export default function Home() {
 
   const onNavigate = (productName: string) => {
     const path = getCategoryPath(productName)
-    router.push(path)
+    const targetPath = path.includes("#") ? path : `${path}#shop`
+    router.push(targetPath)
   }
 
   return (
