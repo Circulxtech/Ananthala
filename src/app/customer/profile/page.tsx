@@ -2,28 +2,58 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { User, Mail, Phone, MapPin, Edit2 } from "lucide-react"
+import { User, Mail, Phone, MapPin, Edit2, Trash2, Plus, Check, ExternalLink } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
+interface Address {
+  _id?: string
+  label: string
+  houseNumber: string
+  crossStreet: string
+  locality: string
+  landmark?: string
+  city: string
+  state: string
+  pincode: string
+  country: string
+  isDefault?: boolean
+  latitude?: number
+  longitude?: number
+}
+
 interface UserProfile {
   id: string
   fullname: string
   email: string
   phone: string
-  address: string
+  addresses: Address[]
 }
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [isEditing, setIsEditing] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
   const [phone, setPhone] = useState("")
-  const [address, setAddress] = useState("")
+  const [addresses, setAddresses] = useState<Address[]>([])
+  const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(null)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [newAddress, setNewAddress] = useState<Address>({
+    label: "Home",
+    houseNumber: "",
+    crossStreet: "",
+    locality: "",
+    landmark: "",
+    city: "",
+    state: "",
+    pincode: "",
+    country: "India",
+    isDefault: false,
+  })
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -34,7 +64,7 @@ export default function ProfilePage() {
         if (data.success && data.user) {
           setUser(data.user)
           setPhone(data.user.phone || "")
-          setAddress(data.user.address || "")
+          setAddresses(data.user.addresses || [])
         } else {
           toast.error("Failed to load profile")
         }
@@ -48,8 +78,21 @@ export default function ProfilePage() {
     fetchProfile()
   }, [])
 
+  const getGoogleMapsUrl = (address: Address) => {
+    if (!address.houseNumber || !address.city || !address.state || !address.pincode) {
+      return null
+    }
+    const query = `${address.houseNumber} ${address.crossStreet} ${address.locality} ${address.city} ${address.state} ${address.pincode}`
+    return `https://maps.google.com/?q=${encodeURIComponent(query)}`
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (addresses.length === 0) {
+      toast.error("Please add at least one address")
+      return
+    }
 
     setSaving(true)
     try {
@@ -60,7 +103,7 @@ export default function ProfilePage() {
         },
         body: JSON.stringify({
           phone: phone.trim(),
-          address: address.trim(),
+          addresses: addresses,
         }),
       })
 
@@ -68,9 +111,12 @@ export default function ProfilePage() {
 
       if (data.success) {
         setUser(data.user)
+        setAddresses(data.user.addresses || [])
         setIsEditing(false)
+        setShowAddForm(false)
+        setEditingAddressIndex(null)
         toast.success("Profile updated successfully!", {
-          description: "Your phone and address have been saved.",
+          description: "Your information has been saved.",
         })
       } else {
         toast.error(data.message || "Failed to update profile")
@@ -81,6 +127,85 @@ export default function ProfilePage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  const handleAddAddress = () => {
+    if (!newAddress.houseNumber || !newAddress.crossStreet || !newAddress.locality || !newAddress.city || !newAddress.state || !newAddress.pincode) {
+      toast.error("Please fill in all required address fields")
+      return
+    }
+
+    // Validate pincode format (6 digits)
+    if (!/^\d{6}$/.test(newAddress.pincode)) {
+      toast.error("Pincode must be 6 digits")
+      return
+    }
+
+    if (editingAddressIndex !== null) {
+      const updatedAddresses = [...addresses]
+      updatedAddresses[editingAddressIndex] = newAddress
+      setAddresses(updatedAddresses)
+      setEditingAddressIndex(null)
+    } else {
+      if (addresses.length >= 3) {
+        toast.error("Maximum 3 addresses allowed")
+        return
+      }
+      setAddresses([...addresses, { ...newAddress, _id: Math.random().toString() }])
+    }
+
+    setNewAddress({
+      label: "Home",
+      houseNumber: "",
+      crossStreet: "",
+      locality: "",
+      landmark: "",
+      city: "",
+      state: "",
+      pincode: "",
+      country: "India",
+      isDefault: false,
+    })
+    setShowAddForm(false)
+    toast.success(editingAddressIndex !== null ? "Address updated" : "Address added successfully")
+  }
+
+  const handleDeleteAddress = (index: number) => {
+    const updatedAddresses = addresses.filter((_, i) => i !== index)
+    setAddresses(updatedAddresses)
+    toast.success("Address deleted")
+  }
+
+  const handleEditAddress = (index: number) => {
+    setEditingAddressIndex(index)
+    setNewAddress(addresses[index])
+    setShowAddForm(true)
+  }
+
+  const handleSetDefault = (index: number) => {
+    const updatedAddresses = addresses.map((addr, i) => ({
+      ...addr,
+      isDefault: i === index,
+    }))
+    setAddresses(updatedAddresses)
+    toast.success("Default address updated")
+  }
+
+  const handleCancelAddForm = () => {
+    setShowAddForm(false)
+    setEditingAddressIndex(null)
+    setNewAddress({
+      label: "Home",
+      houseNumber: "",
+      crossStreet: "",
+      locality: "",
+      landmark: "",
+      city: "",
+      state: "",
+      pincode: "",
+      country: "India",
+      isDefault: false,
+    })
   }
 
   const handleEdit = () => {
@@ -146,7 +271,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="phone" className="text-foreground">
+              <Label htmlFor="phone" className="text-foreground">
                 Phone Number
               </Label>
               <div className="relative">
@@ -163,29 +288,18 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="address" className="text-foreground">
-                Address
-              </Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-foreground" />
-                <textarea
-                  id="address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Enter your address"
-                  rows={3}
-                  className="w-full pl-10 pr-3 py-2 border border-[#D9CFC7] rounded-md focus:outline-none focus:ring-2 focus:ring-foreground bg-background text-foreground disabled:bg-gray-50 disabled:cursor-not-allowed"
-                  disabled={!isEditing}
-                />
-              </div>
-            </div>
-
             <div className="flex gap-3">
               {isEditing ? (
-                <Button type="submit" className="flex-1 bg-[#EED9C4] hover:bg-[#EED9C4]/80 text-foreground" disabled={saving}>
-                  {saving ? "Saving..." : "Save Changes"}
-                </Button>
+                <>
+                  <Button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    variant="outline"
+                    className="flex-1 border-[#D9CFC7] text-foreground"
+                  >
+                    Cancel
+                  </Button>
+                </>
               ) : (
                 <Button
                   type="button"
@@ -198,6 +312,255 @@ export default function ProfilePage() {
               )}
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card className="border" style={{ borderColor: "#D9CFC7" }}>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-foreground flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Addresses (Max 3)
+            </CardTitle>
+            {!showAddForm && addresses.length < 3 && (
+              <Button
+                onClick={() => setShowAddForm(true)}
+                className="bg-[#EED9C4] hover:bg-[#EED9C4]/80 text-foreground"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Address
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {showAddForm && (
+            <div className="border border-[#D9CFC7] rounded-lg p-4 space-y-4 bg-background">
+              <h3 className="font-semibold text-foreground">
+                {editingAddressIndex !== null ? "Edit Address" : "Add New Address"}
+              </h3>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="label" className="text-foreground">
+                    Label
+                  </Label>
+                  <select
+                    id="label"
+                    value={newAddress.label}
+                    onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-[#D9CFC7] rounded-md focus:outline-none focus:ring-2 focus:ring-foreground bg-background text-foreground"
+                  >
+                    <option>Home</option>
+                    <option>Office</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="houseNumber" className="text-foreground">
+                  House/Apartment Number <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="houseNumber"
+                  value={newAddress.houseNumber}
+                  onChange={(e) => setNewAddress({ ...newAddress, houseNumber: e.target.value })}
+                  placeholder="e.g., 123, Apt 4B"
+                  className="border-[#D9CFC7] focus-visible:ring-foreground text-foreground"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="crossStreet" className="text-foreground">
+                  Cross Street/Road <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="crossStreet"
+                  value={newAddress.crossStreet}
+                  onChange={(e) => setNewAddress({ ...newAddress, crossStreet: e.target.value })}
+                  placeholder="e.g., Main Street, XYZ Road"
+                  className="border-[#D9CFC7] focus-visible:ring-foreground text-foreground"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="locality" className="text-foreground">
+                  Locality/Area <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="locality"
+                  value={newAddress.locality}
+                  onChange={(e) => setNewAddress({ ...newAddress, locality: e.target.value })}
+                  placeholder="e.g., Downtown, Westside"
+                  className="border-[#D9CFC7] focus-visible:ring-foreground text-foreground"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="landmark" className="text-foreground">
+                  Landmark (Optional)
+                </Label>
+                <Input
+                  id="landmark"
+                  value={newAddress.landmark}
+                  onChange={(e) => setNewAddress({ ...newAddress, landmark: e.target.value })}
+                  placeholder="e.g., Near City Hospital, Beside Park"
+                  className="border-[#D9CFC7] focus-visible:ring-foreground text-foreground"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city" className="text-foreground">
+                    City <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="city"
+                    value={newAddress.city}
+                    onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                    placeholder="Enter city"
+                    className="border-[#D9CFC7] focus-visible:ring-foreground text-foreground"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="state" className="text-foreground">
+                    State <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="state"
+                    value={newAddress.state}
+                    onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                    placeholder="Enter state"
+                    className="border-[#D9CFC7] focus-visible:ring-foreground text-foreground"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="pincode" className="text-foreground">
+                  Pincode (6 digits) <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="pincode"
+                  value={newAddress.pincode}
+                  onChange={(e) => setNewAddress({ ...newAddress, pincode: e.target.value })}
+                  placeholder="e.g., 110001"
+                  className="border-[#D9CFC7] focus-visible:ring-foreground text-foreground"
+                  maxLength={6}
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleAddAddress}
+                  className="flex-1 bg-[#EED9C4] hover:bg-[#EED9C4]/80 text-foreground"
+                >
+                  {editingAddressIndex !== null ? "Update Address" : "Add Address"}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleCancelAddForm}
+                  variant="outline"
+                  className="flex-1 border-[#D9CFC7] text-foreground"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {addresses.length === 0 && !showAddForm && (
+            <div className="text-center py-8">
+              <p className="text-foreground mb-4">No addresses added yet</p>
+              <Button
+                onClick={() => setShowAddForm(true)}
+                className="bg-[#EED9C4] hover:bg-[#EED9C4]/80 text-foreground"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Your First Address
+              </Button>
+            </div>
+          )}
+
+          {addresses.map((address, index) => {
+            const mapsUrl = getGoogleMapsUrl(address)
+            return (
+              <div
+                key={address._id || index}
+                className="border border-[#D9CFC7] rounded-lg p-4 space-y-3 relative bg-background"
+              >
+                {address.isDefault && (
+                  <div className="absolute top-2 right-2 bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">
+                    Default
+                  </div>
+                )}
+
+                <div className="pr-20">
+                  <h3 className="font-semibold text-foreground">{address.label}</h3>
+                  <p className="text-sm text-foreground">{address.houseNumber}, {address.crossStreet}</p>
+                  <p className="text-sm text-foreground">{address.locality}</p>
+                  {address.landmark && <p className="text-sm text-foreground">Landmark: {address.landmark}</p>}
+                  <p className="text-sm text-foreground">
+                    {address.city}, {address.state} {address.pincode}
+                  </p>
+                  <p className="text-sm text-foreground">{address.country}</p>
+                </div>
+
+                <div className="flex gap-2 flex-wrap">
+                  {mapsUrl && (
+                    <Button
+                      size="sm"
+                      onClick={() => window.open(mapsUrl, "_blank")}
+                      variant="outline"
+                      className="border-[#D9CFC7] text-foreground"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      View on Maps
+                    </Button>
+                  )}
+                  {!address.isDefault && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleSetDefault(index)}
+                      variant="outline"
+                      className="border-[#D9CFC7] text-foreground"
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      Set as Default
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    onClick={() => handleEditAddress(index)}
+                    variant="outline"
+                    className="border-[#D9CFC7] text-foreground"
+                  >
+                    <Edit2 className="h-4 w-4 mr-1" />
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => handleDeleteAddress(index)}
+                    variant="outline"
+                    className="border-[#D9CFC7] text-foreground"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )
+          })}
+
+          {addresses.length > 0 && (
+            <Button
+              onClick={handleSubmit}
+              disabled={saving}
+              className="w-full bg-[#EED9C4] hover:bg-[#EED9C4]/80 text-foreground"
+            >
+              {saving ? "Saving..." : "Save All Changes"}
+            </Button>
+          )}
         </CardContent>
       </Card>
     </div>

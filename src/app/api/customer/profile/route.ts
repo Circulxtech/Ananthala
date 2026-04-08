@@ -3,6 +3,7 @@ import { cookies } from "next/headers"
 import { verifyToken } from "@/lib/jwt"
 import connectDB from "@/lib/mongodb"
 import User from "@/models/User"
+import mongoose from "mongoose"
 
 export const runtime = "nodejs"
 
@@ -37,7 +38,7 @@ export async function GET() {
         fullname: user.fullname,
         email: user.email,
         phone: user.phone || "",
-        address: user.address || "",
+        addresses: user.addresses || [],
         role: user.role,
       },
     })
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: "Invalid token" }, { status: 401 })
     }
 
-    const { phone, address } = await request.json()
+    const { phone, addresses } = await request.json()
 
     await connectDB()
 
@@ -73,7 +74,43 @@ export async function POST(request: Request) {
     }
 
     user.phone = phone?.trim() || ""
-    user.address = address?.trim() || ""
+    
+    // Validate maximum 3 addresses
+    if (Array.isArray(addresses) && addresses.length > 3) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "Maximum 3 addresses allowed" 
+      }, { status: 400 })
+    }
+    
+    // Process addresses with proper validation
+    if (Array.isArray(addresses)) {
+      user.addresses = addresses.map((addr: any) => ({
+        _id: addr._id || new mongoose.Types.ObjectId(),
+        label: addr.label,
+        houseNumber: addr.houseNumber?.trim() || "",
+        crossStreet: addr.crossStreet?.trim() || "",
+        locality: addr.locality?.trim() || "",
+        landmark: addr.landmark?.trim() || "",
+        city: addr.city?.trim() || "",
+        state: addr.state?.trim() || "",
+        pincode: addr.pincode?.trim() || "",
+        country: addr.country?.trim() || "India",
+        isDefault: addr.isDefault || false,
+        latitude: addr.latitude || null,
+        longitude: addr.longitude || null,
+      }))
+
+      // Ensure only one default address
+      let hasDefault = false
+      for (let i = 0; i < user.addresses.length; i++) {
+        if (user.addresses[i].isDefault && !hasDefault) {
+          hasDefault = true
+        } else {
+          user.addresses[i].isDefault = false
+        }
+      }
+    }
 
     await user.save()
 
@@ -85,7 +122,7 @@ export async function POST(request: Request) {
         fullname: user.fullname,
         email: user.email,
         phone: user.phone,
-        address: user.address,
+        addresses: user.addresses || [],
         role: user.role,
       },
     })

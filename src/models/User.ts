@@ -1,16 +1,34 @@
 import mongoose, { Schema, models } from "mongoose"
 
+export interface IAddress {
+  _id?: string
+  label: string
+  houseNumber: string
+  crossStreet: string
+  locality: string
+  landmark?: string
+  city: string
+  state: string
+  pincode: string
+  country: string
+  isDefault?: boolean
+  latitude?: number
+  longitude?: number
+}
+
 export interface IUser {
   fullname: string
   email: string
   password: string
   role: "customer" | "admin" | "agent"
   phone?: string
-  address?: string
+  addresses?: IAddress[]
+  address?: string // kept for backward compatibility
   otpCode?: string
   otpExpiry?: Date
   otpMethod?: "phone" | "email" // Type of OTP sent
-  isProfileComplete?: boolean // Whether user has completed their profile
+  isEmailVerified?: boolean
+  isPhoneVerified?: boolean
   createdAt: Date
 }
 
@@ -53,6 +71,74 @@ const UserSchema = new Schema<IUser>(
       trim: true,
       default: "",
     },
+    addresses: [
+      {
+        _id: Schema.Types.ObjectId,
+        label: {
+          type: String,
+          required: [true, "Please provide an address label"],
+          trim: true,
+          enum: {
+            values: ["Home", "Office", "Other"],
+            message: "{VALUE} is not a valid label",
+          },
+        },
+        houseNumber: {
+          type: String,
+          required: [true, "Please provide house/apartment number"],
+          trim: true,
+        },
+        crossStreet: {
+          type: String,
+          required: [true, "Please provide cross street"],
+          trim: true,
+        },
+        locality: {
+          type: String,
+          required: [true, "Please provide locality/area"],
+          trim: true,
+        },
+        landmark: {
+          type: String,
+          trim: true,
+          default: "",
+        },
+        city: {
+          type: String,
+          required: [true, "Please provide a city"],
+          trim: true,
+        },
+        state: {
+          type: String,
+          required: [true, "Please provide a state"],
+          trim: true,
+        },
+        pincode: {
+          type: String,
+          required: [true, "Please provide a pincode"],
+          trim: true,
+          match: [/^\d{6}$/, "Pincode must be 6 digits"],
+        },
+        country: {
+          type: String,
+          required: [true, "Please provide a country"],
+          trim: true,
+          default: "India",
+        },
+        isDefault: {
+          type: Boolean,
+          default: false,
+        },
+        latitude: {
+          type: Number,
+          default: null,
+        },
+        longitude: {
+          type: Number,
+          default: null,
+        },
+      },
+    ],
     otpCode: {
       type: String,
       default: "",
@@ -61,14 +147,18 @@ const UserSchema = new Schema<IUser>(
       type: Date,
       default: null,
     },
-otpMethod: {
+    otpMethod: {
       type: String,
       enum: ["phone", "email"],
       default: null,
     },
-    isProfileComplete: {
+    isEmailVerified: {
       type: Boolean,
-      default: true, // Existing users with password registration are complete
+      default: false,
+    },
+    isPhoneVerified: {
+      type: Boolean,
+      default: false,
     },
   },
   {

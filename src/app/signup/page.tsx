@@ -1,29 +1,55 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { User, Mail, Lock, Eye, EyeOff, Phone } from "lucide-react"
+import { User, Mail, Lock, Eye, EyeOff, Phone, CheckCircle2, ArrowLeft, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 
+type Step = "form" | "verify"
+
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [step, setStep] = useState<Step>("form")
+  const [formData, setFormData] = useState({
+    fullname: "",
+    email: "",
+    password: "",
+    phone: "",
+  })
+  
+  // Verification state
+  const [emailOtp, setEmailOtp] = useState(["", "", "", ""])
+  const [resendTimer, setResendTimer] = useState(0)
+  const [verifyingEmail, setVerifyingEmail] = useState(false)
+  const [resendingEmail, setResendingEmail] = useState(false)
+  
+  const emailOtpRefs = useRef<(HTMLInputElement | null)[]>([])
+  
   const router = useRouter()
   const { toast } = useToast()
+
+  // Resend timer countdown
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [resendTimer])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
 
-    const formData = new FormData(e.currentTarget)
-    const fullname = formData.get("fullname") as string
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
-    const phone = formData.get("phone") as string
+    const formDataObj = new FormData(e.currentTarget)
+    const fullname = formDataObj.get("fullname") as string
+    const email = formDataObj.get("email") as string
+    const password = formDataObj.get("password") as string
+    const phone = formDataObj.get("phone") as string
 
     try {
       const response = await fetch("/api/auth/signup", {
@@ -36,12 +62,19 @@ export default function SignupPage() {
 
       const data = await response.json()
 
-      if (data.success) {
+      if (data.success && data.requiresVerification) {
+        setFormData({ fullname, email, password, phone })
+        setStep("verify")
+        setResendTimer(60) // 60 seconds before allowing resend
+        toast({
+          title: "Verification Required",
+          description: "Please check your email for the OTP code.",
+        })
+      } else if (data.success) {
         toast({
           title: "Success",
           description: "Signup successful! Redirecting to login...",
         })
-        // Redirect to login page after 1.5 seconds
         setTimeout(() => {
           router.push("/login")
         }, 1500)
@@ -63,6 +96,245 @@ export default function SignupPage() {
     }
   }
 
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return
+
+    const newOtp = [...emailOtp]
+    newOtp[index] = value.slice(-1)
+    setEmailOtp(newOtp)
+
+    // Auto-focus next input
+    if (value && index < 3) {
+      emailOtpRefs.current[index + 1]?.focus()
+    }
+  }
+
+  const handleOtpKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === "Backspace" && index > 0) {
+      if (!emailOtp[index]) {
+        emailOtpRefs.current[index - 1]?.focus()
+      }
+    }
+  }
+
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault()
+    const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4)
+    if (pastedData.length === 4) {
+      const newOtp = pastedData.split("")
+      setEmailOtp(newOtp)
+    }
+  }
+
+  const verifyEmailOtp = async () => {
+    const otp = emailOtp.join("")
+    if (otp.length !== 4) {
+      toast({
+        title: "Invalid OTP",
+        description: "Please enter a valid 4-digit OTP",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setVerifyingEmail(true)
+    try {
+      const response = await fetch("/api/auth/verify-signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          emailOtp: otp,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success && data.accountCreated) {
+        toast({
+          title: "Account Created!",
+          description: "Welcome to Ananthala! Redirecting to login...",
+        })
+        setTimeout(() => {
+          router.push("/login")
+        }, 2000)
+      } else if (data.success) {
+        toast({
+          title: "Verified",
+          description: data.message,
+        })
+      } else {
+        toast({
+          title: "Verification Failed",
+          description: data.message,
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to verify OTP. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setVerifyingEmail(false)
+    }
+  }
+
+  const resendOtp = async () => {
+    setResendingEmail(true)
+
+    try {
+      const response = await fetch("/api/auth/resend-signup-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          type: "email",
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setResendTimer(60)
+        toast({
+          title: "OTP Sent",
+          description: data.message,
+        })
+        // Clear the OTP inputs
+        setEmailOtp(["", "", "", ""])
+        emailOtpRefs.current[0]?.focus()
+      } else {
+        toast({
+          title: "Error",
+          description: data.message,
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to resend OTP. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setResendingEmail(false)
+    }
+  }
+
+  // Verification Step UI
+  if (step === "verify") {
+    return (
+      <div className="min-h-screen bg-[#F5F1ED] flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          {/* Logo/Brand */}
+          <div className="text-center mb-8">
+            <Link href="/" className="inline-block">
+              <span className="text-[#8B5A3C] text-2xl font-normal tracking-wider">ANANTHALA</span>
+            </Link>
+          </div>
+
+          {/* Verification Card */}
+          <div className="bg-white rounded-lg shadow-md p-8 md:p-10">
+            <button
+              onClick={() => setStep("form")}
+              className="flex items-center gap-2 text-[#8B5A3C] hover:text-[#6D4530] mb-6 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="text-sm">Back to form</span>
+            </button>
+
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-[#F5F1ED] rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="h-8 w-8 text-[#8B5A3C]" />
+              </div>
+              <h2 className="text-xl font-semibold text-[#6D4530] mb-2">Verify Your Email</h2>
+              <p className="text-[#8B5A3C] text-sm">
+                We have sent a 4-digit OTP to your email address
+              </p>
+              <p className="text-[#6D4530] font-medium text-sm mt-1">
+                {formData.email.replace(/(.{2})(.*)(@.*)/, "$1***$3")}
+              </p>
+            </div>
+
+            {/* OTP Input */}
+            <div className="mb-6">
+              <label className="block text-[#6D4530] text-sm font-medium mb-3 text-center">
+                Enter OTP
+              </label>
+              <div className="flex gap-3 justify-center">
+                {emailOtp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => { emailOtpRefs.current[index] = el }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(e, index)}
+                    onPaste={handleOtpPaste}
+                    className="w-14 h-14 text-center text-xl font-semibold border-2 border-[#E5D5C5] rounded-lg focus:border-[#8B5A3C] focus:outline-none text-[#6D4530] transition-colors"
+                    disabled={verifyingEmail}
+                    autoFocus={index === 0}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Verify Button */}
+            <Button
+              onClick={verifyEmailOtp}
+              disabled={verifyingEmail || emailOtp.join("").length !== 4}
+              className="w-full h-12 bg-[#8B5A3C] hover:bg-[#6D4530] text-white font-medium text-base transition-colors mb-4"
+            >
+              {verifyingEmail ? (
+                <span className="flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Verifying...
+                </span>
+              ) : (
+                "Verify & Create Account"
+              )}
+            </Button>
+
+            {/* Resend OTP */}
+            <div className="text-center">
+              <p className="text-[#8B5A3C] text-sm mb-2">
+                {"Didn't receive the code?"}
+              </p>
+              <button
+                onClick={resendOtp}
+                disabled={resendTimer > 0 || resendingEmail}
+                className="text-[#6D4530] hover:text-[#8B5A3C] font-medium text-sm disabled:text-[#B8A396] flex items-center gap-1 mx-auto transition-colors"
+              >
+                <RefreshCw className={`h-4 w-4 ${resendingEmail ? "animate-spin" : ""}`} />
+                {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend OTP"}
+              </button>
+            </div>
+
+            {/* Info Note */}
+            <div className="mt-6 pt-4 border-t border-[#E5D5C5]">
+              <p className="text-xs text-[#B8A396] text-center">
+                The OTP is valid for 10 minutes. Please check your spam folder if you don&apos;t see the email in your inbox.
+              </p>
+            </div>
+          </div>
+
+          {/* Sign In Link */}
+          <p className="text-center mt-6 text-[#6D4530]">
+            Already have an account?{" "}
+            <Link href="/login" className="text-[#8B5A3C] hover:text-[#6D4530] font-medium transition-colors">
+              Sign In
+            </Link>
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Registration Form UI
   return (
     <div className="min-h-screen bg-[#F5F1ED] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
@@ -75,10 +347,15 @@ export default function SignupPage() {
 
         {/* Signup Form Card */}
         <div className="bg-white rounded-lg shadow-md p-8 md:p-10">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="text-center mb-6">
+            <h1 className="text-xl font-semibold text-[#6D4530] mb-2">Create Your Account</h1>
+            <p className="text-sm text-[#8B5A3C]">Email verification required to complete signup</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Full Name Field */}
             <div>
-              <label htmlFor="fullname" className="block text-[#6D4530] text-base font-medium mb-3">
+              <label htmlFor="fullname" className="block text-[#6D4530] text-sm font-medium mb-2">
                 Full Name
               </label>
               <div className="relative">
@@ -99,8 +376,8 @@ export default function SignupPage() {
 
             {/* Email Address Field */}
             <div>
-              <label htmlFor="email" className="block text-[#6D4530] text-base font-medium mb-3">
-                Email Address
+              <label htmlFor="email" className="block text-[#6D4530] text-sm font-medium mb-2">
+                Email Address <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B5A3C]">
@@ -116,12 +393,13 @@ export default function SignupPage() {
                   disabled={isLoading}
                 />
               </div>
+              <p className="text-xs text-[#B8A396] mt-1">A verification OTP will be sent to this email</p>
             </div>
 
             {/* Phone Number Field */}
             <div>
-              <label htmlFor="phone" className="block text-[#6D4530] text-base font-medium mb-3">
-                Phone Number
+              <label htmlFor="phone" className="block text-[#6D4530] text-sm font-medium mb-2">
+                Phone Number <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B5A3C]">
@@ -135,7 +413,7 @@ export default function SignupPage() {
                   className="pl-12 h-12 bg-white border-[#E5D5C5] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C]"
                   required
                   inputMode="numeric"
-                  pattern="^(?:\\+91[\\s-]?)?[6-9]\\d{9}$"
+                  pattern="^(?:\+91[\s-]?)?[6-9]\d{9}$"
                   title="Enter a valid 10-digit Indian mobile number"
                   disabled={isLoading}
                 />
@@ -144,7 +422,7 @@ export default function SignupPage() {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-[#6D4530] text-base font-medium mb-3">
+              <label htmlFor="password" className="block text-[#6D4530] text-sm font-medium mb-2">
                 Password
               </label>
               <div className="relative">
@@ -155,7 +433,7 @@ export default function SignupPage() {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="Min. 6 characters"
                   className="pl-12 pr-12 h-12 bg-white border-[#E5D5C5] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C]"
                   required
                   minLength={6}
@@ -179,7 +457,14 @@ export default function SignupPage() {
               className="w-full h-12 bg-[#8B5A3C] hover:bg-[#6D4530] text-white font-medium text-base transition-colors"
               disabled={isLoading}
             >
-              {isLoading ? "Creating Account..." : "Create Account"}
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Sending Verification...
+                </span>
+              ) : (
+                "Continue to Verification"
+              )}
             </Button>
           </form>
 
