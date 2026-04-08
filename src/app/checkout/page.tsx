@@ -229,6 +229,7 @@ export default function CheckoutPage() {
         currency: orderData.order.currency,
         name: "Ananthala",
         description: "Order Payment",
+        image: "/logo.png",
         order_id: orderData.order.id,
         prefill: {
           name: `${formData.firstName} ${formData.lastName}`.trim(),
