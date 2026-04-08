@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     // Connect to database
     await connectDB()
 
-    // Find user
+// Find user
     let user
     if (email) {
       user = await User.findOne({ email: email.toLowerCase() })
@@ -31,7 +31,17 @@ export async function POST(request: Request) {
       // Normalize phone number before lookup
       const normalizedPhone = normalizePhoneNumber(phone)
       console.log(`[v0] Looking up user by phone. Original: ${phone}, Normalized: ${normalizedPhone}`)
-      user = await User.findOne({ phone: normalizedPhone })
+      
+      // Check both with and without country code prefix
+      const phoneWithPrefix = normalizedPhone
+      const phoneWithoutPrefix = normalizedPhone.startsWith("91") ? normalizedPhone.slice(2) : normalizedPhone
+      
+      user = await User.findOne({ 
+        $or: [
+          { phone: phoneWithPrefix },
+          { phone: phoneWithoutPrefix }
+        ]
+      })
     }
 
     if (!user) {
@@ -47,7 +57,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: "Invalid OTP" }, { status: 401 })
     }
 
-    // Check OTP expiry
+// Check OTP expiry
     if (!user.otpExpiry || new Date() > user.otpExpiry) {
       return NextResponse.json(
         { success: false, message: "OTP has expired. Please request a new one." },
@@ -55,16 +65,22 @@ export async function POST(request: Request) {
       )
     }
 
-    // For phone-based OTP, update user details if they're still placeholder values
-    if (phone && user.otpMethod === "phone") {
-      // User can provide full name during first login verification
-      // For now, keep the placeholder, full name can be updated in profile later
-      if (user.fullname === "Phone User") {
-        // Keep as is - user can update in profile section
-      }
-    }
+    // Clear OTP after successful verification
+    user.otpCode = ""
+    user.otpExpiry = null
+    await user.save()
 
+    // Check if profile is complete
+    // Profile is incomplete if:
+    // - For email login: phone is missing or empty
+    // - For phone login: email is missing, empty, or is a temp email
+    const isTempEmail = user.email?.includes("@temp.ananthala.com")
+    const needsProfileCompletion = email 
+      ? (!user.phone || user.phone === "") // Email login - needs phone
+      : (!user.email || user.email === "" || isTempEmail) // Phone login - needs real email
 
+    // Also check if fullname is a placeholder
+    const needsName = user.fullname === "Phone User" || user.fullname === "OTP User"
 
     // Generate authentication token
     const token = generateToken(
@@ -80,13 +96,19 @@ export async function POST(request: Request) {
     const response = NextResponse.json(
       {
         success: true,
-        message: "Login successful",
+        message: needsProfileCompletion || needsName ? "OTP verified. Please complete your profile." : "Login successful",
         user: {
           id: user._id,
           fullname: user.fullname,
           email: user.email,
           phone: user.phone,
         },
+        requiresProfileCompletion: needsProfileCompletion || needsName,
+        profileCompletionNeeds: {
+          name: needsName,
+          phone: email ? (!user.phone || user.phone === "") : false,
+          email: phone ? (!user.email || user.email === "" || isTempEmail) : false,
+        }
       },
       { status: 200 },
     )

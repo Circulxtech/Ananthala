@@ -5,6 +5,26 @@ import User from "@/models/User"
 
 export const runtime = "nodejs"
 
+// Helper function to normalize phone number with country code
+function normalizePhoneForStorage(phone: string): string {
+  const rawPhone = String(phone).trim()
+  let digits = rawPhone.replace(/\D/g, "")
+  
+  // Remove leading 0 if present
+  if (digits.startsWith("0")) {
+    digits = digits.slice(1)
+  }
+  
+  // If starts with 91, keep it
+  if (digits.startsWith("91") && digits.length === 12) {
+    return digits
+  }
+  
+  // Take last 10 digits and add 91 prefix
+  const last10 = digits.slice(-10)
+  return "91" + last10
+}
+
 export async function POST(request: Request) {
   try {
     console.log("[v0] Signup request received")
@@ -20,19 +40,25 @@ export async function POST(request: Request) {
     }
 
     const rawPhone = String(phone).trim()
-    let normalizedPhone = rawPhone.replace(/[\s-]/g, "")
-    if (normalizedPhone.startsWith("+91")) {
-      normalizedPhone = normalizedPhone.slice(3)
+    let phoneDigits = rawPhone.replace(/\D/g, "")
+    
+    // Remove leading country code for validation
+    if (phoneDigits.startsWith("91")) {
+      phoneDigits = phoneDigits.slice(2)
     }
-    if (normalizedPhone.startsWith("0")) {
-      normalizedPhone = normalizedPhone.slice(1)
+    if (phoneDigits.startsWith("0")) {
+      phoneDigits = phoneDigits.slice(1)
     }
-    if (!/^[6-9]\d{9}$/.test(normalizedPhone)) {
+    
+    if (!/^[6-9]\d{9}$/.test(phoneDigits)) {
       return NextResponse.json(
         { success: false, message: "Please enter a valid 10-digit Indian mobile number" },
         { status: 400 },
       )
     }
+
+    // Normalize phone with country code for consistent storage
+    const normalizedPhone = normalizePhoneForStorage(phone)
 
     // Connect to database
     console.log("[v0] Connecting to database...")
@@ -46,7 +72,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: "User already exists with this email" }, { status: 409 })
     }
 
-    const existingPhoneUser = await User.findOne({ phone: normalizedPhone })
+    // Check for existing phone - check both formats (with and without 91 prefix)
+    const phoneWithPrefix = normalizedPhone
+    const phoneWithoutPrefix = normalizedPhone.startsWith("91") ? normalizedPhone.slice(2) : normalizedPhone
+    
+    const existingPhoneUser = await User.findOne({ 
+      $or: [
+        { phone: phoneWithPrefix },
+        { phone: phoneWithoutPrefix }
+      ]
+    })
     if (existingPhoneUser) {
       return NextResponse.json(
         { success: false, message: "An account already exists with this phone number" },
@@ -57,12 +92,13 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    const userData = {
+const userData = {
       fullname,
       email: normalizedEmail,
       password: hashedPassword,
       role: "customer",
       phone: normalizedPhone,
+      isProfileComplete: true, // Users who sign up with full form have complete profiles
     }
 
     console.log("[v0] Creating user with data:", { ...userData, password: "[REDACTED]" })

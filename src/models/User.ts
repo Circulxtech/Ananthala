@@ -10,6 +10,7 @@ export interface IUser {
   otpCode?: string
   otpExpiry?: Date
   otpMethod?: "phone" | "email" // Type of OTP sent
+  isProfileComplete?: boolean // Whether user has completed their profile
   createdAt: Date
 }
 
@@ -60,10 +61,14 @@ const UserSchema = new Schema<IUser>(
       type: Date,
       default: null,
     },
-    otpMethod: {
+otpMethod: {
       type: String,
       enum: ["phone", "email"],
       default: null,
+    },
+    isProfileComplete: {
+      type: Boolean,
+      default: true, // Existing users with password registration are complete
     },
   },
   {
