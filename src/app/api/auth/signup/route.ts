@@ -4,6 +4,7 @@ import connectDB from "@/lib/mongodb"
 import User from "@/models/User"
 import PendingUser from "@/models/PendingUser"
 import nodemailer from "nodemailer"
+import { validatePassword } from "@/lib/password-validation"
 
 export const runtime = "nodejs"
 
@@ -123,8 +124,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: "All fields are required (name, email, password, and phone)" }, { status: 400 })
     }
 
-    if (password.length < 6) {
-      return NextResponse.json({ success: false, message: "Password must be at least 6 characters" }, { status: 400 })
+    // Validate password strength
+    const passwordValidation = validatePassword(password)
+    if (!passwordValidation.isValid) {
+      return NextResponse.json({ 
+        success: false, 
+        message: passwordValidation.errors[0] || "Password does not meet requirements" 
+      }, { status: 400 })
     }
 
     // Validate email format

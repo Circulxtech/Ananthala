@@ -16,7 +16,7 @@ function ResetPasswordForm() {
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [passwordValidation, setPasswordValidation] = useState({ isValid: false, errors: [], strength: "weak" as const })
+  const [passwordValidation, setPasswordValidation] = useState({ isValid: false, errors: [] as string[], strength: "weak" as const })
   const [passwordsMatch, setPasswordsMatch] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()

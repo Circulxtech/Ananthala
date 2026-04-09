@@ -4,7 +4,8 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { User, Mail, Lock, Eye, EyeOff, Phone, CheckCircle2, ArrowLeft, RefreshCw } from "lucide-react"
+import { User, Mail, Lock, Eye, EyeOff, Phone, CheckCircle2, ArrowLeft, RefreshCw, XCircle, Check } from "lucide-react"
+import { validatePassword, PASSWORD_REQUIREMENTS } from "@/lib/password-validation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
@@ -21,6 +22,8 @@ export default function SignupPage() {
     password: "",
     phone: "",
   })
+  const [password, setPassword] = useState("")
+  const [passwordValidation, setPasswordValidation] = useState(validatePassword(""))
   
   // Verification state
   const [emailOtp, setEmailOtp] = useState(["", "", "", ""])
@@ -41,14 +44,32 @@ export default function SignupPage() {
     }
   }, [resendTimer])
 
+  // Password validation handler
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value
+    setPassword(newPassword)
+    setPasswordValidation(validatePassword(newPassword))
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    
+    // Validate password before submission
+    if (!passwordValidation.isValid) {
+      toast({
+        title: "Invalid Password",
+        description: "Please ensure your password meets all requirements.",
+        variant: "destructive",
+      })
+      return
+    }
+    
     setIsLoading(true)
 
     const formDataObj = new FormData(e.currentTarget)
     const fullname = formDataObj.get("fullname") as string
     const email = formDataObj.get("email") as string
-    const password = formDataObj.get("password") as string
+    const passwordValue = password
     const phone = formDataObj.get("phone") as string
 
     try {
@@ -57,13 +78,13 @@ export default function SignupPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fullname, email, password, phone }),
+        body: JSON.stringify({ fullname, email, password: passwordValue, phone }),
       })
 
       const data = await response.json()
 
       if (data.success && data.requiresVerification) {
-        setFormData({ fullname, email, password, phone })
+        setFormData({ fullname, email, password: passwordValue, phone })
         setStep("verify")
         setResendTimer(60) // 60 seconds before allowing resend
         toast({
@@ -423,7 +444,7 @@ export default function SignupPage() {
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-[#6D4530] text-sm font-medium mb-2">
-                Password
+                Password <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B5A3C]">
@@ -433,10 +454,14 @@ export default function SignupPage() {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Min. 6 characters"
-                  className="pl-12 pr-12 h-12 bg-white border-[#E5D5C5] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C]"
+                  placeholder="Create a strong password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  className={`pl-12 pr-12 h-12 bg-white border-[#E5D5C5] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] ${
+                    password && !passwordValidation.isValid ? "border-red-300" : ""
+                  } ${password && passwordValidation.isValid ? "border-green-400" : ""}`}
                   required
-                  minLength={6}
+                  minLength={PASSWORD_REQUIREMENTS.minLength}
                   disabled={isLoading}
                 />
                 <button
@@ -449,7 +474,74 @@ export default function SignupPage() {
                   <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
                 </button>
               </div>
+              
+              {/* Password Requirements */}
+              {password && (
+                <div className="mt-3 p-3 bg-[#F5F1ED] rounded-lg">
+                  <p className="text-xs font-medium text-[#6D4530] mb-2">Password must contain:</p>
+                  <ul className="space-y-1">
+                    <li className={`flex items-center gap-2 text-xs ${password.length >= PASSWORD_REQUIREMENTS.minLength ? "text-green-600" : "text-[#B8A396]"}`}>
+                      {password.length >= PASSWORD_REQUIREMENTS.minLength ? (
+                        <Check className="h-3 w-3" />
+                      ) : (
+                        <XCircle className="h-3 w-3" />
+                      )}
+                      At least {PASSWORD_REQUIREMENTS.minLength} characters
+                    </li>
+                    <li className={`flex items-center gap-2 text-xs ${PASSWORD_REQUIREMENTS.uppercase.test(password) ? "text-green-600" : "text-[#B8A396]"}`}>
+                      {PASSWORD_REQUIREMENTS.uppercase.test(password) ? (
+                        <Check className="h-3 w-3" />
+                      ) : (
+                        <XCircle className="h-3 w-3" />
+                      )}
+                      One uppercase letter (A-Z)
+                    </li>
+                    <li className={`flex items-center gap-2 text-xs ${PASSWORD_REQUIREMENTS.lowercase.test(password) ? "text-green-600" : "text-[#B8A396]"}`}>
+                      {PASSWORD_REQUIREMENTS.lowercase.test(password) ? (
+                        <Check className="h-3 w-3" />
+                      ) : (
+                        <XCircle className="h-3 w-3" />
+                      )}
+                      One lowercase letter (a-z)
+                    </li>
+                    <li className={`flex items-center gap-2 text-xs ${PASSWORD_REQUIREMENTS.number.test(password) ? "text-green-600" : "text-[#B8A396]"}`}>
+                      {PASSWORD_REQUIREMENTS.number.test(password) ? (
+                        <Check className="h-3 w-3" />
+                      ) : (
+                        <XCircle className="h-3 w-3" />
+                      )}
+                      One number (0-9)
+                    </li>
+                    <li className={`flex items-center gap-2 text-xs ${PASSWORD_REQUIREMENTS.special.test(password) ? "text-green-600" : "text-[#B8A396]"}`}>
+                      {PASSWORD_REQUIREMENTS.special.test(password) ? (
+                        <Check className="h-3 w-3" />
+                      ) : (
+                        <XCircle className="h-3 w-3" />
+                      )}
+                      One special character (!@#$%&_*)
+                    </li>
+                  </ul>
+                  
+                  {/* Password Strength Indicator */}
+                  {passwordValidation.isValid && (
+                    <div className="mt-2 pt-2 border-t border-[#E5D5C5]">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-[#6D4530]">Strength:</span>
+                        <span className={`text-xs font-medium ${
+                          passwordValidation.strength === "strong" ? "text-green-600" :
+                          passwordValidation.strength === "good" ? "text-blue-600" :
+                          passwordValidation.strength === "fair" ? "text-yellow-600" : "text-red-500"
+                        }`}>
+                          {passwordValidation.strength.charAt(0).toUpperCase() + passwordValidation.strength.slice(1)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+
+            
 
             {/* Create Account Button */}
             <Button
