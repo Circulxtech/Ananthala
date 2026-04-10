@@ -25,12 +25,25 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    shippingAddress: {
+shippingAddress: {
       fullAddress: String,
       city: String,
       state: String,
       zipCode: String,
       country: String,
+    },
+    billingAddress: {
+      firstName: String,
+      lastName: String,
+      fullAddress: String,
+      city: String,
+      state: String,
+      zipCode: String,
+      country: String,
+    },
+    gstDetails: {
+      gstNumber: String,
+      companyName: String,
     },
     items: [
       {

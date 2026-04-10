@@ -6,9 +6,31 @@ import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import Image from "next/image"
-import { IndianRupee, ShoppingCart, ChevronRight } from "lucide-react"
+import { IndianRupee, ShoppingCart, ChevronRight, MapPin, Check, AlertCircle, Building2 } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
 import { getAllStates, getCitiesForState } from "@/lib/indian-states-cities"
+import { useToast } from "@/hooks/use-toast"
+
+interface SavedAddress {
+  _id: string
+  label: string
+  houseNumber: string
+  crossStreet: string
+  locality: string
+  landmark?: string
+  city: string
+  state: string
+  pincode: string
+  country: string
+  isDefault?: boolean
+}
+
+interface UserProfile {
+  fullname: string
+  email: string
+  phone: string
+  addresses: SavedAddress[]
+}
 
 declare global {
   interface Window {
@@ -25,8 +47,27 @@ export default function CheckoutPage() {
   const [allStates, setAllStates] = useState<string[]>([])
   const [availableCities, setAvailableCities] = useState<string[]>([])
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [couponCode, setCouponCode] = useState("")
+const [couponCode, setCouponCode] = useState("")
   const [couponError, setCouponError] = useState("")
+  const { toast } = useToast()
+  
+  // Saved address states
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
+  const [useNewAddress, setUseNewAddress] = useState(false)
+  
+  // Billing address states
+  const [billingDifferent, setBillingDifferent] = useState(false)
+  const [billingAllStates, setBillingAllStates] = useState<string[]>([])
+  const [billingAvailableCities, setBillingAvailableCities] = useState<string[]>([])
+  
+  // GST states
+  const [hasGST, setHasGST] = useState(false)
+  const [gstNumber, setGstNumber] = useState("")
+  const [companyName, setCompanyName] = useState("")
+  
+  // Field validation errors
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -39,6 +80,16 @@ export default function CheckoutPage() {
     zipCode: "",
     country: "India",
     paymentMethod: "razorpay",
+  })
+
+  const [billingData, setBillingData] = useState({
+    firstName: "",
+    lastName: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "India",
   })
 
   const loadRazorpayScript = () =>
@@ -58,7 +109,7 @@ export default function CheckoutPage() {
       document.body.appendChild(script)
     })
 
-  useEffect(() => {
+useEffect(() => {
     const ensureAuthenticated = async () => {
       try {
         const response = await fetch("/api/auth/verify", {
@@ -73,6 +124,9 @@ export default function CheckoutPage() {
         // User is authenticated
         setIsAuthenticated(true)
         setIsAuthChecking(false)
+        
+        // Fetch user profile with saved addresses
+        fetchUserProfile()
       } catch (error) {
         console.error("[Checkout] Auth check error:", error)
         setIsAuthChecking(false)
@@ -82,6 +136,83 @@ export default function CheckoutPage() {
 
     ensureAuthenticated()
   }, [router])
+
+  // Fetch user profile and saved addresses
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch("/api/customer/profile", {
+        credentials: "include",
+      })
+      const data = await response.json()
+      if (data.success && data.user) {
+        setUserProfile(data.user)
+        
+        // Pre-fill name, email, phone from profile
+        const nameParts = data.user.fullname?.split(" ") || []
+        setFormData(prev => ({
+          ...prev,
+          firstName: nameParts[0] || "",
+          lastName: nameParts.slice(1).join(" ") || "",
+          email: data.user.email || "",
+          phone: data.user.phone || "",
+        }))
+        
+        // If user has saved addresses, select the default one or first one
+        if (data.user.addresses && data.user.addresses.length > 0) {
+          const defaultAddr = data.user.addresses.find((a: SavedAddress) => a.isDefault) || data.user.addresses[0]
+          if (defaultAddr) {
+            setSelectedAddressId(defaultAddr._id)
+            applySelectedAddress(defaultAddr)
+          }
+        } else {
+          setUseNewAddress(true)
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error)
+    }
+  }
+
+  // Apply selected address to form
+  const applySelectedAddress = (address: SavedAddress) => {
+    const fullAddress = [
+      address.houseNumber,
+      address.crossStreet,
+      address.locality,
+      address.landmark
+    ].filter(Boolean).join(", ")
+    
+    setFormData(prev => ({
+      ...prev,
+      address: fullAddress,
+      city: address.city,
+      state: address.state,
+      zipCode: address.pincode,
+      country: address.country || "India",
+    }))
+  }
+
+  // Handle saved address selection
+  const handleAddressSelection = (addressId: string) => {
+    if (addressId === "new") {
+      setUseNewAddress(true)
+      setSelectedAddressId(null)
+      setFormData(prev => ({
+        ...prev,
+        address: "",
+        city: "",
+        state: "",
+        zipCode: "",
+      }))
+    } else {
+      setUseNewAddress(false)
+      setSelectedAddressId(addressId)
+      const selectedAddr = userProfile?.addresses.find(a => a._id === addressId)
+      if (selectedAddr) {
+        applySelectedAddress(selectedAddr)
+      }
+    }
+  }
 
   // Load states data from package
   useEffect(() => {
@@ -96,7 +227,7 @@ export default function CheckoutPage() {
     loadStates()
   }, [])
 
-  // Update cities when state changes
+// Update cities when state changes
   useEffect(() => {
     const loadCities = async () => {
       if (formData.state) {
@@ -113,6 +244,39 @@ export default function CheckoutPage() {
     }
     loadCities()
   }, [formData.state])
+
+  // Load billing states
+  useEffect(() => {
+    const loadBillingStates = async () => {
+      try {
+        const states = await getAllStates()
+        setBillingAllStates(states)
+      } catch (error) {
+        console.error("Error loading billing states:", error)
+      }
+    }
+    if (billingDifferent) {
+      loadBillingStates()
+    }
+  }, [billingDifferent])
+
+  // Update billing cities when billing state changes
+  useEffect(() => {
+    const loadBillingCities = async () => {
+      if (billingData.state) {
+        try {
+          const cities = await getCitiesForState(billingData.state)
+          setBillingAvailableCities(cities)
+        } catch (error) {
+          console.error("Error loading billing cities:", error)
+          setBillingAvailableCities([])
+        }
+      } else {
+        setBillingAvailableCities([])
+      }
+    }
+    loadBillingCities()
+  }, [billingData.state])
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -178,7 +342,7 @@ export default function CheckoutPage() {
     setCouponError("")
   }
 
-  const handleInputChange = (
+const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target
@@ -188,10 +352,98 @@ export default function CheckoutPage() {
       // Reset city when state changes
       ...(name === "state" && { city: "" }),
     })
+    // Clear field error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({ ...prev, [name]: "" }))
+    }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleBillingInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
+    setBillingData({
+      ...billingData,
+      [name]: value,
+      ...(name === "state" && { city: "" }),
+    })
+    // Clear field error when user starts typing
+    const billingFieldName = `billing_${name}`
+    if (fieldErrors[billingFieldName]) {
+      setFieldErrors(prev => ({ ...prev, [billingFieldName]: "" }))
+    }
+  }
+
+  // Validate GST number format (Indian GST)
+  const validateGSTNumber = (gst: string) => {
+    const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/
+    return gstRegex.test(gst.toUpperCase())
+  }
+
+  // Validate all required fields
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {}
+    
+    // Required shipping fields
+    if (!formData.firstName.trim()) errors.firstName = "First name is required"
+    if (!formData.lastName.trim()) errors.lastName = "Last name is required"
+    if (!formData.email.trim()) errors.email = "Email is required"
+    else if (!/^\S+@\S+\.\S+$/.test(formData.email)) errors.email = "Invalid email format"
+    if (!formData.phone.trim()) errors.phone = "Phone number is required"
+    else if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/\s/g, ""))) errors.phone = "Invalid phone number"
+    if (!formData.address.trim()) errors.address = "Address is required"
+    if (!formData.state) errors.state = "State is required"
+    if (!formData.city) errors.city = "City is required"
+    if (!formData.zipCode.trim()) errors.zipCode = "ZIP code is required"
+    else if (!/^\d{6}$/.test(formData.zipCode)) errors.zipCode = "ZIP code must be 6 digits"
+    
+    // Billing address validation if different
+    if (billingDifferent) {
+      if (!billingData.firstName.trim()) errors.billing_firstName = "First name is required"
+      if (!billingData.lastName.trim()) errors.billing_lastName = "Last name is required"
+      if (!billingData.address.trim()) errors.billing_address = "Address is required"
+      if (!billingData.state) errors.billing_state = "State is required"
+      if (!billingData.city) errors.billing_city = "City is required"
+      if (!billingData.zipCode.trim()) errors.billing_zipCode = "ZIP code is required"
+      else if (!/^\d{6}$/.test(billingData.zipCode)) errors.billing_zipCode = "ZIP code must be 6 digits"
+    }
+    
+    // GST validation if provided
+    if (hasGST) {
+      if (!gstNumber.trim()) errors.gstNumber = "GST number is required"
+      else if (!validateGSTNumber(gstNumber)) errors.gstNumber = "Invalid GST number format"
+      if (!companyName.trim()) errors.companyName = "Company name is required for GST"
+    }
+    
+    setFieldErrors(errors)
+    
+    if (Object.keys(errors).length > 0) {
+      // Focus on first error field
+      const firstErrorField = Object.keys(errors)[0]
+      const element = document.querySelector(`[name="${firstErrorField.replace('billing_', '')}"]`)
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+      
+      toast({
+        title: "Please fill all required fields",
+        description: "Some mandatory fields are missing or invalid.",
+        variant: "destructive",
+      })
+      return false
+    }
+    
+    return true
+  }
+
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validate form before processing
+    if (!validateForm()) {
+      return
+    }
+    
     setIsProcessing(true)
     setErrorMessage(null)
 
@@ -257,13 +509,26 @@ export default function CheckoutPage() {
                   email: formData.email,
                   phone: formData.phone,
                 },
-                shippingAddress: {
+shippingAddress: {
                   address: formData.address,
                   city: formData.city,
                   state: formData.state,
                   zipCode: formData.zipCode,
                   country: formData.country,
                 },
+                billingAddress: billingDifferent ? {
+                  firstName: billingData.firstName,
+                  lastName: billingData.lastName,
+                  address: billingData.address,
+                  city: billingData.city,
+                  state: billingData.state,
+                  zipCode: billingData.zipCode,
+                  country: billingData.country,
+                } : null,
+                gstDetails: hasGST ? {
+                  gstNumber: gstNumber.toUpperCase(),
+                  companyName: companyName,
+                } : null,
                 items: cartItems.map((item) => ({
                   name: item.name,
                   quantity: item.quantity,
@@ -416,145 +681,521 @@ export default function CheckoutPage() {
             {/* Checkout Form */}
             <div className="lg:col-span-2">
               <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Shipping Information */}
+{/* Contact Information */}
                 <div>
                   <h2 className="text-xl md:text-2xl font-serif text-black mb-6">
-                    Shipping Information
+                    Contact Information
                   </h2>
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-black mb-2 text-lg font-medium">First Name</label>
+                        <label className="block text-black mb-2 text-lg font-medium">
+                          First Name <span className="text-red-500">*</span>
+                        </label>
                         <input
                           type="text"
                           name="firstName"
                           value={formData.firstName}
                           onChange={handleInputChange}
-                          required
-                          className="w-full px-4 py-3 border text-black text-lg"
-                          style={{ borderColor: "#D9CFC7" }}
+                          className={`w-full px-4 py-3 border text-black text-lg ${fieldErrors.firstName ? "border-red-500 bg-red-50" : ""}`}
+                          style={{ borderColor: fieldErrors.firstName ? undefined : "#D9CFC7" }}
                         />
+                        {fieldErrors.firstName && (
+                          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                            <AlertCircle className="w-4 h-4" /> {fieldErrors.firstName}
+                          </p>
+                        )}
                       </div>
                       <div>
-                        <label className="block text-black mb-2 text-lg font-medium">Last Name</label>
+                        <label className="block text-black mb-2 text-lg font-medium">
+                          Last Name <span className="text-red-500">*</span>
+                        </label>
                         <input
                           type="text"
                           name="lastName"
                           value={formData.lastName}
                           onChange={handleInputChange}
-                          required
-                          className="w-full px-4 py-3 border text-black text-lg"
-                          style={{ borderColor: "#D9CFC7" }}
+                          className={`w-full px-4 py-3 border text-black text-lg ${fieldErrors.lastName ? "border-red-500 bg-red-50" : ""}`}
+                          style={{ borderColor: fieldErrors.lastName ? undefined : "#D9CFC7" }}
                         />
+                        {fieldErrors.lastName && (
+                          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                            <AlertCircle className="w-4 h-4" /> {fieldErrors.lastName}
+                          </p>
+                        )}
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-black mb-2 text-lg font-medium">Email</label>
+                      <label className="block text-black mb-2 text-lg font-medium">
+                        Email <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 border text-black text-lg"
-                        style={{ borderColor: "#D9CFC7" }}
+                        className={`w-full px-4 py-3 border text-black text-lg ${fieldErrors.email ? "border-red-500 bg-red-50" : ""}`}
+                        style={{ borderColor: fieldErrors.email ? undefined : "#D9CFC7" }}
                       />
+                      {fieldErrors.email && (
+                        <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" /> {fieldErrors.email}
+                        </p>
+                      )}
                     </div>
 
                     <div>
-                      <label className="block text-black mb-2 text-lg font-medium">Phone Number</label>
+                      <label className="block text-black mb-2 text-lg font-medium">
+                        Phone Number <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="tel"
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 border text-black text-lg"
-                        style={{ borderColor: "#D9CFC7" }}
+                        placeholder="10 digit mobile number"
+                        className={`w-full px-4 py-3 border text-black text-lg ${fieldErrors.phone ? "border-red-500 bg-red-50" : ""}`}
+                        style={{ borderColor: fieldErrors.phone ? undefined : "#D9CFC7" }}
                       />
-                    </div>
-
-                    <div>
-                      <label className="block text-black mb-2 text-lg font-medium">Address</label>
-                      <textarea
-                        name="address"
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        required
-                        rows={3}
-                        className="w-full px-4 py-3 border text-black text-lg"
-                        style={{ borderColor: "#D9CFC7" }}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-black mb-2 text-lg font-medium">State</label>
-                        <select
-                          name="state"
-                          value={formData.state}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full px-4 py-3 border text-black bg-white text-lg"
-                          style={{ borderColor: "#D9CFC7" }}
-                        >
-                          <option value="">Select State</option>
-                          {allStates.map((state) => (
-                            <option key={state} value={state}>
-                              {state}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-black mb-2 text-lg font-medium">City</label>
-                        <select
-                          name="city"
-                          value={formData.city}
-                          onChange={handleInputChange}
-                          required
-                          disabled={!formData.state}
-                          className="w-full px-4 py-3 border text-black bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg"
-                          style={{ borderColor: "#D9CFC7" }}
-                        >
-                          <option value="">Select City</option>
-                          {availableCities.map((city) => (
-                            <option key={city} value={city}>
-                              {city}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-black mb-2 text-lg font-medium">ZIP Code</label>
-                        <input
-                          type="text"
-                          name="zipCode"
-                          value={formData.zipCode}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full px-4 py-3 border text-black text-lg"
-                          style={{ borderColor: "#D9CFC7" }}
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-black mb-2 text-lg font-medium">Country</label>
-                      <select
-                        name="country"
-                        value={formData.country}
-                        onChange={handleInputChange}
-                        required
-                        disabled
-                        className="w-full px-4 py-3 border text-black bg-gray-100 cursor-not-allowed text-lg"
-                        style={{ borderColor: "#D9CFC7" }}
-                      >
-                        <option value="India">India</option>
-                      </select>
+                      {fieldErrors.phone && (
+                        <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" /> {fieldErrors.phone}
+                        </p>
+                      )}
                     </div>
                   </div>
+                </div>
+
+                {/* Shipping Information */}
+                <div>
+                  <h2 className="text-xl md:text-2xl font-serif text-black mb-6">
+                    Shipping Address
+                  </h2>
+                  
+                  {/* Saved Addresses */}
+                  {userProfile?.addresses && userProfile.addresses.length > 0 && (
+                    <div className="mb-6">
+                      <p className="text-black font-medium mb-3 flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-[#8B5A3C]" />
+                        Select from saved addresses
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {userProfile.addresses.map((addr) => (
+                          <div
+                            key={addr._id}
+                            onClick={() => handleAddressSelection(addr._id)}
+                            className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                              selectedAddressId === addr._id && !useNewAddress
+                                ? "border-[#8B5A3C] bg-[#F5F1ED] ring-2 ring-[#8B5A3C]"
+                                : "border-[#D9CFC7] hover:border-[#8B5A3C]"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <span className={`inline-block px-2 py-1 text-xs font-medium rounded mb-2 ${
+                                  addr.label === "Home" ? "bg-blue-100 text-blue-700" :
+                                  addr.label === "Office" ? "bg-purple-100 text-purple-700" :
+                                  "bg-gray-100 text-gray-700"
+                                }`}>
+                                  {addr.label}
+                                  {addr.isDefault && " (Default)"}
+                                </span>
+                                <p className="text-sm text-black">
+                                  {addr.houseNumber}, {addr.crossStreet}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  {addr.locality}{addr.landmark ? `, ${addr.landmark}` : ""}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  {addr.city}, {addr.state} - {addr.pincode}
+                                </p>
+                              </div>
+                              {selectedAddressId === addr._id && !useNewAddress && (
+                                <Check className="w-5 h-5 text-[#8B5A3C]" />
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {/* Add New Address Option */}
+                        <div
+                          onClick={() => handleAddressSelection("new")}
+                          className={`p-4 border rounded-lg cursor-pointer transition-all flex items-center justify-center ${
+                            useNewAddress
+                              ? "border-[#8B5A3C] bg-[#F5F1ED] ring-2 ring-[#8B5A3C]"
+                              : "border-dashed border-[#D9CFC7] hover:border-[#8B5A3C]"
+                          }`}
+                        >
+                          <div className="text-center">
+                            <MapPin className="w-8 h-8 text-[#8B5A3C] mx-auto mb-2" />
+                            <p className="text-sm font-medium text-black">Use a different address</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* New Address Form - Show if no saved addresses or user wants new address */}
+                  {(useNewAddress || !userProfile?.addresses?.length) && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-black mb-2 text-lg font-medium">
+                          Address <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          name="address"
+                          value={formData.address}
+                          onChange={handleInputChange}
+                          rows={3}
+                          placeholder="House/Flat No., Street, Locality, Landmark"
+                          className={`w-full px-4 py-3 border text-black text-lg ${fieldErrors.address ? "border-red-500 bg-red-50" : ""}`}
+                          style={{ borderColor: fieldErrors.address ? undefined : "#D9CFC7" }}
+                        />
+                        {fieldErrors.address && (
+                          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                            <AlertCircle className="w-4 h-4" /> {fieldErrors.address}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-black mb-2 text-lg font-medium">
+                            State <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            name="state"
+                            value={formData.state}
+                            onChange={handleInputChange}
+                            className={`w-full px-4 py-3 border text-black bg-white text-lg ${fieldErrors.state ? "border-red-500 bg-red-50" : ""}`}
+                            style={{ borderColor: fieldErrors.state ? undefined : "#D9CFC7" }}
+                          >
+                            <option value="">Select State</option>
+                            {allStates.map((state) => (
+                              <option key={state} value={state}>
+                                {state}
+                              </option>
+                            ))}
+                          </select>
+                          {fieldErrors.state && (
+                            <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                              <AlertCircle className="w-4 h-4" /> {fieldErrors.state}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="block text-black mb-2 text-lg font-medium">
+                            City <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            name="city"
+                            value={formData.city}
+                            onChange={handleInputChange}
+                            disabled={!formData.state}
+                            className={`w-full px-4 py-3 border text-black bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg ${fieldErrors.city ? "border-red-500 bg-red-50" : ""}`}
+                            style={{ borderColor: fieldErrors.city ? undefined : "#D9CFC7" }}
+                          >
+                            <option value="">Select City</option>
+                            {availableCities.map((city) => (
+                              <option key={city} value={city}>
+                                {city}
+                              </option>
+                            ))}
+                          </select>
+                          {fieldErrors.city && (
+                            <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                              <AlertCircle className="w-4 h-4" /> {fieldErrors.city}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="block text-black mb-2 text-lg font-medium">
+                            PIN Code <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            name="zipCode"
+                            value={formData.zipCode}
+                            onChange={handleInputChange}
+                            maxLength={6}
+                            placeholder="6 digit PIN"
+                            className={`w-full px-4 py-3 border text-black text-lg ${fieldErrors.zipCode ? "border-red-500 bg-red-50" : ""}`}
+                            style={{ borderColor: fieldErrors.zipCode ? undefined : "#D9CFC7" }}
+                          />
+                          {fieldErrors.zipCode && (
+                            <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                              <AlertCircle className="w-4 h-4" /> {fieldErrors.zipCode}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-black mb-2 text-lg font-medium">Country</label>
+                        <select
+                          name="country"
+                          value={formData.country}
+                          onChange={handleInputChange}
+                          disabled
+                          className="w-full px-4 py-3 border text-black bg-gray-100 cursor-not-allowed text-lg"
+                          style={{ borderColor: "#D9CFC7" }}
+                        >
+                          <option value="India">India</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Show selected address summary when using saved address */}
+                  {selectedAddressId && !useNewAddress && (
+                    <div className="mt-4 p-4 bg-[#F5F1ED] rounded-lg border border-[#E5D5C5]">
+                      <p className="text-sm font-medium text-[#6D4530] mb-2">Shipping to:</p>
+                      <p className="text-black">{formData.address}</p>
+                      <p className="text-gray-600">{formData.city}, {formData.state} - {formData.zipCode}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Billing Address Option */}
+                <div className="border-t pt-6" style={{ borderColor: "#D9CFC7" }}>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={billingDifferent}
+                      onChange={(e) => setBillingDifferent(e.target.checked)}
+                      className="w-5 h-5 rounded border-[#D9CFC7] text-[#8B5A3C] focus:ring-[#8B5A3C]"
+                    />
+                    <span className="text-black text-lg font-medium">
+                      Billing address is different from shipping address
+                    </span>
+                  </label>
+
+                  {billingDifferent && (
+                    <div className="mt-6 p-4 border rounded-lg" style={{ borderColor: "#D9CFC7" }}>
+                      <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
+                        <Building2 className="w-5 h-5 text-[#8B5A3C]" />
+                        Billing Address
+                      </h3>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-black mb-2 font-medium">
+                              First Name <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              name="firstName"
+                              value={billingData.firstName}
+                              onChange={handleBillingInputChange}
+                              className={`w-full px-4 py-3 border text-black ${fieldErrors.billing_firstName ? "border-red-500 bg-red-50" : ""}`}
+                              style={{ borderColor: fieldErrors.billing_firstName ? undefined : "#D9CFC7" }}
+                            />
+                            {fieldErrors.billing_firstName && (
+                              <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                                <AlertCircle className="w-4 h-4" /> {fieldErrors.billing_firstName}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <label className="block text-black mb-2 font-medium">
+                              Last Name <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              name="lastName"
+                              value={billingData.lastName}
+                              onChange={handleBillingInputChange}
+                              className={`w-full px-4 py-3 border text-black ${fieldErrors.billing_lastName ? "border-red-500 bg-red-50" : ""}`}
+                              style={{ borderColor: fieldErrors.billing_lastName ? undefined : "#D9CFC7" }}
+                            />
+                            {fieldErrors.billing_lastName && (
+                              <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                                <AlertCircle className="w-4 h-4" /> {fieldErrors.billing_lastName}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-black mb-2 font-medium">
+                            Address <span className="text-red-500">*</span>
+                          </label>
+                          <textarea
+                            name="address"
+                            value={billingData.address}
+                            onChange={handleBillingInputChange}
+                            rows={3}
+                            className={`w-full px-4 py-3 border text-black ${fieldErrors.billing_address ? "border-red-500 bg-red-50" : ""}`}
+                            style={{ borderColor: fieldErrors.billing_address ? undefined : "#D9CFC7" }}
+                          />
+                          {fieldErrors.billing_address && (
+                            <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                              <AlertCircle className="w-4 h-4" /> {fieldErrors.billing_address}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-black mb-2 font-medium">
+                              State <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                              name="state"
+                              value={billingData.state}
+                              onChange={handleBillingInputChange}
+                              className={`w-full px-4 py-3 border text-black bg-white ${fieldErrors.billing_state ? "border-red-500 bg-red-50" : ""}`}
+                              style={{ borderColor: fieldErrors.billing_state ? undefined : "#D9CFC7" }}
+                            >
+                              <option value="">Select State</option>
+                              {billingAllStates.map((state) => (
+                                <option key={state} value={state}>
+                                  {state}
+                                </option>
+                              ))}
+                            </select>
+                            {fieldErrors.billing_state && (
+                              <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                                <AlertCircle className="w-4 h-4" /> {fieldErrors.billing_state}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <label className="block text-black mb-2 font-medium">
+                              City <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                              name="city"
+                              value={billingData.city}
+                              onChange={handleBillingInputChange}
+                              disabled={!billingData.state}
+                              className={`w-full px-4 py-3 border text-black bg-white disabled:bg-gray-100 disabled:cursor-not-allowed ${fieldErrors.billing_city ? "border-red-500 bg-red-50" : ""}`}
+                              style={{ borderColor: fieldErrors.billing_city ? undefined : "#D9CFC7" }}
+                            >
+                              <option value="">Select City</option>
+                              {billingAvailableCities.map((city) => (
+                                <option key={city} value={city}>
+                                  {city}
+                                </option>
+                              ))}
+                            </select>
+                            {fieldErrors.billing_city && (
+                              <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                                <AlertCircle className="w-4 h-4" /> {fieldErrors.billing_city}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <label className="block text-black mb-2 font-medium">
+                              PIN Code <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              name="zipCode"
+                              value={billingData.zipCode}
+                              onChange={handleBillingInputChange}
+                              maxLength={6}
+                              className={`w-full px-4 py-3 border text-black ${fieldErrors.billing_zipCode ? "border-red-500 bg-red-50" : ""}`}
+                              style={{ borderColor: fieldErrors.billing_zipCode ? undefined : "#D9CFC7" }}
+                            />
+                            {fieldErrors.billing_zipCode && (
+                              <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                                <AlertCircle className="w-4 h-4" /> {fieldErrors.billing_zipCode}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-black mb-2 font-medium">Country</label>
+                          <select
+                            name="country"
+                            value={billingData.country}
+                            onChange={handleBillingInputChange}
+                            disabled
+                            className="w-full px-4 py-3 border text-black bg-gray-100 cursor-not-allowed"
+                            style={{ borderColor: "#D9CFC7" }}
+                          >
+                            <option value="India">India</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* GST Details */}
+                <div className="border-t pt-6" style={{ borderColor: "#D9CFC7" }}>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={hasGST}
+                      onChange={(e) => setHasGST(e.target.checked)}
+                      className="w-5 h-5 rounded border-[#D9CFC7] text-[#8B5A3C] focus:ring-[#8B5A3C]"
+                    />
+                    <span className="text-black text-lg font-medium">
+                      I have a GST number (for business purchases)
+                    </span>
+                  </label>
+
+                  {hasGST && (
+                    <div className="mt-6 p-4 border rounded-lg bg-[#FAFAFA]" style={{ borderColor: "#D9CFC7" }}>
+                      <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
+                        <Building2 className="w-5 h-5 text-[#8B5A3C]" />
+                        GST Details
+                      </h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-black mb-2 font-medium">
+                            GST Number <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={gstNumber}
+                            onChange={(e) => {
+                              setGstNumber(e.target.value.toUpperCase())
+                              if (fieldErrors.gstNumber) setFieldErrors(prev => ({ ...prev, gstNumber: "" }))
+                            }}
+                            placeholder="e.g., 22AAAAA0000A1Z5"
+                            maxLength={15}
+                            className={`w-full px-4 py-3 border text-black uppercase ${fieldErrors.gstNumber ? "border-red-500 bg-red-50" : ""}`}
+                            style={{ borderColor: fieldErrors.gstNumber ? undefined : "#D9CFC7" }}
+                          />
+                          {fieldErrors.gstNumber && (
+                            <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                              <AlertCircle className="w-4 h-4" /> {fieldErrors.gstNumber}
+                            </p>
+                          )}
+                          <p className="text-xs text-gray-500 mt-1">
+                            Format: 2 digits state code + 10 char PAN + 1 entity code + Z + 1 check digit
+                          </p>
+                        </div>
+
+                        <div>
+                          <label className="block text-black mb-2 font-medium">
+                            Company / Business Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={companyName}
+                            onChange={(e) => {
+                              setCompanyName(e.target.value)
+                              if (fieldErrors.companyName) setFieldErrors(prev => ({ ...prev, companyName: "" }))
+                            }}
+                            placeholder="Enter registered company name"
+                            className={`w-full px-4 py-3 border text-black ${fieldErrors.companyName ? "border-red-500 bg-red-50" : ""}`}
+                            style={{ borderColor: fieldErrors.companyName ? undefined : "#D9CFC7" }}
+                          />
+                          {fieldErrors.companyName && (
+                            <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                              <AlertCircle className="w-4 h-4" /> {fieldErrors.companyName}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Payment Method */}
