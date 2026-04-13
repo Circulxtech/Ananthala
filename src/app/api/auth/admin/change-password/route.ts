@@ -4,43 +4,41 @@ import connectDB from "@/lib/mongodb"
 import User from "@/models/User"
 import { verifyToken } from "@/lib/jwt"
 import { cookies } from "next/headers"
+import { validatePassword } from "@/lib/password-validation"
 
 export const runtime = "nodejs"
 
 export async function POST(request: Request) {
   try {
     const cookieStore = await cookies()
-    const token = cookieStore.get("admin_token")?.value
+    const token = cookieStore.get("auth_token")?.value
 
-    // Verify admin authentication
+    // Verify authentication
     if (!token) {
       return NextResponse.json({ success: false, message: "Unauthorized. Please login first." }, { status: 401 })
     }
 
     const decoded = verifyToken(token)
-    if (!decoded || decoded.role !== "admin") {
-      return NextResponse.json({ success: false, message: "Unauthorized access." }, { status: 403 })
+    if (!decoded || !decoded.userId) {
+      return NextResponse.json({ success: false, message: "Invalid token. Please login again." }, { status: 401 })
     }
 
-    const { currentPassword, newPassword, confirmPassword } = await request.json()
+    const { currentPassword, newPassword } = await request.json()
 
     // Validate input
-    if (!currentPassword || !newPassword || !confirmPassword) {
+    if (!currentPassword || !newPassword) {
       return NextResponse.json({ success: false, message: "All fields are required." }, { status: 400 })
     }
 
-    // Validate new password length
-    if (newPassword.length < 6) {
+    // Validate new password against requirements
+    const passwordValidation = validatePassword(newPassword)
+    if (!passwordValidation.isValid) {
       return NextResponse.json(
-        { success: false, message: "New password must be at least 6 characters long." },
-        { status: 400 },
-      )
-    }
-
-    // Check if new and confirm passwords match
-    if (newPassword !== confirmPassword) {
-      return NextResponse.json(
-        { success: false, message: "New password and confirm password do not match." },
+        {
+          success: false,
+          message: "Password does not meet requirements.",
+          errors: passwordValidation.errors,
+        },
         { status: 400 },
       )
     }

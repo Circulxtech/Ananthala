@@ -4,10 +4,11 @@ import type React from "react"
 import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Lock, Eye, EyeOff, CheckCircle2 } from "lucide-react"
+import { Lock, Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
+import { validatePassword, PASSWORD_REQUIREMENTS } from "@/lib/password-validation"
 
 function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -15,6 +16,7 @@ function ResetPasswordForm() {
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [passwordValidation, setPasswordValidation] = useState({ isValid: false, errors: [] as string[], strength: "weak" as const })
   const [passwordsMatch, setPasswordsMatch] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -34,14 +36,16 @@ function ResetPasswordForm() {
     }
   }, [email, router, toast])
 
-  useEffect(() => {
-    // Check if passwords match and are not empty
-    if (newPassword && confirmPassword && newPassword === confirmPassword) {
-      setPasswordsMatch(true)
-    } else {
-      setPasswordsMatch(false)
-    }
-  }, [newPassword, confirmPassword])
+  const handlePasswordChange = (value: string) => {
+    setNewPassword(value)
+    const validation = validatePassword(value)
+    setPasswordValidation(validation)
+  }
+
+  const handleConfirmPasswordChange = (value: string) => {
+    setConfirmPassword(value)
+    setPasswordsMatch(value === newPassword && value.length > 0)
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -55,19 +59,19 @@ function ResetPasswordForm() {
       return
     }
 
-    if (!passwordsMatch) {
+    if (!passwordValidation.isValid) {
       toast({
         title: "Error",
-        description: "Passwords do not match.",
+        description: "Password does not meet requirements.",
         variant: "destructive",
       })
       return
     }
 
-    if (newPassword.length < 6) {
+    if (!passwordsMatch) {
       toast({
         title: "Error",
-        description: "Password must be at least 6 characters.",
+        description: "Passwords do not match.",
         variant: "destructive",
       })
       return
@@ -150,11 +154,10 @@ function ResetPasswordForm() {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
                   className="pl-12 pr-12 h-12 bg-white border-[#E5D5C5] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C]"
                   required
                   disabled={isLoading}
-                  minLength={6}
                 />
                 <button
                   type="button"
@@ -166,7 +169,63 @@ function ResetPasswordForm() {
                   <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
                 </button>
               </div>
-              <p className="text-xs text-[#B8A396] mt-1.5">Must be at least 6 characters</p>
+
+              {/* Password Requirements */}
+              <div className="mt-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <p className="text-xs font-semibold text-[#6D4530] mb-2">Password must contain:</p>
+                <ul className="space-y-1 text-xs">
+                  <li className="flex items-center gap-2">
+                    {newPassword.length >= PASSWORD_REQUIREMENTS.minLength ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-gray-400" />
+                    )}
+                    <span className={newPassword.length >= PASSWORD_REQUIREMENTS.minLength ? "text-green-600" : "text-[#6D4530]"}>
+                      At least 8 characters
+                    </span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    {PASSWORD_REQUIREMENTS.uppercase.test(newPassword) ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-gray-400" />
+                    )}
+                    <span className={PASSWORD_REQUIREMENTS.uppercase.test(newPassword) ? "text-green-600" : "text-[#6D4530]"}>
+                      One uppercase letter (A-Z)
+                    </span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    {PASSWORD_REQUIREMENTS.lowercase.test(newPassword) ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-gray-400" />
+                    )}
+                    <span className={PASSWORD_REQUIREMENTS.lowercase.test(newPassword) ? "text-green-600" : "text-[#6D4530]"}>
+                      One lowercase letter (a-z)
+                    </span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    {PASSWORD_REQUIREMENTS.number.test(newPassword) ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-gray-400" />
+                    )}
+                    <span className={PASSWORD_REQUIREMENTS.number.test(newPassword) ? "text-green-600" : "text-[#6D4530]"}>
+                      One number (0-9)
+                    </span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    {PASSWORD_REQUIREMENTS.special.test(newPassword) ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-gray-400" />
+                    )}
+                    <span className={PASSWORD_REQUIREMENTS.special.test(newPassword) ? "text-green-600" : "text-[#6D4530]"}>
+                      One special character (!@#$%&_*)
+                    </span>
+                  </li>
+                </ul>
+              </div>
             </div>
 
             {/* Confirm Password Field */}
@@ -184,11 +243,10 @@ function ResetPasswordForm() {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => handleConfirmPasswordChange(e.target.value)}
                   className="pl-12 pr-16 h-12 bg-white border-[#E5D5C5] text-[#6D4530] placeholder:text-[#B8A396] focus:border-[#8B5A3C] focus:ring-[#8B5A3C]"
                   required
                   disabled={isLoading}
-                  minLength={6}
                 />
                 {/* Match Indicator */}
                 {confirmPassword && (
@@ -219,7 +277,7 @@ function ResetPasswordForm() {
             <Button
               type="submit"
               className="w-full h-12 bg-[#8B5A3C] hover:bg-[#6D4530] text-white font-medium text-base transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isLoading || !passwordsMatch || !newPassword || !confirmPassword}
+              disabled={isLoading || !passwordValidation.isValid || !passwordsMatch || !newPassword || !confirmPassword}
             >
               {isLoading ? "Resetting Password..." : "Reset Password"}
             </Button>

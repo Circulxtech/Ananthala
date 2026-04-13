@@ -35,12 +35,14 @@ export async function POST(request: Request) {
       )
     }
 
-    const {
+const {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
       customer,
       shippingAddress,
+      billingAddress,
+      gstDetails,
       items,
       subtotal,
       shippingCost,
@@ -87,13 +89,26 @@ export async function POST(request: Request) {
       customerName: `${customer?.firstName || ""} ${customer?.lastName || ""}`.trim(),
       customerEmail: customer?.email || "",
       customerPhone: customer?.phone || "",
-      shippingAddress: {
+shippingAddress: {
         fullAddress: shippingAddress?.address || "",
         city: shippingAddress?.city || "",
         state: shippingAddress?.state || "",
         zipCode: shippingAddress?.zipCode || "",
         country: shippingAddress?.country || "India",
       },
+      billingAddress: billingAddress ? {
+        firstName: billingAddress.firstName || "",
+        lastName: billingAddress.lastName || "",
+        fullAddress: billingAddress.address || "",
+        city: billingAddress.city || "",
+        state: billingAddress.state || "",
+        zipCode: billingAddress.zipCode || "",
+        country: billingAddress.country || "India",
+      } : null,
+      gstDetails: gstDetails ? {
+        gstNumber: gstDetails.gstNumber || "",
+        companyName: gstDetails.companyName || "",
+      } : null,
       items: orderItems,
       subtotal: Number(subtotal) || 0,
       shippingCost: Number(shippingCost) || 0,

@@ -1,8 +1,7 @@
-"use client"
-
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
+import Link from "next/link"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -135,6 +134,13 @@ export function PasswordLoginForm({ isLoading: initialLoading = false }: Passwor
             Remember me
           </label>
         </div>
+
+        <Link
+          href="/forgot-password"
+          className="text-xs md:text-sm text-[#8B5A3C] hover:text-[#6D4530] font-medium transition-colors"
+        >
+          Forgot Password?
+        </Link>
       </div>
 
       <Button

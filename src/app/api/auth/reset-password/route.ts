@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import connectDB from "@/lib/mongodb"
 import User from "@/models/User"
+import { validatePassword } from "@/lib/password-validation"
 
 export const runtime = "nodejs"
 
@@ -13,9 +14,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: "Email and new password are required" }, { status: 400 })
     }
 
-    // Validate password length
-    if (newPassword.length < 6) {
-      return NextResponse.json({ success: false, message: "Password must be at least 6 characters" }, { status: 400 })
+    // Validate new password against requirements
+    const passwordValidation = validatePassword(newPassword)
+    if (!passwordValidation.isValid) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Password does not meet requirements.",
+          errors: passwordValidation.errors,
+        },
+        { status: 400 },
+      )
     }
 
     await connectDB()

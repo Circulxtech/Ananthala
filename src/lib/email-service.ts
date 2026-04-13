@@ -1369,3 +1369,138 @@ Thank you for choosing Ananthala!
     return false
   }
 }
+
+// Send welcome email to new user
+export async function sendWelcomeEmail(
+  email: string,
+  fullname: string
+): Promise<boolean> {
+  try {
+    const transporter = await getEmailTransporter()
+    
+    if (!transporter) {
+      console.error(`[v0] Email transporter not configured for welcome email`)
+      return false
+    }
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Welcome to Ananthala</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #F5F1ED;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #6d4530 0%, #8b5a3c 100%); padding: 40px 32px; text-align: center;">
+            <h1 style="color: white; font-size: 32px; margin: 0; letter-spacing: 3px; font-weight: 700;">ANANTHALA</h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 14px; margin-top: 8px; letter-spacing: 1px;">Premium Comfort for Your Little Ones</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="padding: 40px 32px;">
+            <h2 style="color: #6D4530; font-size: 24px; margin: 0 0 16px 0;">Welcome, ${fullname}!</h2>
+            
+            <p style="color: #8B5A3C; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+              Thank you for joining the Ananthala family! Your account has been successfully created and verified.
+            </p>
+            
+            <div style="background-color: #F5F1ED; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+              <h3 style="color: #6D4530; font-size: 16px; margin: 0 0 16px 0;">What You Can Do Now:</h3>
+              <ul style="color: #8B5A3C; font-size: 14px; line-height: 2; margin: 0; padding-left: 20px;">
+                <li>Browse our premium collection of baby products</li>
+                <li>Customize products with your preferred colors and sizes</li>
+                <li>Track your orders in real-time</li>
+                <li>Save items to your wishlist</li>
+                <li>Enjoy exclusive member discounts</li>
+              </ul>
+            </div>
+            
+            <div style="text-align: center; margin: 32px 0;">
+              <a href="${appUrl}" style="display: inline-block; background: linear-gradient(135deg, #6d4530 0%, #5a3a26 100%); color: white; padding: 14px 40px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 16px; letter-spacing: 0.5px;">
+                Start Shopping
+              </a>
+            </div>
+            
+            <div style="border-top: 1px solid #E5D5C5; padding-top: 24px; margin-top: 32px;">
+              <p style="color: #8B5A3C; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+                At Ananthala, we are committed to providing the finest quality products for your precious little ones. Each product is crafted with love and care to ensure maximum comfort and safety.
+              </p>
+              <p style="color: #6D4530; font-size: 14px; font-weight: 600; margin: 0;">
+                Welcome to the family!
+              </p>
+              <p style="color: #8B5A3C; font-size: 14px; margin: 4px 0 0 0;">
+                The Ananthala Team
+              </p>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background-color: #F5F1ED; padding: 24px 32px; text-align: center; border-top: 1px solid #E5D5C5;">
+            <p style="color: #8B5A3C; font-size: 13px; margin: 0 0 12px 0;">
+              Need help? We are here for you!
+            </p>
+            <p style="color: #6D4530; font-size: 13px; margin: 0 0 8px 0;">
+              <strong>Email:</strong> qualprodsllp@gmail.com | <strong>Phone:</strong> +91 9071799966
+            </p>
+            <div style="margin-top: 16px;">
+              <a href="${appUrl}/contact-us" style="color: #6D4530; text-decoration: none; font-size: 12px; margin: 0 10px;">Contact Us</a>
+              <a href="${appUrl}/policy-privacy" style="color: #6D4530; text-decoration: none; font-size: 12px; margin: 0 10px;">Privacy Policy</a>
+              <a href="${appUrl}/policy-terms" style="color: #6D4530; text-decoration: none; font-size: 12px; margin: 0 10px;">Terms of Service</a>
+            </div>
+            <p style="color: #B8A396; font-size: 11px; margin-top: 16px;">
+              © 2026 Ananthala. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+    `
+
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || "noreply@ananthala.com",
+      to: email,
+      subject: "Welcome to Ananthala - Your Account is Ready!",
+      html: htmlContent,
+      text: `
+Welcome to Ananthala, ${fullname}!
+
+Thank you for joining the Ananthala family! Your account has been successfully created and verified.
+
+What You Can Do Now:
+- Browse our premium collection of baby products
+- Customize products with your preferred colors and sizes
+- Track your orders in real-time
+- Save items to your wishlist
+- Enjoy exclusive member discounts
+
+Visit us at: ${appUrl}
+
+At Ananthala, we are committed to providing the finest quality products for your precious little ones.
+
+Welcome to the family!
+The Ananthala Team
+
+Need help?
+Email: qualprodsllp@gmail.com
+Phone: +91 9071799966
+
+© 2026 Ananthala. All rights reserved.
+      `,
+    }
+
+    await transporter.sendMail(mailOptions)
+    console.log(`[v0] Welcome email sent to ${email}`)
+    return true
+  } catch (error) {
+    console.error(`[v0] Failed to send welcome email: ${error}`)
+    return false
+  }
+}

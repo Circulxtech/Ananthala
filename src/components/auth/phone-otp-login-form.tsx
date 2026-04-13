@@ -3,21 +3,30 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
-import { Phone } from "lucide-react"
+import { Phone, User, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
+
+interface ProfileCompletionNeeds {
+  name: boolean
+  phone: boolean
+  email: boolean
+}
 
 export function PhoneOTPLoginForm() {
-  const [step, setStep] = useState<"phone" | "otp">("phone")
+  const [step, setStep] = useState<"phone" | "otp" | "complete-profile">("phone")
   const [phone, setPhone] = useState("")
   const [otp, setOtp] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [maskedPhone, setMaskedPhone] = useState("")
   const [redirectUrl, setRedirectUrl] = useState<string>("/")
+  const [profileNeeds, setProfileNeeds] = useState<ProfileCompletionNeeds>({ name: false, phone: false, email: false })
+  const [profileData, setProfileData] = useState({ fullname: "", email: "" })
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
@@ -34,8 +43,6 @@ export function PhoneOTPLoginForm() {
 
     // Validate phone number - allow digits, +, -, spaces
     const phoneDigits = phone.replace(/\D/g, "")
-    
-    console.log(`[v0] Phone input: ${phone}, digits only: ${phoneDigits}, length: ${phoneDigits.length}`)
 
     if (phoneDigits.length < 10) {
       toast({
@@ -58,7 +65,6 @@ export function PhoneOTPLoginForm() {
     setIsLoading(true)
 
     try {
-      console.log(`[v0] Sending OTP request for phone: ${phone}`)
       const response = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -66,7 +72,6 @@ export function PhoneOTPLoginForm() {
       })
 
       const data = await response.json()
-      console.log(`[v0] Send OTP response:`, data)
 
       if (data.success) {
         setMaskedPhone(data.maskedPhone)
@@ -74,6 +79,12 @@ export function PhoneOTPLoginForm() {
         toast({
           title: "Success",
           description: "OTP sent to your phone",
+        })
+      } else if (data.notRegistered) {
+        toast({
+          title: "Account Not Found",
+          description: "No account found with this phone number. Please sign up first.",
+          variant: "destructive",
         })
       } else {
         toast({
@@ -83,7 +94,6 @@ export function PhoneOTPLoginForm() {
         })
       }
     } catch (error) {
-      console.error(`[v0] Send OTP error:`, error)
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -109,7 +119,6 @@ export function PhoneOTPLoginForm() {
     setIsLoading(true)
 
     try {
-      console.log(`[v0] Verifying OTP for phone: ${phone}, OTP: ${otp}`)
       const response = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -117,17 +126,26 @@ export function PhoneOTPLoginForm() {
       })
 
       const data = await response.json()
-      console.log(`[v0] Verify OTP response:`, data)
 
       if (data.success) {
-        toast({
-          title: "Success",
-          description: "Login successful! Redirecting...",
-        })
-        setTimeout(() => {
-          router.push(redirectUrl)
-          router.refresh()
-        }, 1000)
+        // Check if profile completion is required
+        if (data.requiresProfileCompletion) {
+          setProfileNeeds(data.profileCompletionNeeds)
+          setStep("complete-profile")
+          toast({
+            title: "Almost There!",
+            description: "Please complete your profile to continue.",
+          })
+        } else {
+          toast({
+            title: "Success",
+            description: "Login successful! Redirecting...",
+          })
+          setTimeout(() => {
+            router.push(redirectUrl)
+            router.refresh()
+          }, 1000)
+        }
       } else {
         toast({
           title: "Error",
@@ -136,7 +154,6 @@ export function PhoneOTPLoginForm() {
         })
       }
     } catch (error) {
-      console.error(`[v0] Verify OTP error:`, error)
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -145,6 +162,113 @@ export function PhoneOTPLoginForm() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleCompleteProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      const response = await fetch("/api/auth/complete-profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullname: profileNeeds.name ? profileData.fullname : undefined,
+          email: profileNeeds.email ? profileData.email : undefined,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast({
+          title: "Success",
+          description: "Profile completed! Redirecting...",
+        })
+        setTimeout(() => {
+          router.push(redirectUrl)
+          router.refresh()
+        }, 1000)
+      } else {
+        toast({
+          title: "Error",
+          description: data.message || "Failed to update profile",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Profile completion form
+  if (step === "complete-profile") {
+    return (
+      <form onSubmit={handleCompleteProfile} className="space-y-6 font-roboto">
+        <div className="text-center mb-4">
+          <h3 className="text-lg font-semibold text-[#6D4530]">Complete Your Profile</h3>
+          <p className="text-sm text-[#8B5A3C] mt-1">Please provide the following details to continue</p>
+        </div>
+
+        {profileNeeds.name && (
+          <div>
+            <label htmlFor="fullname" className="block text-[#6D4530] text-sm md:text-base font-semibold mb-3">
+              Full Name
+            </label>
+            <div className="relative">
+              <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#8B5A3C]" />
+              <Input
+                id="fullname"
+                name="fullname"
+                type="text"
+                placeholder="Enter your full name"
+                value={profileData.fullname}
+                onChange={(e) => setProfileData({ ...profileData, fullname: e.target.value })}
+                className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#8B5A3C] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold"
+                required
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+        )}
+
+        {profileNeeds.email && (
+          <div>
+            <label htmlFor="email" className="block text-[#6D4530] text-sm md:text-base font-semibold mb-3">
+              Email Address
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#8B5A3C]" />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Enter your email address"
+                value={profileData.email}
+                onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#8B5A3C] focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold"
+                required
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+        )}
+
+        <Button
+          type="submit"
+          className="w-full h-12 bg-[#8B5A3C] hover:bg-[#6D4530] text-white font-semibold text-base transition-colors"
+          disabled={isLoading}
+        >
+          {isLoading ? "Saving..." : "Complete Profile"}
+        </Button>
+      </form>
+    )
   }
 
   if (step === "phone") {
@@ -160,7 +284,7 @@ export function PhoneOTPLoginForm() {
               id="phone"
               name="phone"
               type="tel"
-              placeholder="Enter 10-digit number (e.g., 9876543210 or +91-9876543210)"
+              placeholder="Enter 10-digit number (e.g., 9876543210)"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="pl-12 h-12 bg-white border-[#D9CFC7] text-[#000000] placeholder:text-[#8B5A3C] placeholder:text-sm focus:border-[#8B5A3C] focus:ring-[#8B5A3C] text-base font-semibold mb-3"
@@ -168,7 +292,12 @@ export function PhoneOTPLoginForm() {
               disabled={isLoading}
             />
           </div>
-          <p className="text-xs text-[#8B5A3C] mt-2">We'll send a 4-digit OTP to your phone number. No registration needed!</p>
+          <p className="text-xs text-[#8B5A3C] mt-2">
+            We&apos;ll send a 4-digit OTP to your registered phone.{" "}
+            <Link href="/signup" className="text-[#6D4530] underline hover:no-underline font-semibold">
+              New user? Sign up
+            </Link>
+          </p>
         </div>
 
         <Button

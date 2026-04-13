@@ -102,27 +102,26 @@ export async function POST(request: Request) {
     const otp = generateOTP()
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000) // 5 minutes from now
 
-    if (method === "email") {
-      // Check if user exists with email
-      let user = await User.findOne({ email: email.toLowerCase() })
+if (method === "email") {
+      // Check if user exists with email - OTP login only for registered users
+      const user = await User.findOne({ email: email.toLowerCase() })
 
-      // If user doesn't exist, create a temporary record
+      // If user doesn't exist, return error - they need to register first
       if (!user) {
-        user = new User({
-          fullname: "OTP User",
-          email: email.toLowerCase(),
-          password: "otp-auth-placeholder",
-          phone: "",
-          otpCode: otp,
-          otpExpiry: otpExpiry,
-          otpMethod: "email",
-        })
-      } else {
-        // Update existing user
-        user.otpCode = otp
-        user.otpExpiry = otpExpiry
-        user.otpMethod = "email"
+        return NextResponse.json(
+          { 
+            success: false, 
+            message: "No account found with this email. Please sign up first.",
+            notRegistered: true 
+          },
+          { status: 404 },
+        )
       }
+
+      // Update existing user with OTP
+      user.otpCode = otp
+      user.otpExpiry = otpExpiry
+      user.otpMethod = "email"
 
       try {
         // Send OTP via email
@@ -145,32 +144,44 @@ export async function POST(request: Request) {
       }
     } else if (method === "phone") {
       try {
-        // Normalize phone number (adds +91 if not present)
+        // Normalize phone number (adds 91 if not present)
         const normalizedPhone = normalizePhoneNumber(phone)
         console.log(`[v0] Original phone: ${phone}, Normalized: ${normalizedPhone}`)
 
-        // Check if user exists with normalized phone
-        let user = await User.findOne({ phone: normalizedPhone })
+        // Check if user exists with phone - check both with and without country code
+        const phoneWithPrefix = normalizedPhone
+        const phoneWithoutPrefix = normalizedPhone.startsWith("91") ? normalizedPhone.slice(2) : normalizedPhone
+        
+        let user = await User.findOne({ 
+          $or: [
+            { phone: phoneWithPrefix },
+            { phone: phoneWithoutPrefix }
+          ]
+        })
 
-        // If user doesn't exist, create a temporary record for passwordless registration
+        // If user doesn't exist, return error - they need to register first
         if (!user) {
-          console.log(`[v0] Creating new user with phone: ${normalizedPhone}`)
-          user = new User({
-            fullname: "Phone User",
-            email: `phone_${normalizedPhone}_${Date.now()}@temp.ananthala.com`,
-            password: "otp-auth-placeholder",
-            phone: normalizedPhone,
-            otpCode: otp,
-            otpExpiry: otpExpiry,
-            otpMethod: "phone",
-          })
-        } else {
-          console.log(`[v0] User found with phone: ${normalizedPhone}`)
-          // Update existing user with OTP
-          user.otpCode = otp
-          user.otpExpiry = otpExpiry
-          user.otpMethod = "phone"
+          console.log(`[v0] No user found with phone: ${normalizedPhone}`)
+          return NextResponse.json(
+            { 
+              success: false, 
+              message: "No account found with this phone number. Please sign up first.",
+              notRegistered: true 
+            },
+            { status: 404 },
+          )
         }
+        
+        // Update phone to normalized format if it was stored without prefix
+        if (user.phone !== normalizedPhone) {
+          user.phone = normalizedPhone
+        }
+
+        console.log(`[v0] User found with phone: ${normalizedPhone}`)
+        // Update existing user with OTP
+        user.otpCode = otp
+        user.otpExpiry = otpExpiry
+        user.otpMethod = "phone"
 
         // Send OTP via SMS using MSG91
         console.log(`[v0] Attempting to send OTP via MSG91...`)
