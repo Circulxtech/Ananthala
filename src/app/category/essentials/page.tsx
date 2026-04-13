@@ -159,40 +159,15 @@ export default function EssentialsPage() {
                 <h2 className="text-2xl md:text-3xl font-medium text-foreground font-cormorant">
                   Our Crafted Heritage
                 </h2>
-                <p className="text-lg text-foreground font-medium">
-                  Our essentials are developed with premium fabrics and refined construction standards to deliver
-                  comfort you can feel every day. We focus on practical quality and timeless design.
-                </p>
-                <div className="space-y-4 mb-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">Premium Materials</p>
-                      <p className="font-medium text-lg text-foreground">
-                        Breathable, soft-touch fabrics built for comfort
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">Daily Durability</p>
-                      <p className="font-medium text-lg text-foreground">
-                        Reliable quality made to withstand everyday use
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">Thoughtful Design</p>
-                      <p className="font-medium text-lg text-foreground">
-                        Functional products crafted to complement your bedroom
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <Link href="/about">
+                <ul className="mt-3 space-y-3 mb-4 list-disc pl-6 text-lg text-foreground font-medium">
+                <li>Rooted in the early 20th century, our journey is shaped by a deep bond with nature and generations of craftsmanship.</li>
+                <li>We create refined, nature-led products that elevate everyday living through purity, simplicity, and enduring design.</li>
+                <li>Using the finest cotton and responsibly sourced timber, untouched by synthetics, we honour both material and method.</li>
+                <li>Each piece reflects quiet precision - crafted to last, and to restore balance to body and mind.</li>
+                <li>Guided by a responsibility to the land, we create with care for both present and future.</li>
+                <li>This is our legacy - where heritage, nature, and understated luxury come together.</li>
+              </ul>
+              <Link href="/about">
                   <Button className="mt-4 bg-[#EED9C4] hover:bg-[#D9BB9B] text-foreground border-2 border-[#EED9C4] px-6 py-4 text-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105">
                     More
                   </Button>

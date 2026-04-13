@@ -118,7 +118,11 @@ export default function AgentLoginPage() {
         <div className="space-y-8 text-center lg:text-left order-2 lg:order-1">
           {/* Logo/Icon */}
           <div className="flex justify-center lg:justify-start">
-            <img src="/logo.png" alt="Ananthala Agent" className="h-20 md:h-24 w-auto" />
+            <img
+              src="/logo.png"
+              alt="Ananthala Agent"
+              className="h-20 md:h-24 w-auto mix-blend-multiply"
+            />
           </div>
 
           {/* Welcome Message */}

@@ -139,7 +139,7 @@ export function Header() {
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <Link href="/" className="flex items-center group overflow-hidden h-20">
                 <img
-                  src="/Hi Res Logo.png"
+                  src="/logo.png"
                   alt="Ananthala Logo"
                   className="h-28 w-auto object-contain"
                 />
@@ -228,8 +228,12 @@ export function Header() {
             style={{ borderColor: "#D9CFC7" }}
           >
             <nav className="p-4">
-              <div className="flex items-center justify-center py-4">
-                <img src="/Hi Res Logo.png" alt="Ananthala" className="h-14 w-auto" />
+              <div className="flex items-center justify-center px-2 py-5">
+                <img
+                  src="/logo.png"
+                  alt="Ananthala"
+                  className="h-28 w-auto max-w-full object-contain"
+                />
               </div>
               <ul className="space-y-1">
                 {getMenuItems(!!user).map((item, index) => (

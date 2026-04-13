@@ -9,6 +9,7 @@ import { ArrowRight, Volume2, VolumeX, ChevronLeft, ChevronRight } from "lucide-
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { isHomepageCardVideoUrl } from "@/lib/homepage-card-media"
 
 // Categories data
 const categories = [
@@ -39,6 +40,94 @@ interface HomepageCard {
   position: "center" | "bottom-right" | "bottom-left"
   isActive?: boolean
   displayOrder?: number
+}
+
+function rangeLabelForCard(name: string) {
+  const normalizedName = name.toLowerCase()
+  if (normalizedName.includes("joy")) return "Kids range"
+  if (normalizedName.includes("bliss")) return "Adult range"
+  if (normalizedName.includes("grace")) return "Seniors range"
+  return ""
+}
+
+function HomepageRangeProductCard({
+  card,
+  onNavigate,
+}: {
+  card: HomepageCard
+  onNavigate: (productName: string) => void
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const backgroundImage = card.backgroundUrl || "/placeholder.svg"
+  const isPlaceholder = backgroundImage === "/placeholder.svg"
+  const isVideo = !isPlaceholder && isHomepageCardVideoUrl(backgroundImage)
+  const rangeLabel = rangeLabelForCard(card.name)
+
+  const handleVideoHoverStart = () => {
+    const video = videoRef.current
+    if (!video) return
+    void video.play().catch(() => {
+      // Hover can end before play resolves; ignore expected aborts.
+    })
+  }
+
+  const handleVideoHoverEnd = () => {
+    const v = videoRef.current
+    if (!v) return
+    v.pause()
+    v.currentTime = 0
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <button
+        type="button"
+        onClick={() => onNavigate(card.name)}
+        onMouseEnter={isVideo ? handleVideoHoverStart : undefined}
+        onMouseLeave={isVideo ? handleVideoHoverEnd : undefined}
+        className="group relative w-full aspect-3/4 overflow-hidden cursor-pointer bg-gray-100"
+      >
+        {isVideo ? (
+          <video
+            ref={videoRef}
+            src={backgroundImage}
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden
+          />
+        ) : (
+          <img
+            src={backgroundImage}
+            alt={card.name}
+            className={`absolute inset-0 w-full h-full transition-transform duration-500 ${
+              isPlaceholder ? "object-contain bg-white" : "object-cover group-hover:scale-105"
+            }`}
+          />
+        )}
+        <div className="absolute inset-x-0 bottom-0">
+          <div className="mx-4 mb-4 border border-[#EED9C4] bg-[#EED9C4]/60 px-4 py-3 text-center backdrop-blur-sm">
+            <div
+              className="tracking-wider text-base md:text-lg font-bold uppercase text-foreground"
+              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
+            >
+              {card.name}
+            </div>
+            {rangeLabel && (
+              <div
+                className="mt-1 text-xs uppercase tracking-[0.25em] text-foreground/80"
+                style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
+              >
+                {rangeLabel}
+              </div>
+            )}
+          </div>
+        </div>
+      </button>
+    </div>
+  )
 }
 
 export default function Home() {
@@ -85,7 +174,13 @@ export default function Home() {
         if (data.success) {
           const activeCards = data.data
             .filter((card: HomepageCard) => card.isActive)
-            .sort((a: HomepageCard, b: HomepageCard) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+            .sort((a: HomepageCard, b: HomepageCard) => {
+              const aIsJoy = a.name.trim().toLowerCase() === "joy"
+              const bIsJoy = b.name.trim().toLowerCase() === "joy"
+              if (aIsJoy && !bIsJoy) return -1
+              if (!aIsJoy && bIsJoy) return 1
+              return (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+            })
 
           setHomepageCards(activeCards)
         }
@@ -280,53 +375,9 @@ export default function Home() {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {homepageCards.map((card) => {
-                const cardKey = card._id || card.name
-                const backgroundImage = card.backgroundUrl || "/placeholder.svg"
-                const isPlaceholder = backgroundImage === "/placeholder.svg"
-                const rangeLabel = (() => {
-                  const normalizedName = card.name.toLowerCase()
-                  if (normalizedName.includes("joy")) return "Kids range"
-                  if (normalizedName.includes("bliss")) return "Adult range"
-                  if (normalizedName.includes("grace")) return "Seniors range"
-                  return ""
-                })()
-
-                return (
-                  <div key={cardKey} className="flex flex-col gap-3">
-                    <button
-                      onClick={() => onNavigate(card.name)}
-                      className="group relative w-full aspect-3/4 overflow-hidden cursor-pointer bg-gray-100"
-                    >
-                      <img
-                        src={backgroundImage}
-                        alt={card.name}
-                        className={`absolute inset-0 w-full h-full transition-transform duration-500 ${
-                          isPlaceholder ? "object-contain bg-white" : "object-cover group-hover:scale-105"
-                        }`}
-                      />
-                      <div className="absolute inset-x-0 bottom-0">
-                        <div className="mx-4 mb-4 border border-[#EED9C4] bg-[#EED9C4]/60 px-4 py-3 text-center backdrop-blur-sm">
-                          <div
-                            className="tracking-wider text-base md:text-lg font-bold uppercase text-foreground"
-                            style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
-                          >
-                            {card.name}
-                          </div>
-                          {rangeLabel && (
-                            <div
-                              className="mt-1 text-xs uppercase tracking-[0.25em] text-foreground/80"
-                              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
-                            >
-                              {rangeLabel}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-                )
-              })}
+              {homepageCards.map((card) => (
+                <HomepageRangeProductCard key={card._id || card.name} card={card} onNavigate={onNavigate} />
+              ))}
             </div>
           </div>
         </section>
@@ -338,40 +389,14 @@ export default function Home() {
               <div className="order-2 lg:order-1">
                 <p className="text-3xl font-medium mb-2 text-foreground">Our Crafted Heritage</p>
 
-                <p className="mb-6 text-lg text-foreground/90 font-medium">
-                  Our mattresses are engineered with cutting-edge sleep technology and premium materials to provide the
-                  perfect balance of comfort and support. Every layer is thoughtfully designed to help you wake up
-                  refreshed.
-                </p>
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">Pressure Relief Technology</p>
-                      <p className="font-medium text-lg text-foreground">
-                        Conforms to your body for optimal spinal alignment
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">Temperature Regulation</p>
-                      <p className="font-medium text-lg text-foreground">
-                        Advanced cooling system keeps you comfortable all night
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-[#EED9C4] rounded-full mt-2"></div>
-                    <div>
-                      <p className="mb-1 font-medium text-lg text-foreground">Motion Isolation</p>
-                      <p className="font-medium text-lg text-foreground">
-                        Undisturbed sleep even with a restless partner
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <ul className="mt-3 space-y-3 mb-8 list-disc pl-6 text-lg text-foreground/90 font-medium">
+                  <li>Rooted in the early 20th century, our journey is shaped by a deep bond with nature and generations of craftsmanship.</li>
+                  <li>We create refined, nature-led products that elevate everyday living through purity, simplicity, and enduring design.</li>
+                  <li>Using the finest cotton and responsibly sourced timber, untouched by synthetics, we honour both material and method.</li>
+                  <li>Each piece reflects quiet precision - crafted to last, and to restore balance to body and mind.</li>
+                  <li>Guided by a responsibility to the land, we create with care for both present and future.</li>
+                  <li>This is our legacy - where heritage, nature, and understated luxury come together.</li>
+                </ul>
                 <button
                   onClick={() => router.push("/about")}
                   className="bg-[#EED9C4] text-foreground font-medium text-lg px-8 py-3 hover:bg-[#D9BB9B] transition-colors"
